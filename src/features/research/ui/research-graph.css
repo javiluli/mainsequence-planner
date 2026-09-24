@@ -1,0 +1,42 @@
+.research-canvas {
+  position: relative;
+  background: hsl(var(--heroui-background));
+}
+
+.research-canvas .react-flow__edge-path {
+  stroke: hsl(var(--heroui-foreground) / 0.78);
+  stroke-width: 1.75;
+  vector-effect: non-scaling-stroke;
+}
+
+.research-canvas .research-flow__edge--focus .react-flow__edge-path {
+  stroke: hsl(var(--heroui-warning) / 0.9);
+  stroke-width: 2.25;
+}
+
+.research-canvas .react-flow__node:focus-visible article {
+  outline: 2px solid hsl(var(--heroui-focus));
+  outline-offset: 3px;
+}
+
+.research-canvas .react-flow__controls {
+  overflow: hidden;
+  border: 1px solid hsl(var(--heroui-divider) / 0.75);
+  border-radius: 0.375rem;
+  background: hsl(var(--heroui-content1) / 0.96);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 22%);
+}
+
+.research-canvas .react-flow__controls-button {
+  border-bottom-color: hsl(var(--heroui-divider) / 0.7);
+  background: transparent;
+  color: hsl(var(--heroui-foreground) / 0.8);
+}
+
+.research-canvas .react-flow__controls-button:hover {
+  background: hsl(var(--heroui-default) / 0.45);
+}
+
+.research-canvas .react-flow__controls-button svg {
+  fill: currentColor;
+}

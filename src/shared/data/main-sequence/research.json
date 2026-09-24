@@ -1,0 +1,2237 @@
+{
+  "Relic Technology": {
+    "id": "alien_technology",
+    "components": [{ "id": "T_RelicShard", "points": 1 }],
+    "technologies": [
+      {
+        "id": "RSC_BasicOreSynthesis",
+        "name": "Basic Ore Synthesis",
+        "icon": "T_Protomatter",
+        "xp": 250,
+        "primary_prerequisite": "RSC_RelicSynthesis",
+        "rewards": [
+          { "id": "protomatter", "name": "Protomatter", "type": "recipe" },
+          { "id": "titanium_synthesis", "name": "Titanium Ore", "type": "recipe" },
+          { "id": "nickel_synthesis", "name": "Nickel Ore", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_RelicCapacitor",
+        "name": "Relic Capacitor",
+        "icon": "T_RelicCapacitor",
+        "xp": 20,
+        "primary_prerequisite": "RSC_RelicAnalyzer",
+        "rewards": [{ "id": "relic_capacitor", "name": "Relic Capacitor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_RelicSynthesis",
+        "name": "Relic Synthesizer",
+        "icon": "T_RelicSynthesizer",
+        "xp": 200,
+        "primary_prerequisite": "RSC_RelicCapacitor",
+        "prerequisites": ["RSC_SupercondutorCoil"],
+        "rewards": [
+          { "id": "DAT_RelicSynthesizer", "name": "Relic Synthesizer", "type": "buildable" },
+          { "id": "relic_shard_synthesis", "name": "Relic Shard", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_RelicThruster_01",
+        "name": "Small Relic Thruster",
+        "icon": "T_Thruster_04",
+        "xp": 30,
+        "primary_prerequisite": "RSC_RelicCapacitor",
+        "rewards": [
+          { "id": "BPO_Thruster_04L_C", "name": "Thruster 04 L", "type": "block" },
+          { "id": "BPO_Thruster_04R_C", "name": "Thruster 04 R", "type": "block" }
+        ]
+      }
+    ]
+  },
+  "Astronomic Science": {
+    "id": "astronomy_science",
+    "components": [{ "id": "T_EncodedSimulationMatrix", "points": 3 }],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ChromaticAlloy",
+        "name": "Chromatic Alloy",
+        "icon": "T_ChromaticAlloy",
+        "xp": 300,
+        "primary_prerequisite": "RSC_AstronomicScience",
+        "rewards": [{ "id": "chromatic_alloy", "name": "Chromatic Alloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_LargeThruster2",
+        "name": "Large Thruster",
+        "icon": "T_Thruster_05",
+        "xp": 500,
+        "primary_prerequisite": "RSC_ShipLargeThrusters",
+        "prerequisites": ["RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "BPO_Thruster_05_C", "name": "Thruster 05", "type": "block" }]
+      },
+      {
+        "id": "RSC_Multisensor",
+        "name": "Multisensor",
+        "icon": "T_Multisensor",
+        "xp": 300,
+        "primary_prerequisite": "RSC_ChromaticAlloy",
+        "rewards": [{ "id": "multisensor", "name": "Multisensor", "type": "recipe" }]
+      }
+    ]
+  },
+  "Computation Science": {
+    "id": "computation_science",
+    "components": [{ "id": "T_BasicCircuit", "points": 1 }],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedAssembler",
+        "name": "Advanced Assembler",
+        "icon": "T_AdvancedAssembler1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_QuantumScience",
+        "rewards": [{ "id": "DAT_AdvancedAssembler", "name": "Advanced Assembler", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_AdvancedCircuits",
+        "name": "Advanced Circuits",
+        "icon": "T_AdvancedCircuit",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "advanced_circuits", "name": "Advanced Circuits", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Armoury",
+        "name": "Armoury",
+        "icon": "T_Armoury",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_Servomotors"],
+        "rewards": [
+          { "id": "DAT_Armoury", "name": "Armoury", "type": "buildable" },
+          { "id": "backpack_mk1", "name": "Backpack Mk. 1", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_AstronomicScanning",
+        "name": "Astronomic Scanning",
+        "icon": "T_AstronomicScanner",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedCircuits",
+        "rewards": [{ "id": "BPO_AstronomicScanner_C", "name": "Astronomic Scanner", "type": "block" }]
+      },
+      {
+        "id": "RSC_AstronomicScience",
+        "name": "Astronomic Science",
+        "icon": "T_AstroSciLab",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Supercomputer",
+        "rewards": [{ "id": "DAT_AstroSciLab", "name": "Astronomic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Backpack2",
+        "name": "Backpack Mk. 2",
+        "icon": "T_Backpack_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Armoury",
+        "prerequisites": ["RSC_QuantumScience"],
+        "rewards": [{ "id": "backpack_mk2", "name": "Backpack Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Backpack3",
+        "name": "Backpack Mk. 3",
+        "icon": "T_Backpack_1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Backpack2",
+        "prerequisites": ["RSC_Biolattice", "RSC_XenobiologicScience", "RSC_SuperalloyFrame"],
+        "rewards": [{ "id": "backpack_mk3", "name": "Backpack Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Biolattice",
+        "name": "Biolattice",
+        "icon": "T_Biolattice",
+        "xp": 200,
+        "primary_prerequisite": "RSC_GrowthChamber",
+        "rewards": [
+          { "id": "alpha_protein", "name": "Alpha Protein", "type": "recipe" },
+          { "id": "beta_protein", "name": "Beta Protein", "type": "recipe" },
+          { "id": "biolattice", "name": "Biolattice", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiomassRecycling",
+        "name": "Biomass Recycling",
+        "icon": "T_XenoarchaeaRecycling",
+        "xp": 100,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [
+          { "id": "xenobacteria_recycling", "name": "Xenobacteria", "type": "recipe" },
+          { "id": "xeno_eukarya_recycling", "name": "Xenoeukarya", "type": "recipe" },
+          { "id": "xenoarchaea_recycling", "name": "Xenoarchaea", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiosampleCollection",
+        "name": "Biosample Collection",
+        "icon": "T_Xenobacteria",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "BPO_BiosampleCollector_C", "name": "Biosample Collector", "type": "block" }]
+      },
+      {
+        "id": "RSC_ChitinComposite",
+        "name": "Chitin Composite",
+        "icon": "T_ChitinComposite",
+        "xp": 500,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [{ "id": "chitin_composite", "name": "Chitin Composite", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ChromaticAlloy",
+        "name": "Chromatic Alloy",
+        "icon": "T_ChromaticAlloy",
+        "xp": 300,
+        "primary_prerequisite": "RSC_AstronomicScience",
+        "rewards": [{ "id": "chromatic_alloy", "name": "Chromatic Alloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_CobaltRefining",
+        "name": "Cobalt Refining",
+        "icon": "T_CobaltOre",
+        "xp": 100,
+        "primary_prerequisite": "RSC_WarpDrive",
+        "rewards": [{ "id": "cobalt_plates", "name": "Cobalt Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ContainmentCoil",
+        "name": "Containment Coil",
+        "icon": "T_ContainmentCoil1",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "containment_coil", "name": "Containment Coil", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Coolant",
+        "name": "Coolant",
+        "icon": "T_Coolant",
+        "xp": 150,
+        "primary_prerequisite": "RSC_GasExtraction",
+        "rewards": [{ "id": "coolant", "name": "Coolant", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_DetectorArray",
+        "name": "Detector Array",
+        "icon": "T_DetectorArray",
+        "xp": 100,
+        "primary_prerequisite": "RSC_CobaltRefining",
+        "prerequisites": ["RSC_GraphiteRefining"],
+        "rewards": [{ "id": "detector_array", "name": "Detector Array", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ElectromagneticScience",
+        "name": "Electromagnetic Science",
+        "icon": "T_ElectroSciLab",
+        "xp": 100,
+        "primary_prerequisite": "RSC_DetectorArray",
+        "rewards": [{ "id": "DAT_ElectroSciLab", "name": "Electromagnetic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_EnrichmentChamber",
+        "name": "Enrichment Chamber",
+        "icon": "T_EnrichmentChamber2",
+        "xp": 150,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_ContainmentCoil"],
+        "rewards": [
+          { "id": "DAT_EnrichmentChamber", "name": "Enrichment Chamber", "type": "buildable" },
+          { "id": "enriched_fuel", "name": "Deuterium Fuel", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_Exoskeleton1",
+        "name": "Exoskeleton Mk. 1",
+        "icon": "T_Exoskeleton_1",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Armoury",
+        "rewards": [{ "id": "exoskeleton_mk1", "name": "Exoskeleton Mk. 1", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton2",
+        "name": "Exoskeleton Mk. 2",
+        "icon": "T_Exoskeleton_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Exoskeleton1",
+        "prerequisites": ["RSC_MaglevCoupling", "RSC_Coolant"],
+        "rewards": [{ "id": "exoskeleton_mk2", "name": "Exoskeleton Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_GasExtraction",
+        "name": "Gas Extraction",
+        "icon": "T_T1Miner",
+        "xp": 150,
+        "primary_prerequisite": "RSC_ReinforcedPlates",
+        "rewards": [{ "id": "DAT_GasExtractor", "name": "Gas Extractor", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_GraphiteRefining",
+        "name": "Graphite Refining",
+        "icon": "T_Graphite",
+        "xp": 100,
+        "primary_prerequisite": "RSC_WarpDrive",
+        "rewards": [{ "id": "graphene", "name": "Graphene", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_GrowthChamber",
+        "name": "Growth Chamber",
+        "icon": "T_GrowthChamber1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_BiosampleCollection",
+        "rewards": [
+          { "id": "DAT_GrowthChamber", "name": "Growth Chamber", "type": "buildable" },
+          { "id": "nutrients", "name": "Nutrients", "type": "recipe" },
+          { "id": "enzyme", "name": "Enzyme", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_IndustrialDock",
+        "name": "Industrial Dock",
+        "icon": "T_Dock_02",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Logistics2",
+        "rewards": [{ "id": "BPO_Dock_2_C", "name": "Dock 2", "type": "block" }]
+      },
+      {
+        "id": "RSC_InterstellarWarpDrive",
+        "name": "Interstellar Warp Drive",
+        "icon": "T_InterstellarWarpDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame", "RSC_AdvancedCircuits"],
+        "rewards": [{ "id": "BPO_InterstellarWarpDriveBlock_C", "name": "Interstellar Warp Drive Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_IridiumRefining",
+        "name": "Iridium Refining",
+        "icon": "T_IridiumOre",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "iridium_plates", "name": "Iridium Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_LargeThruster2",
+        "name": "Large Thruster",
+        "icon": "T_Thruster_05",
+        "xp": 500,
+        "primary_prerequisite": "RSC_ShipLargeThrusters",
+        "prerequisites": ["RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "BPO_Thruster_05_C", "name": "Thruster 05", "type": "block" }]
+      },
+      {
+        "id": "RSC_Logistics2",
+        "name": "Logistics II",
+        "icon": "T_Conveyor_02",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_Servomotors"],
+        "rewards": [
+          { "id": "DAT_ConveyorBelt2", "name": "Conveyor Belt Mk. 2", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt_2", "name": "Underground Belt Mk. 2", "type": "buildable" },
+          { "id": "DAT_Splitter_2", "name": "Splitter Mk. 2", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_02", "name": "Belt Balancer Mk. 2", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_Logistics3",
+        "name": "Logistics III",
+        "icon": "T_Conveyor_03-1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Logistics2",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [
+          { "id": "DAT_ConveyorBelt3", "name": "Conveyor Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt_3", "name": "Underground Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_Splitter_3", "name": "Splitter Mk. 3", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_03", "name": "Belt Balancer Mk. 3", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_MaglevCoupling",
+        "name": "Maglev Coupling",
+        "icon": "T_MaglevCoupling",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "prerequisites": ["RSC_GraphiteRefining"],
+        "rewards": [{ "id": "maglev_coupling", "name": "Maglev Coupling", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_MiningDroneBay_2",
+        "name": "Mining Drones Mk. 2",
+        "icon": "T_Drone",
+        "xp": 150,
+        "primary_prerequisite": "RSC_Logistics2",
+        "prerequisites": ["RSC_MiningDroneBay"],
+        "rewards": [{ "id": "BPO_MiningDroneBayBlock_2_C", "name": "Mining Drone Bay Block 2", "type": "block" }]
+      },
+      {
+        "id": "RSC_MissileLauncher",
+        "name": "Missile Launcher",
+        "icon": "T_MissileLauncher",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [
+          { "id": "BPO_MissileLauncherBlock_01_C", "name": "Missile Launcher Block 01", "type": "block" },
+          { "id": "missile", "name": "Missile", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_MultiblockElevator",
+        "name": "Elevator 2×2",
+        "icon": "T_StationElevator_02",
+        "xp": 300,
+        "primary_prerequisite": "RSC_StationModules4",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_ElevatorBlock_02A_C", "name": "Elevator Block 02 A", "type": "block" }]
+      },
+      {
+        "id": "RSC_Multisensor",
+        "name": "Multisensor",
+        "icon": "T_Multisensor",
+        "xp": 300,
+        "primary_prerequisite": "RSC_ChromaticAlloy",
+        "rewards": [{ "id": "multisensor", "name": "Multisensor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_OreEnrichment",
+        "name": "Ore Enrichment",
+        "icon": "T_EnrichedTitanium",
+        "xp": 100,
+        "primary_prerequisite": "RSC_CobaltRefining",
+        "prerequisites": ["RSC_EnrichmentChamber"],
+        "rewards": [
+          { "id": "enriched_titanium_ore", "name": "Enriched Titanium Ore", "type": "recipe" },
+          { "id": "enriched_nickel_ore", "name": "Enriched Nickel Ore", "type": "recipe" },
+          { "id": "enriched_cobalt_ore", "name": "Enriched Cobalt Ore", "type": "recipe" },
+          { "id": "enriched_titanium_plates", "name": "Titanium Plates", "type": "recipe" },
+          { "id": "enriched_nickel_plates", "name": "Nickel Plates", "type": "recipe" },
+          { "id": "enriched_cobalt_plates", "name": "Cobalt Plates", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_PlasmaLance",
+        "name": "Plasma Lance",
+        "icon": "T_PlasmaLance",
+        "xp": 300,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_LanceBlock_C", "name": "Lance Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_QuantumScience",
+        "name": "Quantum Science",
+        "icon": "T_QuantumSciLab",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SupercondutorCoil",
+        "prerequisites": ["RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "DAT_QuantumSciLab", "name": "Quantum Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_ReinforcedPlates",
+        "name": "Reinforced Plate",
+        "icon": "T_ReinforcedPlate",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "rewards": [{ "id": "reinforced_plates", "name": "Reinforced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ShipContainer",
+        "name": "Ship Container",
+        "icon": "T_ShipContainer",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_ComputationScience"],
+        "rewards": [{ "id": "BPO_ShipContainerBlock_C", "name": "Ship Container Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_ShipLargeThrusters",
+        "name": "Medium Thruster",
+        "icon": "T_Thruster_03",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_ContainmentCoil"],
+        "rewards": [{ "id": "BPO_Thruster_03_C", "name": "Thruster 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_Shipyard2",
+        "name": "Shipyard Core Mk. 2",
+        "icon": "T_Shipyard_02",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_Superalloy"],
+        "rewards": [{ "id": "BPO_ShipyardCore_02_C", "name": "Shipyard Core 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SmallHangar",
+        "name": "Ship Hangar",
+        "icon": "T_SmallHangar",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame"],
+        "rewards": [
+          { "id": "BPO_Hangar_2_C", "name": "Hangar 2", "type": "block" },
+          { "id": "DAT_Fighter", "name": "Fighter", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_SmartContainers",
+        "name": "Smart Containers",
+        "icon": "T_Container_Filters",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "DAT_SmartContainerResearch", "name": "Smart Containers", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_SolarPanels",
+        "name": "Solar Panels Mk. 1",
+        "icon": "T_SolarPanels_2",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "BPO_SolarPanelBlock_C", "name": "Solar Panel Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_SolarPanels2",
+        "name": "Solar Panels Mk. 2",
+        "icon": "T_SolarPanels_01",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SolarPanels",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_02_C", "name": "Solar Panel Block 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SolarPanels3",
+        "name": "Solar Panels Mk. 3",
+        "icon": "T_SolarPanels_3",
+        "xp": 300,
+        "primary_prerequisite": "RSC_SolarPanels2",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_03_C", "name": "Solar Panel Block 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules2",
+        "name": "Station 2×2 B",
+        "icon": "T_Station_02B",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Station2A",
+        "prerequisites": ["RSC_StationLift", "RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "BPO_Station_02_C", "name": "Station 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules4",
+        "name": "Station 2×2 C",
+        "icon": "T_Station_02C",
+        "xp": 200,
+        "primary_prerequisite": "RSC_StationModules2",
+        "rewards": [
+          { "id": "BPO_StationAdapter_01_C", "name": "Station Adapter 01", "type": "block" },
+          { "id": "BPO_Station_03_C", "name": "Station 03", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Superalloy",
+        "name": "Superalloy",
+        "icon": "T_Superalloy",
+        "xp": 150,
+        "primary_prerequisite": "RSC_OreEnrichment",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "superalloy", "name": "Superalloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_SuperalloyFrame",
+        "name": "Superalloy Frame",
+        "icon": "T_SuperalloyFrame",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "superalloy_frame", "name": "Superalloy Frame", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Supercomputer",
+        "name": "Supercomputer",
+        "icon": "T_Supercomputer",
+        "xp": 500,
+        "primary_prerequisite": "RSC_AstronomicScanning",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [
+          { "id": "DAT_Supercomputer", "name": "Supercomputer", "type": "buildable" },
+          { "id": "empty_simulation_matrix", "name": "Empty Simulation Matrix", "type": "recipe" },
+          { "id": "encoded_simulation_matrix", "name": "Encoded Simulation Matrix", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_SupercondutorCoil",
+        "name": "Superconductor Coil",
+        "icon": "T_SuperconductorCoil1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MaglevCoupling",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [{ "id": "superconductor_coil", "name": "Superconductor Coil", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_WarpDrive",
+        "name": "Slipstream Drive",
+        "icon": "T_SlipstreamDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_EnrichmentChamber"],
+        "rewards": [
+          { "id": "BPO_WarpDriveBlock_C", "name": "Warp Drive Block", "type": "block" },
+          { "id": "warp_fuel", "name": "Warp Fuel", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_WarpFuel",
+        "name": "Warp Fuel",
+        "icon": "T_WarpFuel1",
+        "xp": 400,
+        "primary_prerequisite": "RSC_AdvancedPlates",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [{ "id": "warp_fuel", "name": "Warp Fuel", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_XenobiologicScience",
+        "name": "Xenobiologic Science",
+        "icon": "T_XenoSciLab",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Biolattice",
+        "rewards": [{ "id": "DAT_XenoSciLab", "name": "Xenobiologic Science Lab", "type": "buildable" }]
+      }
+    ]
+  },
+  "Electromagnetic Science": {
+    "id": "electromagnetic_science",
+    "components": [{ "id": "T_DetectorArray", "points": 1 }],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedAssembler",
+        "name": "Advanced Assembler",
+        "icon": "T_AdvancedAssembler1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_QuantumScience",
+        "rewards": [{ "id": "DAT_AdvancedAssembler", "name": "Advanced Assembler", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_AdvancedCircuits",
+        "name": "Advanced Circuits",
+        "icon": "T_AdvancedCircuit",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "advanced_circuits", "name": "Advanced Circuits", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AstronomicScanning",
+        "name": "Astronomic Scanning",
+        "icon": "T_AstronomicScanner",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedCircuits",
+        "rewards": [{ "id": "BPO_AstronomicScanner_C", "name": "Astronomic Scanner", "type": "block" }]
+      },
+      {
+        "id": "RSC_AstronomicScience",
+        "name": "Astronomic Science",
+        "icon": "T_AstroSciLab",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Supercomputer",
+        "rewards": [{ "id": "DAT_AstroSciLab", "name": "Astronomic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Backpack2",
+        "name": "Backpack Mk. 2",
+        "icon": "T_Backpack_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Armoury",
+        "prerequisites": ["RSC_QuantumScience"],
+        "rewards": [{ "id": "backpack_mk2", "name": "Backpack Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Backpack3",
+        "name": "Backpack Mk. 3",
+        "icon": "T_Backpack_1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Backpack2",
+        "prerequisites": ["RSC_Biolattice", "RSC_XenobiologicScience", "RSC_SuperalloyFrame"],
+        "rewards": [{ "id": "backpack_mk3", "name": "Backpack Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Biolattice",
+        "name": "Biolattice",
+        "icon": "T_Biolattice",
+        "xp": 200,
+        "primary_prerequisite": "RSC_GrowthChamber",
+        "rewards": [
+          { "id": "alpha_protein", "name": "Alpha Protein", "type": "recipe" },
+          { "id": "beta_protein", "name": "Beta Protein", "type": "recipe" },
+          { "id": "biolattice", "name": "Biolattice", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiomassRecycling",
+        "name": "Biomass Recycling",
+        "icon": "T_XenoarchaeaRecycling",
+        "xp": 100,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [
+          { "id": "xenobacteria_recycling", "name": "Xenobacteria", "type": "recipe" },
+          { "id": "xeno_eukarya_recycling", "name": "Xenoeukarya", "type": "recipe" },
+          { "id": "xenoarchaea_recycling", "name": "Xenoarchaea", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiosampleCollection",
+        "name": "Biosample Collection",
+        "icon": "T_Xenobacteria",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "BPO_BiosampleCollector_C", "name": "Biosample Collector", "type": "block" }]
+      },
+      {
+        "id": "RSC_ChitinComposite",
+        "name": "Chitin Composite",
+        "icon": "T_ChitinComposite",
+        "xp": 500,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [{ "id": "chitin_composite", "name": "Chitin Composite", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ChromaticAlloy",
+        "name": "Chromatic Alloy",
+        "icon": "T_ChromaticAlloy",
+        "xp": 300,
+        "primary_prerequisite": "RSC_AstronomicScience",
+        "rewards": [{ "id": "chromatic_alloy", "name": "Chromatic Alloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Coolant",
+        "name": "Coolant",
+        "icon": "T_Coolant",
+        "xp": 150,
+        "primary_prerequisite": "RSC_GasExtraction",
+        "rewards": [{ "id": "coolant", "name": "Coolant", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton2",
+        "name": "Exoskeleton Mk. 2",
+        "icon": "T_Exoskeleton_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Exoskeleton1",
+        "prerequisites": ["RSC_MaglevCoupling", "RSC_Coolant"],
+        "rewards": [{ "id": "exoskeleton_mk2", "name": "Exoskeleton Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_GasExtraction",
+        "name": "Gas Extraction",
+        "icon": "T_T1Miner",
+        "xp": 150,
+        "primary_prerequisite": "RSC_ReinforcedPlates",
+        "rewards": [{ "id": "DAT_GasExtractor", "name": "Gas Extractor", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_GrowthChamber",
+        "name": "Growth Chamber",
+        "icon": "T_GrowthChamber1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_BiosampleCollection",
+        "rewards": [
+          { "id": "DAT_GrowthChamber", "name": "Growth Chamber", "type": "buildable" },
+          { "id": "nutrients", "name": "Nutrients", "type": "recipe" },
+          { "id": "enzyme", "name": "Enzyme", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_InterstellarWarpDrive",
+        "name": "Interstellar Warp Drive",
+        "icon": "T_InterstellarWarpDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame", "RSC_AdvancedCircuits"],
+        "rewards": [{ "id": "BPO_InterstellarWarpDriveBlock_C", "name": "Interstellar Warp Drive Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_IridiumRefining",
+        "name": "Iridium Refining",
+        "icon": "T_IridiumOre",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "iridium_plates", "name": "Iridium Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_LargeThruster2",
+        "name": "Large Thruster",
+        "icon": "T_Thruster_05",
+        "xp": 500,
+        "primary_prerequisite": "RSC_ShipLargeThrusters",
+        "prerequisites": ["RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "BPO_Thruster_05_C", "name": "Thruster 05", "type": "block" }]
+      },
+      {
+        "id": "RSC_Logistics3",
+        "name": "Logistics III",
+        "icon": "T_Conveyor_03-1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Logistics2",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [
+          { "id": "DAT_ConveyorBelt3", "name": "Conveyor Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt_3", "name": "Underground Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_Splitter_3", "name": "Splitter Mk. 3", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_03", "name": "Belt Balancer Mk. 3", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_MaglevCoupling",
+        "name": "Maglev Coupling",
+        "icon": "T_MaglevCoupling",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "prerequisites": ["RSC_GraphiteRefining"],
+        "rewards": [{ "id": "maglev_coupling", "name": "Maglev Coupling", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_MissileLauncher",
+        "name": "Missile Launcher",
+        "icon": "T_MissileLauncher",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [
+          { "id": "BPO_MissileLauncherBlock_01_C", "name": "Missile Launcher Block 01", "type": "block" },
+          { "id": "missile", "name": "Missile", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_MultiblockElevator",
+        "name": "Elevator 2×2",
+        "icon": "T_StationElevator_02",
+        "xp": 300,
+        "primary_prerequisite": "RSC_StationModules4",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_ElevatorBlock_02A_C", "name": "Elevator Block 02 A", "type": "block" }]
+      },
+      {
+        "id": "RSC_Multisensor",
+        "name": "Multisensor",
+        "icon": "T_Multisensor",
+        "xp": 300,
+        "primary_prerequisite": "RSC_ChromaticAlloy",
+        "rewards": [{ "id": "multisensor", "name": "Multisensor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_PlasmaLance",
+        "name": "Plasma Lance",
+        "icon": "T_PlasmaLance",
+        "xp": 300,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_LanceBlock_C", "name": "Lance Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_QuantumScience",
+        "name": "Quantum Science",
+        "icon": "T_QuantumSciLab",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SupercondutorCoil",
+        "prerequisites": ["RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "DAT_QuantumSciLab", "name": "Quantum Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_ReinforcedPlates",
+        "name": "Reinforced Plate",
+        "icon": "T_ReinforcedPlate",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "rewards": [{ "id": "reinforced_plates", "name": "Reinforced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Shipyard2",
+        "name": "Shipyard Core Mk. 2",
+        "icon": "T_Shipyard_02",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_Superalloy"],
+        "rewards": [{ "id": "BPO_ShipyardCore_02_C", "name": "Shipyard Core 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SmallHangar",
+        "name": "Ship Hangar",
+        "icon": "T_SmallHangar",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame"],
+        "rewards": [
+          { "id": "BPO_Hangar_2_C", "name": "Hangar 2", "type": "block" },
+          { "id": "DAT_Fighter", "name": "Fighter", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_SolarPanels2",
+        "name": "Solar Panels Mk. 2",
+        "icon": "T_SolarPanels_01",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SolarPanels",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_02_C", "name": "Solar Panel Block 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SolarPanels3",
+        "name": "Solar Panels Mk. 3",
+        "icon": "T_SolarPanels_3",
+        "xp": 300,
+        "primary_prerequisite": "RSC_SolarPanels2",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_03_C", "name": "Solar Panel Block 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules2",
+        "name": "Station 2×2 B",
+        "icon": "T_Station_02B",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Station2A",
+        "prerequisites": ["RSC_StationLift", "RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "BPO_Station_02_C", "name": "Station 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules4",
+        "name": "Station 2×2 C",
+        "icon": "T_Station_02C",
+        "xp": 200,
+        "primary_prerequisite": "RSC_StationModules2",
+        "rewards": [
+          { "id": "BPO_StationAdapter_01_C", "name": "Station Adapter 01", "type": "block" },
+          { "id": "BPO_Station_03_C", "name": "Station 03", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Superalloy",
+        "name": "Superalloy",
+        "icon": "T_Superalloy",
+        "xp": 150,
+        "primary_prerequisite": "RSC_OreEnrichment",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "superalloy", "name": "Superalloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_SuperalloyFrame",
+        "name": "Superalloy Frame",
+        "icon": "T_SuperalloyFrame",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "superalloy_frame", "name": "Superalloy Frame", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Supercomputer",
+        "name": "Supercomputer",
+        "icon": "T_Supercomputer",
+        "xp": 500,
+        "primary_prerequisite": "RSC_AstronomicScanning",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [
+          { "id": "DAT_Supercomputer", "name": "Supercomputer", "type": "buildable" },
+          { "id": "empty_simulation_matrix", "name": "Empty Simulation Matrix", "type": "recipe" },
+          { "id": "encoded_simulation_matrix", "name": "Encoded Simulation Matrix", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_SupercondutorCoil",
+        "name": "Superconductor Coil",
+        "icon": "T_SuperconductorCoil1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MaglevCoupling",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [{ "id": "superconductor_coil", "name": "Superconductor Coil", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_XenobiologicScience",
+        "name": "Xenobiologic Science",
+        "icon": "T_XenoSciLab",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Biolattice",
+        "rewards": [{ "id": "DAT_XenoSciLab", "name": "Xenobiologic Science Lab", "type": "buildable" }]
+      }
+    ]
+  },
+  "Material Science": {
+    "id": "material_science",
+    "components": [
+      { "id": "T_HullPlate", "points": 1 },
+      { "id": "T_Servomotor", "points": 3 }
+    ],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedAssembler",
+        "name": "Advanced Assembler",
+        "icon": "T_AdvancedAssembler1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_QuantumScience",
+        "rewards": [{ "id": "DAT_AdvancedAssembler", "name": "Advanced Assembler", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_AdvancedCircuits",
+        "name": "Advanced Circuits",
+        "icon": "T_AdvancedCircuit",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "advanced_circuits", "name": "Advanced Circuits", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Armoury",
+        "name": "Armoury",
+        "icon": "T_Armoury",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_Servomotors"],
+        "rewards": [
+          { "id": "DAT_Armoury", "name": "Armoury", "type": "buildable" },
+          { "id": "backpack_mk1", "name": "Backpack Mk. 1", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_AstronomicScanning",
+        "name": "Astronomic Scanning",
+        "icon": "T_AstronomicScanner",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedCircuits",
+        "rewards": [{ "id": "BPO_AstronomicScanner_C", "name": "Astronomic Scanner", "type": "block" }]
+      },
+      {
+        "id": "RSC_AstronomicScience",
+        "name": "Astronomic Science",
+        "icon": "T_AstroSciLab",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Supercomputer",
+        "rewards": [{ "id": "DAT_AstroSciLab", "name": "Astronomic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Backpack2",
+        "name": "Backpack Mk. 2",
+        "icon": "T_Backpack_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Armoury",
+        "prerequisites": ["RSC_QuantumScience"],
+        "rewards": [{ "id": "backpack_mk2", "name": "Backpack Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Backpack3",
+        "name": "Backpack Mk. 3",
+        "icon": "T_Backpack_1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Backpack2",
+        "prerequisites": ["RSC_Biolattice", "RSC_XenobiologicScience", "RSC_SuperalloyFrame"],
+        "rewards": [{ "id": "backpack_mk3", "name": "Backpack Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_BasicCircuits",
+        "name": "Basic Circuits",
+        "icon": "T_BasicCircuit",
+        "xp": 30,
+        "primary_prerequisite": "RSC_SilicaRefining",
+        "rewards": [{ "id": "basic_circuit", "name": "Basic Circuits", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Biolattice",
+        "name": "Biolattice",
+        "icon": "T_Biolattice",
+        "xp": 200,
+        "primary_prerequisite": "RSC_GrowthChamber",
+        "rewards": [
+          { "id": "alpha_protein", "name": "Alpha Protein", "type": "recipe" },
+          { "id": "beta_protein", "name": "Beta Protein", "type": "recipe" },
+          { "id": "biolattice", "name": "Biolattice", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiomassRecycling",
+        "name": "Biomass Recycling",
+        "icon": "T_XenoarchaeaRecycling",
+        "xp": 100,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [
+          { "id": "xenobacteria_recycling", "name": "Xenobacteria", "type": "recipe" },
+          { "id": "xeno_eukarya_recycling", "name": "Xenoeukarya", "type": "recipe" },
+          { "id": "xenoarchaea_recycling", "name": "Xenoarchaea", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiosampleCollection",
+        "name": "Biosample Collection",
+        "icon": "T_Xenobacteria",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "BPO_BiosampleCollector_C", "name": "Biosample Collector", "type": "block" }]
+      },
+      {
+        "id": "RSC_ChitinComposite",
+        "name": "Chitin Composite",
+        "icon": "T_ChitinComposite",
+        "xp": 500,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [{ "id": "chitin_composite", "name": "Chitin Composite", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ChromaticAlloy",
+        "name": "Chromatic Alloy",
+        "icon": "T_ChromaticAlloy",
+        "xp": 300,
+        "primary_prerequisite": "RSC_AstronomicScience",
+        "rewards": [{ "id": "chromatic_alloy", "name": "Chromatic Alloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_CobaltRefining",
+        "name": "Cobalt Refining",
+        "icon": "T_CobaltOre",
+        "xp": 100,
+        "primary_prerequisite": "RSC_WarpDrive",
+        "rewards": [{ "id": "cobalt_plates", "name": "Cobalt Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ComputationScience",
+        "name": "Computation Science",
+        "icon": "T_CompSciLab",
+        "xp": 50,
+        "primary_prerequisite": "RSC_BasicCircuits",
+        "prerequisites": ["RSC_Logistics1"],
+        "rewards": [{ "id": "DAT_CompSciLab", "name": "Computation Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_ContainerMachine2",
+        "name": "Large Container",
+        "icon": "T_LargeContainer",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Servomotors",
+        "rewards": [{ "id": "DAT_Container_2", "name": "Large Container", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_ContainmentCoil",
+        "name": "Containment Coil",
+        "icon": "T_ContainmentCoil1",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "containment_coil", "name": "Containment Coil", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Coolant",
+        "name": "Coolant",
+        "icon": "T_Coolant",
+        "xp": 150,
+        "primary_prerequisite": "RSC_GasExtraction",
+        "rewards": [{ "id": "coolant", "name": "Coolant", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_DetectorArray",
+        "name": "Detector Array",
+        "icon": "T_DetectorArray",
+        "xp": 100,
+        "primary_prerequisite": "RSC_CobaltRefining",
+        "prerequisites": ["RSC_GraphiteRefining"],
+        "rewards": [{ "id": "detector_array", "name": "Detector Array", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ElectromagneticScience",
+        "name": "Electromagnetic Science",
+        "icon": "T_ElectroSciLab",
+        "xp": 100,
+        "primary_prerequisite": "RSC_DetectorArray",
+        "rewards": [{ "id": "DAT_ElectroSciLab", "name": "Electromagnetic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_EnrichmentChamber",
+        "name": "Enrichment Chamber",
+        "icon": "T_EnrichmentChamber2",
+        "xp": 150,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_ContainmentCoil"],
+        "rewards": [
+          { "id": "DAT_EnrichmentChamber", "name": "Enrichment Chamber", "type": "buildable" },
+          { "id": "enriched_fuel", "name": "Deuterium Fuel", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_Exoskeleton1",
+        "name": "Exoskeleton Mk. 1",
+        "icon": "T_Exoskeleton_1",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Armoury",
+        "rewards": [{ "id": "exoskeleton_mk1", "name": "Exoskeleton Mk. 1", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton2",
+        "name": "Exoskeleton Mk. 2",
+        "icon": "T_Exoskeleton_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Exoskeleton1",
+        "prerequisites": ["RSC_MaglevCoupling", "RSC_Coolant"],
+        "rewards": [{ "id": "exoskeleton_mk2", "name": "Exoskeleton Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Furniture1",
+        "name": "Decorations I",
+        "icon": "T_SignWall",
+        "xp": 30,
+        "rewards": [{ "id": "DAT_SignWall", "name": "Doorway Wall", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Furniture2",
+        "name": "Decorations II",
+        "icon": "T_Armchair",
+        "xp": 50,
+        "primary_prerequisite": "RSC_Furniture1",
+        "rewards": [
+          { "id": "DAT_Chair", "name": "Armchair", "type": "buildable" },
+          { "id": "DAT_CoffeeTable", "name": "Coffee Table", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_GasExtraction",
+        "name": "Gas Extraction",
+        "icon": "T_T1Miner",
+        "xp": 150,
+        "primary_prerequisite": "RSC_ReinforcedPlates",
+        "rewards": [{ "id": "DAT_GasExtractor", "name": "Gas Extractor", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_GraphiteRefining",
+        "name": "Graphite Refining",
+        "icon": "T_Graphite",
+        "xp": 100,
+        "primary_prerequisite": "RSC_WarpDrive",
+        "rewards": [{ "id": "graphene", "name": "Graphene", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_GrowthChamber",
+        "name": "Growth Chamber",
+        "icon": "T_GrowthChamber1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_BiosampleCollection",
+        "rewards": [
+          { "id": "DAT_GrowthChamber", "name": "Growth Chamber", "type": "buildable" },
+          { "id": "nutrients", "name": "Nutrients", "type": "recipe" },
+          { "id": "enzyme", "name": "Enzyme", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_IndustrialDock",
+        "name": "Industrial Dock",
+        "icon": "T_Dock_02",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Logistics2",
+        "rewards": [{ "id": "BPO_Dock_2_C", "name": "Dock 2", "type": "block" }]
+      },
+      {
+        "id": "RSC_InterstellarWarpDrive",
+        "name": "Interstellar Warp Drive",
+        "icon": "T_InterstellarWarpDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame", "RSC_AdvancedCircuits"],
+        "rewards": [{ "id": "BPO_InterstellarWarpDriveBlock_C", "name": "Interstellar Warp Drive Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_IridiumRefining",
+        "name": "Iridium Refining",
+        "icon": "T_IridiumOre",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "iridium_plates", "name": "Iridium Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_LargeThruster2",
+        "name": "Large Thruster",
+        "icon": "T_Thruster_05",
+        "xp": 500,
+        "primary_prerequisite": "RSC_ShipLargeThrusters",
+        "prerequisites": ["RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "BPO_Thruster_05_C", "name": "Thruster 05", "type": "block" }]
+      },
+      {
+        "id": "RSC_Logistics1",
+        "name": "Logistics I",
+        "icon": "T_Conveyor_01-1",
+        "xp": 10,
+        "rewards": [
+          { "id": "DAT_ConveyorBelt", "name": "Conveyor Belt Mk. 1", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt", "name": "Underground Belt Mk. 1", "type": "buildable" },
+          { "id": "DAT_Splitter", "name": "Splitter Mk. 1", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_01", "name": "Belt Balancer Mk. 1", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_Logistics2",
+        "name": "Logistics II",
+        "icon": "T_Conveyor_02",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "prerequisites": ["RSC_Servomotors"],
+        "rewards": [
+          { "id": "DAT_ConveyorBelt2", "name": "Conveyor Belt Mk. 2", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt_2", "name": "Underground Belt Mk. 2", "type": "buildable" },
+          { "id": "DAT_Splitter_2", "name": "Splitter Mk. 2", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_02", "name": "Belt Balancer Mk. 2", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_Logistics3",
+        "name": "Logistics III",
+        "icon": "T_Conveyor_03-1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Logistics2",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [
+          { "id": "DAT_ConveyorBelt3", "name": "Conveyor Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_UndergroundBelt_3", "name": "Underground Belt Mk. 3", "type": "buildable" },
+          { "id": "DAT_Splitter_3", "name": "Splitter Mk. 3", "type": "buildable" },
+          { "id": "DAT_BeltBalancer_03", "name": "Belt Balancer Mk. 3", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_MaglevCoupling",
+        "name": "Maglev Coupling",
+        "icon": "T_MaglevCoupling",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "prerequisites": ["RSC_GraphiteRefining"],
+        "rewards": [{ "id": "maglev_coupling", "name": "Maglev Coupling", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_MiningDroneBay_2",
+        "name": "Mining Drones Mk. 2",
+        "icon": "T_Drone",
+        "xp": 150,
+        "primary_prerequisite": "RSC_Logistics2",
+        "prerequisites": ["RSC_MiningDroneBay"],
+        "rewards": [{ "id": "BPO_MiningDroneBayBlock_2_C", "name": "Mining Drone Bay Block 2", "type": "block" }]
+      },
+      {
+        "id": "RSC_MiningDroneBay",
+        "name": "Mining Drones",
+        "icon": "T_Drone",
+        "xp": 30,
+        "primary_prerequisite": "RSC_Logistics1",
+        "rewards": [{ "id": "BPO_MiningDroneBayBlock_C", "name": "Mining Drone Bay Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_MiningLaser",
+        "name": "Mining Laser",
+        "icon": "T_MiningLaser",
+        "xp": 15,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "rewards": [
+          { "id": "BPO_MiningLaserBlock_C", "name": "Mining Laser Block", "type": "block" },
+          { "id": "BPO_MiningLaserBlock_B_C", "name": "Mining Laser Block B", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_MissileLauncher",
+        "name": "Missile Launcher",
+        "icon": "T_MissileLauncher",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [
+          { "id": "BPO_MissileLauncherBlock_01_C", "name": "Missile Launcher Block 01", "type": "block" },
+          { "id": "missile", "name": "Missile", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_MultiblockElevator",
+        "name": "Elevator 2×2",
+        "icon": "T_StationElevator_02",
+        "xp": 300,
+        "primary_prerequisite": "RSC_StationModules4",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_ElevatorBlock_02A_C", "name": "Elevator Block 02 A", "type": "block" }]
+      },
+      {
+        "id": "RSC_Multisensor",
+        "name": "Multisensor",
+        "icon": "T_Multisensor",
+        "xp": 300,
+        "primary_prerequisite": "RSC_ChromaticAlloy",
+        "rewards": [{ "id": "multisensor", "name": "Multisensor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_OreEnrichment",
+        "name": "Ore Enrichment",
+        "icon": "T_EnrichedTitanium",
+        "xp": 100,
+        "primary_prerequisite": "RSC_CobaltRefining",
+        "prerequisites": ["RSC_EnrichmentChamber"],
+        "rewards": [
+          { "id": "enriched_titanium_ore", "name": "Enriched Titanium Ore", "type": "recipe" },
+          { "id": "enriched_nickel_ore", "name": "Enriched Nickel Ore", "type": "recipe" },
+          { "id": "enriched_cobalt_ore", "name": "Enriched Cobalt Ore", "type": "recipe" },
+          { "id": "enriched_titanium_plates", "name": "Titanium Plates", "type": "recipe" },
+          { "id": "enriched_nickel_plates", "name": "Nickel Plates", "type": "recipe" },
+          { "id": "enriched_cobalt_plates", "name": "Cobalt Plates", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_Plants1",
+        "name": "Small Plants",
+        "icon": "T_Plant_01",
+        "xp": 30,
+        "rewards": [{ "id": "DAT_Plant_01", "name": "Plant", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_PlasmaLance",
+        "name": "Plasma Lance",
+        "icon": "T_PlasmaLance",
+        "xp": 300,
+        "primary_prerequisite": "RSC_MiningLaser",
+        "prerequisites": ["RSC_MaglevCoupling"],
+        "rewards": [{ "id": "BPO_LanceBlock_C", "name": "Lance Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_QuantumScience",
+        "name": "Quantum Science",
+        "icon": "T_QuantumSciLab",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SupercondutorCoil",
+        "prerequisites": ["RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "DAT_QuantumSciLab", "name": "Quantum Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_ReinforcedPlates",
+        "name": "Reinforced Plate",
+        "icon": "T_ReinforcedPlate",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Superalloy",
+        "rewards": [{ "id": "reinforced_plates", "name": "Reinforced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_RelicAnalyzer",
+        "name": "Relic Analyzer",
+        "icon": "T_RelicShard",
+        "xp": 15,
+        "rewards": [{ "id": "DAT_RelicAnalyzer", "name": "Relic Analyzer", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Servomotors",
+        "name": "Servomotor",
+        "icon": "T_Servomotor",
+        "xp": 15,
+        "rewards": [{ "id": "servomotor", "name": "Servomotor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ShipContainer",
+        "name": "Ship Container",
+        "icon": "T_ShipContainer",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_ComputationScience"],
+        "rewards": [{ "id": "BPO_ShipContainerBlock_C", "name": "Ship Container Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_ShipDeco_01",
+        "name": "Ship Windows I",
+        "icon": "T_ShipHabCorner_01",
+        "xp": 50,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_SilicaRefining"],
+        "rewards": [
+          { "id": "BPO_Body_02_C", "name": "Body 02", "type": "block" },
+          { "id": "BPO_ShipCorner_01_C", "name": "Ship Corner 01", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_ShipFrames",
+        "name": "Ship Frames",
+        "icon": "T_Frame_01",
+        "xp": 50,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "rewards": [
+          { "id": "BPO_Frame_01_C", "name": "Frame 01", "type": "block" },
+          { "id": "BPO_FrameSlope_01T_C", "name": "Frame Slope 01 T", "type": "block" },
+          { "id": "BPO_FrameSlope_01B_C", "name": "Frame Slope 01 B", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_ShipLadder",
+        "name": "Ship Ladder",
+        "icon": "T_ShipLadder_01",
+        "xp": 30,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "rewards": [{ "id": "BPO_LadderBlock_C", "name": "Ladder Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_ShipLargeThrusters",
+        "name": "Medium Thruster",
+        "icon": "T_Thruster_03",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_ContainmentCoil"],
+        "rewards": [{ "id": "BPO_Thruster_03_C", "name": "Thruster 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_Shipyard1",
+        "name": "Shipyard",
+        "icon": "T_ShipyardCore_01",
+        "xp": 15,
+        "rewards": [
+          { "id": "BPO_ShipyardCore_C", "name": "Shipyard Core", "type": "block" },
+          { "id": "BPO_ShipyardSide_C", "name": "Shipyard Side", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Shipyard2",
+        "name": "Shipyard Core Mk. 2",
+        "icon": "T_Shipyard_02",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_Superalloy"],
+        "rewards": [{ "id": "BPO_ShipyardCore_02_C", "name": "Shipyard Core 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SilicaRefining",
+        "name": "Silica Refining",
+        "icon": "T_Silica",
+        "xp": 30,
+        "rewards": [
+          { "id": "silicon_wafers", "name": "Silicon Wafers", "type": "recipe" },
+          { "id": "reinforced_glass", "name": "Reinforced Glass", "type": "recipe" },
+          { "id": "BPO_WindowBlock_C", "name": "Window Block", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_SmallHangar",
+        "name": "Ship Hangar",
+        "icon": "T_SmallHangar",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame"],
+        "rewards": [
+          { "id": "BPO_Hangar_2_C", "name": "Hangar 2", "type": "block" },
+          { "id": "DAT_Fighter", "name": "Fighter", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_SmartContainers",
+        "name": "Smart Containers",
+        "icon": "T_Container_Filters",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "DAT_SmartContainerResearch", "name": "Smart Containers", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_SolarPanels",
+        "name": "Solar Panels Mk. 1",
+        "icon": "T_SolarPanels_2",
+        "xp": 100,
+        "primary_prerequisite": "RSC_ComputationScience",
+        "rewards": [{ "id": "BPO_SolarPanelBlock_C", "name": "Solar Panel Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_SolarPanels2",
+        "name": "Solar Panels Mk. 2",
+        "icon": "T_SolarPanels_01",
+        "xp": 200,
+        "primary_prerequisite": "RSC_SolarPanels",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_02_C", "name": "Solar Panel Block 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_SolarPanels3",
+        "name": "Solar Panels Mk. 3",
+        "icon": "T_SolarPanels_3",
+        "xp": 300,
+        "primary_prerequisite": "RSC_SolarPanels2",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_03_C", "name": "Solar Panel Block 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_Station2A",
+        "name": "Station 2×2 A",
+        "icon": "T_Station_02A",
+        "xp": 50,
+        "primary_prerequisite": "RSC_StationModules1",
+        "rewards": [{ "id": "BPO_Station_02A_C", "name": "Station 02 A", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationArmour1",
+        "name": "Station Armour",
+        "icon": "T_StationArmour_01",
+        "xp": 30,
+        "primary_prerequisite": "RSC_StationModules1",
+        "rewards": [
+          { "id": "BPO_StationArmour_01_C", "name": "Station Armour 01", "type": "block" },
+          { "id": "BPO_StationArmour_01B_C", "name": "Station Armour 01 B", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_StationLift",
+        "name": "Elevator 1×1",
+        "icon": "T_StationElevator_01",
+        "xp": 30,
+        "primary_prerequisite": "RSC_Servomotors",
+        "rewards": [{ "id": "BPO_ElevatorBlock_03_C", "name": "Elevator Block 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules2",
+        "name": "Station 2×2 B",
+        "icon": "T_Station_02B",
+        "xp": 100,
+        "primary_prerequisite": "RSC_Station2A",
+        "prerequisites": ["RSC_StationLift", "RSC_ReinforcedPlates"],
+        "rewards": [{ "id": "BPO_Station_02_C", "name": "Station 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules3",
+        "name": "Station Decoration Blocks",
+        "icon": "T_StationCorner_01",
+        "xp": 30,
+        "primary_prerequisite": "RSC_SilicaRefining",
+        "rewards": [
+          { "id": "BPO_StationCorner_01_C", "name": "Station Corner 01", "type": "block" },
+          { "id": "BPO_StationCorridor_01_C", "name": "Station Corridor 01", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_StationModules4",
+        "name": "Station 2×2 C",
+        "icon": "T_Station_02C",
+        "xp": 200,
+        "primary_prerequisite": "RSC_StationModules2",
+        "rewards": [
+          { "id": "BPO_StationAdapter_01_C", "name": "Station Adapter 01", "type": "block" },
+          { "id": "BPO_Station_03_C", "name": "Station 03", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_StationTurret",
+        "name": "Plasma Turret",
+        "icon": "T_StationTurret",
+        "xp": 10,
+        "rewards": [{ "id": "BPO_StationTurretBlock_01_C", "name": "Station Turret Block 01", "type": "block" }]
+      },
+      {
+        "id": "RSC_Superalloy",
+        "name": "Superalloy",
+        "icon": "T_Superalloy",
+        "xp": 150,
+        "primary_prerequisite": "RSC_OreEnrichment",
+        "prerequisites": ["RSC_ElectromagneticScience"],
+        "rewards": [{ "id": "superalloy", "name": "Superalloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_SuperalloyFrame",
+        "name": "Superalloy Frame",
+        "icon": "T_SuperalloyFrame",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "superalloy_frame", "name": "Superalloy Frame", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Supercomputer",
+        "name": "Supercomputer",
+        "icon": "T_Supercomputer",
+        "xp": 500,
+        "primary_prerequisite": "RSC_AstronomicScanning",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [
+          { "id": "DAT_Supercomputer", "name": "Supercomputer", "type": "buildable" },
+          { "id": "empty_simulation_matrix", "name": "Empty Simulation Matrix", "type": "recipe" },
+          { "id": "encoded_simulation_matrix", "name": "Encoded Simulation Matrix", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_SupercondutorCoil",
+        "name": "Superconductor Coil",
+        "icon": "T_SuperconductorCoil1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_MaglevCoupling",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [{ "id": "superconductor_coil", "name": "Superconductor Coil", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_WarpDrive",
+        "name": "Slipstream Drive",
+        "icon": "T_SlipstreamDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard1",
+        "prerequisites": ["RSC_EnrichmentChamber"],
+        "rewards": [
+          { "id": "BPO_WarpDriveBlock_C", "name": "Warp Drive Block", "type": "block" },
+          { "id": "warp_fuel", "name": "Warp Fuel", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_WarpFuel",
+        "name": "Warp Fuel",
+        "icon": "T_WarpFuel1",
+        "xp": 400,
+        "primary_prerequisite": "RSC_AdvancedPlates",
+        "prerequisites": ["RSC_Coolant"],
+        "rewards": [{ "id": "warp_fuel", "name": "Warp Fuel", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_XenobiologicScience",
+        "name": "Xenobiologic Science",
+        "icon": "T_XenoSciLab",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Biolattice",
+        "rewards": [{ "id": "DAT_XenoSciLab", "name": "Xenobiologic Science Lab", "type": "buildable" }]
+      }
+    ]
+  },
+  "Quantum Science": {
+    "id": "quantum_science",
+    "components": [{ "id": "T_SuperconductorCoil1", "points": 5 }],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedAssembler",
+        "name": "Advanced Assembler",
+        "icon": "T_AdvancedAssembler1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_QuantumScience",
+        "rewards": [{ "id": "DAT_AdvancedAssembler", "name": "Advanced Assembler", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_AdvancedCircuits",
+        "name": "Advanced Circuits",
+        "icon": "T_AdvancedCircuit",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "advanced_circuits", "name": "Advanced Circuits", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_AstronomicScanning",
+        "name": "Astronomic Scanning",
+        "icon": "T_AstronomicScanner",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedCircuits",
+        "rewards": [{ "id": "BPO_AstronomicScanner_C", "name": "Astronomic Scanner", "type": "block" }]
+      },
+      {
+        "id": "RSC_AstronomicScience",
+        "name": "Astronomic Science",
+        "icon": "T_AstroSciLab",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Supercomputer",
+        "rewards": [{ "id": "DAT_AstroSciLab", "name": "Astronomic Science Lab", "type": "buildable" }]
+      },
+      {
+        "id": "RSC_Backpack2",
+        "name": "Backpack Mk. 2",
+        "icon": "T_Backpack_1",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Armoury",
+        "prerequisites": ["RSC_QuantumScience"],
+        "rewards": [{ "id": "backpack_mk2", "name": "Backpack Mk. 2", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Backpack3",
+        "name": "Backpack Mk. 3",
+        "icon": "T_Backpack_1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Backpack2",
+        "prerequisites": ["RSC_Biolattice", "RSC_XenobiologicScience", "RSC_SuperalloyFrame"],
+        "rewards": [{ "id": "backpack_mk3", "name": "Backpack Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Biolattice",
+        "name": "Biolattice",
+        "icon": "T_Biolattice",
+        "xp": 200,
+        "primary_prerequisite": "RSC_GrowthChamber",
+        "rewards": [
+          { "id": "alpha_protein", "name": "Alpha Protein", "type": "recipe" },
+          { "id": "beta_protein", "name": "Beta Protein", "type": "recipe" },
+          { "id": "biolattice", "name": "Biolattice", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiomassRecycling",
+        "name": "Biomass Recycling",
+        "icon": "T_XenoarchaeaRecycling",
+        "xp": 100,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [
+          { "id": "xenobacteria_recycling", "name": "Xenobacteria", "type": "recipe" },
+          { "id": "xeno_eukarya_recycling", "name": "Xenoeukarya", "type": "recipe" },
+          { "id": "xenoarchaea_recycling", "name": "Xenoarchaea", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_BiosampleCollection",
+        "name": "Biosample Collection",
+        "icon": "T_Xenobacteria",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "BPO_BiosampleCollector_C", "name": "Biosample Collector", "type": "block" }]
+      },
+      {
+        "id": "RSC_ChitinComposite",
+        "name": "Chitin Composite",
+        "icon": "T_ChitinComposite",
+        "xp": 500,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [{ "id": "chitin_composite", "name": "Chitin Composite", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_ChromaticAlloy",
+        "name": "Chromatic Alloy",
+        "icon": "T_ChromaticAlloy",
+        "xp": 300,
+        "primary_prerequisite": "RSC_AstronomicScience",
+        "rewards": [{ "id": "chromatic_alloy", "name": "Chromatic Alloy", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_GrowthChamber",
+        "name": "Growth Chamber",
+        "icon": "T_GrowthChamber1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_BiosampleCollection",
+        "rewards": [
+          { "id": "DAT_GrowthChamber", "name": "Growth Chamber", "type": "buildable" },
+          { "id": "nutrients", "name": "Nutrients", "type": "recipe" },
+          { "id": "enzyme", "name": "Enzyme", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_InterstellarWarpDrive",
+        "name": "Interstellar Warp Drive",
+        "icon": "T_InterstellarWarpDrive",
+        "xp": 200,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame", "RSC_AdvancedCircuits"],
+        "rewards": [{ "id": "BPO_InterstellarWarpDriveBlock_C", "name": "Interstellar Warp Drive Block", "type": "block" }]
+      },
+      {
+        "id": "RSC_IridiumRefining",
+        "name": "Iridium Refining",
+        "icon": "T_IridiumOre",
+        "xp": 200,
+        "primary_prerequisite": "RSC_InterstellarWarpDrive",
+        "rewards": [{ "id": "iridium_plates", "name": "Iridium Plates", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_LargeThruster2",
+        "name": "Large Thruster",
+        "icon": "T_Thruster_05",
+        "xp": 500,
+        "primary_prerequisite": "RSC_ShipLargeThrusters",
+        "prerequisites": ["RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "BPO_Thruster_05_C", "name": "Thruster 05", "type": "block" }]
+      },
+      {
+        "id": "RSC_Multisensor",
+        "name": "Multisensor",
+        "icon": "T_Multisensor",
+        "xp": 300,
+        "primary_prerequisite": "RSC_ChromaticAlloy",
+        "rewards": [{ "id": "multisensor", "name": "Multisensor", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_SmallHangar",
+        "name": "Ship Hangar",
+        "icon": "T_SmallHangar",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Shipyard2",
+        "prerequisites": ["RSC_SuperalloyFrame"],
+        "rewards": [
+          { "id": "BPO_Hangar_2_C", "name": "Hangar 2", "type": "block" },
+          { "id": "DAT_Fighter", "name": "Fighter", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_SolarPanels3",
+        "name": "Solar Panels Mk. 3",
+        "icon": "T_SolarPanels_3",
+        "xp": 300,
+        "primary_prerequisite": "RSC_SolarPanels2",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [{ "id": "BPO_SolarPanelBlock_03_C", "name": "Solar Panel Block 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_SuperalloyFrame",
+        "name": "Superalloy Frame",
+        "icon": "T_SuperalloyFrame",
+        "xp": 200,
+        "primary_prerequisite": "RSC_AdvancedAssembler",
+        "rewards": [{ "id": "superalloy_frame", "name": "Superalloy Frame", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Supercomputer",
+        "name": "Supercomputer",
+        "icon": "T_Supercomputer",
+        "xp": 500,
+        "primary_prerequisite": "RSC_AstronomicScanning",
+        "prerequisites": ["RSC_IridiumRefining"],
+        "rewards": [
+          { "id": "DAT_Supercomputer", "name": "Supercomputer", "type": "buildable" },
+          { "id": "empty_simulation_matrix", "name": "Empty Simulation Matrix", "type": "recipe" },
+          { "id": "encoded_simulation_matrix", "name": "Encoded Simulation Matrix", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_XenobiologicScience",
+        "name": "Xenobiologic Science",
+        "icon": "T_XenoSciLab",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Biolattice",
+        "rewards": [{ "id": "DAT_XenoSciLab", "name": "Xenobiologic Science Lab", "type": "buildable" }]
+      }
+    ]
+  },
+  "Xenobiologic Science": {
+    "id": "xenobiology_science",
+    "components": [{ "id": "T_Biolattice", "points": 1 }],
+    "technologies": [
+      {
+        "id": "RSC_AdvancedPlates",
+        "name": "Advanced Plate",
+        "icon": "T_AdvancedPlate",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Multisensor",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "advanced_plates", "name": "Advanced Plate", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Backpack3",
+        "name": "Backpack Mk. 3",
+        "icon": "T_Backpack_1",
+        "xp": 300,
+        "primary_prerequisite": "RSC_Backpack2",
+        "prerequisites": ["RSC_Biolattice", "RSC_XenobiologicScience", "RSC_SuperalloyFrame"],
+        "rewards": [{ "id": "backpack_mk3", "name": "Backpack Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_BiomassRecycling",
+        "name": "Biomass Recycling",
+        "icon": "T_XenoarchaeaRecycling",
+        "xp": 100,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [
+          { "id": "xenobacteria_recycling", "name": "Xenobacteria", "type": "recipe" },
+          { "id": "xeno_eukarya_recycling", "name": "Xenoeukarya", "type": "recipe" },
+          { "id": "xenoarchaea_recycling", "name": "Xenoarchaea", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_ChitinComposite",
+        "name": "Chitin Composite",
+        "icon": "T_ChitinComposite",
+        "xp": 500,
+        "primary_prerequisite": "RSC_XenobiologicScience",
+        "rewards": [{ "id": "chitin_composite", "name": "Chitin Composite", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exoskeleton3",
+        "name": "Exoskeleton Mk. 3",
+        "icon": "T_Exoskeleton_1",
+        "xp": 500,
+        "primary_prerequisite": "RSC_Exoskeleton2",
+        "prerequisites": ["RSC_ChitinComposite", "RSC_ChromaticAlloy"],
+        "rewards": [{ "id": "exoskeleton_mk3", "name": "Exoskeleton Mk. 3", "type": "recipe" }]
+      },
+      {
+        "id": "RSC_Exosuit",
+        "name": "Exosuit",
+        "icon": "T_Exosuit",
+        "xp": 1000,
+        "primary_prerequisite": "RSC_Exoskeleton3",
+        "prerequisites": ["RSC_Backpack3", "RSC_AdvancedPlates"],
+        "rewards": [{ "id": "exosuit", "name": "Exosuit", "type": "recipe" }]
+      }
+    ]
+  },
+  "General": {
+    "id": "general",
+    "components": [],
+    "technologies": [
+      {
+        "id": "RSC_CaptainQuarters",
+        "name": "Captain's Quarters",
+        "icon": "T_CaptainsQuarters",
+        "xp": 0,
+        "rewards": [{ "id": "BPO_ShipOffice_01_C", "name": "Ship Office 01", "type": "block" }]
+      },
+      {
+        "id": "RSC_Corridor2",
+        "name": "Corridor 2×2",
+        "icon": "T_Corridor_02",
+        "xp": 0,
+        "rewards": [
+          { "id": "BPO_StationAdapter_01_C", "name": "Station Adapter 01", "type": "block" },
+          { "id": "BPO_StationCorridor_02_C", "name": "Station Corridor 02", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Crafting1",
+        "name": "Basic Crafting",
+        "icon": "T_HullPlate",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "lightweight_frame", "name": "Lightweight Frames", "type": "recipe" },
+          { "id": "hull_plates", "name": "Hull Plate", "type": "recipe" },
+          { "id": "magnetic_coils", "name": "Magnetic Coils", "type": "recipe" },
+          { "id": "capacitor", "name": "Capacitor", "type": "recipe" },
+          { "id": "basic_motor", "name": "Basic Motor", "type": "recipe" },
+          { "id": "repair_kit", "name": "Repair Kit", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_MediumBridge",
+        "name": "Medium Bridge",
+        "icon": "T_MediumBridge",
+        "xp": 0,
+        "rewards": [{ "id": "BPO_Cockpit_03_C", "name": "Cockpit 03", "type": "block" }]
+      },
+      {
+        "id": "RSC_PowerGen1",
+        "name": "Hydrogen Power",
+        "icon": "T_ReactorMachine",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "DAT_ReactorMachine", "name": "Reactor", "type": "buildable" },
+          { "id": "BPO_ReactorBlock_Small_C", "name": "Reactor Block Small", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Production1",
+        "name": "Basic Production",
+        "icon": "T_Refinery",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "DAT_WorkbenchMachine", "name": "Workstation", "type": "buildable" },
+          { "id": "DAT_Refinery", "name": "Refinery", "type": "buildable" },
+          { "id": "DAT_Assembler", "name": "Assembler", "type": "buildable" },
+          { "id": "DAT_MatSciLab", "name": "Material Science Lab", "type": "buildable" },
+          { "id": "DAT_Container", "name": "Container", "type": "buildable" }
+        ]
+      },
+      {
+        "id": "RSC_Refining1",
+        "name": "Basic Refining",
+        "icon": "T_TitaniumOre",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "titanium_plates", "name": "Titanium Plates", "type": "recipe" },
+          { "id": "nickel_plates", "name": "Nickel Plates", "type": "recipe" },
+          { "id": "hydrogen_fuel", "name": "Hydrogen Fuel", "type": "recipe" }
+        ]
+      },
+      {
+        "id": "RSC_ShipArmour",
+        "name": "Armour Wings",
+        "icon": "T_Armour_01",
+        "xp": 0,
+        "rewards": [
+          { "id": "BPO_Armour_01L_C", "name": "Armour 01 L", "type": "block" },
+          { "id": "BPO_Armour_01R_C", "name": "Armour 01 R", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_ShipArmourSlopes1",
+        "name": "Armour Slopes",
+        "icon": "T_ArmourSlope_02",
+        "xp": 0,
+        "rewards": [
+          { "id": "BPO_ArmourSlope_01T_C", "name": "Armour Slope 01 T", "type": "block" },
+          { "id": "BPO_ArmourSlope_01B_C", "name": "Armour Slope 01 B", "type": "block" },
+          { "id": "BPO_ArmourSlope_02T_C", "name": "Armour Slope 02 T", "type": "block" },
+          { "id": "BPO_ArmourSlope_02B_C", "name": "Armour Slope 02 B", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_ShipModules1",
+        "name": "Basic Ship Modules",
+        "icon": "T_Cockpit",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "BPO_Body_01_C", "name": "Body 01", "type": "block" },
+          { "id": "BPO_Cockpit_01_C", "name": "Cockpit 01", "type": "block" },
+          { "id": "BPO_Thruster_02L_C", "name": "Thruster 02 L", "type": "block" },
+          { "id": "BPO_Thruster_02R_C", "name": "Thruster 02 R", "type": "block" },
+          { "id": "BPO_ReactorBlock_Small_C", "name": "Reactor Block Small", "type": "block" },
+          { "id": "BPO_DockingCollar_C", "name": "Docking Collar", "type": "block" },
+          { "id": "BPO_WorkstationBlock_C", "name": "Workstation Block", "type": "block" },
+          { "id": "BPO_LandingGear_01_C", "name": "Landing Gear 01", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_ShipWeapons1",
+        "name": "Basic Ship Weapons",
+        "icon": "T_PlasmaCannons_01",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "BPO_CannonBlock_C", "name": "Cannon Block", "type": "block" },
+          { "id": "BPO_CannonBlock_B_C", "name": "Cannon Block B", "type": "block" },
+          { "id": "BPO_TractorBeamBlock_C", "name": "Tractor Beam Block", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_SmallBridge",
+        "name": "Small Bridge",
+        "icon": "T_SmallBridge",
+        "xp": 0,
+        "rewards": [{ "id": "BPO_Cockpit_02_C", "name": "Cockpit 02", "type": "block" }]
+      },
+      {
+        "id": "RSC_StationModules1",
+        "name": "Basic Station Modules",
+        "icon": "T_CommandModule",
+        "xp": 0,
+        "start_unlocked": true,
+        "rewards": [
+          { "id": "BPO_Station_01_C", "name": "Station 01", "type": "block" },
+          { "id": "BPO_Dock_C", "name": "Dock", "type": "block" },
+          { "id": "BPO_CommandModule_C", "name": "Command Module", "type": "block" }
+        ]
+      },
+      {
+        "id": "RSC_Teleporter",
+        "name": "Short-Range Teleporter",
+        "icon": "T_TeleporterPad",
+        "xp": 0,
+        "rewards": [{ "id": "DAT_Teleporter", "name": "Short-Range Teleporter", "type": "buildable" }]
+      }
+    ]
+  }
+}

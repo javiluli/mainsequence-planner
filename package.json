@@ -1,0 +1,68 @@
+{
+  "name": "mainsequence-planner",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "type": "module",
+  "description": "A production planning tool for the game Main Sequence.",
+  "author": "javiluli",
+  "license": "MIT",
+  "keywords": [
+    "main-sequence",
+    "production-planner",
+    "gaming-tool",
+    "react",
+    "typescript",
+    "react-flow",
+    "supply-chain-calculator"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "data:main-sequence": "node scripts/build-main-sequence-catalog.mjs",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "preview": "vite preview",
+    "test": "vitest run src"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "^3.1.1",
+    "@heroui/react": "^2.8.10",
+    "@tanstack/react-virtual": "^3.14.10",
+    "@xyflow/react": "^12.10.2",
+    "framer-motion": "^12.40.0",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.18.3",
+    "thinking-orbs": "^0.3.2",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.62.1",
+    "@tailwindcss/vite": "^4.3.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^24.12.4",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.4.26",
+    "globals": "^16.5.0",
+    "jsdom": "^30.0.1",
+    "prettier": "3.9.6",
+    "tailwindcss": "^4.3.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.59.4",
+    "vite": "^7.3.3",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.11"
+  }
+}
