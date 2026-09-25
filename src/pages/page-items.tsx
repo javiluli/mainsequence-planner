@@ -14,29 +14,26 @@ export const PageItems = () => {
   const filteredItems = useFilteredItemRows(itemRows)
 
   return (
-    <>
-      <link rel="canonical" href="https://mainsequence-planner.vercel.app/items" />
-      <PageContainer>
-        <PageHeader>
-          <Typography as="h1" variant="h2" className="sr-only">
-            Main Sequence Items & Resources
-          </Typography>
-          <Flex wrap="wrap" justify="between" align="end" gap="lg">
-            <Flex wrap="wrap" gap="sm" className="w-full lg:w-auto">
-              <CategorySelect />
-              <BuildingSelect />
-              <SearchInput />
-              <ClearFiltersButton />
-            </Flex>
-
-            <StatLabel value={filteredItems.length} label="Item" />
+    <PageContainer>
+      <PageHeader>
+        <Typography as="h1" variant="h2" className="sr-only">
+          Main Sequence Items & Resources
+        </Typography>
+        <Flex wrap="wrap" justify="between" align="end" gap="lg">
+          <Flex wrap="wrap" gap="sm" className="w-full lg:w-auto">
+            <CategorySelect />
+            <BuildingSelect />
+            <SearchInput />
+            <ClearFiltersButton />
           </Flex>
-        </PageHeader>
 
-        <PageContent overflow="hidden" surface="muted">
-          <ItemsTable items={filteredItems} />
-        </PageContent>
-      </PageContainer>
-    </>
+          <StatLabel value={filteredItems.length} label="Item" />
+        </Flex>
+      </PageHeader>
+
+      <PageContent overflow="hidden" surface="muted">
+        <ItemsTable items={filteredItems} />
+      </PageContent>
+    </PageContainer>
   )
 }

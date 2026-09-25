@@ -2,10 +2,7 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text y=%22.9em%22 font-size=%2290%22>◆</text></svg>"
-    />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon.png" />
     <link rel="preload" as="font" type="font/woff2" href="/fonts/geist/Geist-Variable.woff2" crossorigin />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#05070c" />
@@ -13,7 +10,15 @@
       name="description"
       content="Production planner and calculator for Main Sequence. Plan production chains, machines, resources, items, recipes, and research."
     />
-    <title>Main Sequence Planner</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Main Sequence Planner",
+        "url": "https://mainsequence-planner.vercel.app/"
+      }
+    </script>
+    <title>Main Sequence Planner — Production Calculator</title>
   </head>
   <body>
     <div id="root"></div>

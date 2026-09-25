@@ -5,26 +5,23 @@ export const PageRecipes = () => {
   const stats = useRecipesSummary()
 
   return (
-    <>
-      <link rel="canonical" href="https://mainsequence-planner.vercel.app/recipes" />
-      <PageContainer>
-        <PageHeader>
-          <Flex align="center" justify="between" gap="lg" wrap="wrap">
-            <Typography as="h1" variant="h2">
-              <span className="sr-only">Main Sequence </span>
-              Buildings & Recipes
-            </Typography>
-            <Flex gap="md" align="center">
-              <StatLabel value={stats.buildingsCount} label="Building" />
-              <StatLabel value={stats.recipesCount} label="Recipe" />
-            </Flex>
+    <PageContainer>
+      <PageHeader>
+        <Flex align="center" justify="between" gap="lg" wrap="wrap">
+          <Typography as="h1" variant="h2">
+            <span className="sr-only">Main Sequence </span>
+            Buildings & Recipes
+          </Typography>
+          <Flex gap="md" align="center">
+            <StatLabel value={stats.buildingsCount} label="Building" />
+            <StatLabel value={stats.recipesCount} label="Recipe" />
           </Flex>
-        </PageHeader>
+        </Flex>
+      </PageHeader>
 
-        <PageContent>
-          <RecipesAccordion />
-        </PageContent>
-      </PageContainer>
-    </>
+      <PageContent>
+        <RecipesAccordion />
+      </PageContent>
+    </PageContainer>
   )
 }

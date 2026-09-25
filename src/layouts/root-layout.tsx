@@ -1,4 +1,5 @@
 import { PRIMARY_NAVIGATION, ROUTE } from '@/router/routes'
+import { RouteSeo } from '@/router/route-seo'
 import { Flex, Typography } from '@/shared/ui'
 import { cn, Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@heroui/react'
 import { NavLink, Outlet } from 'react-router-dom'
@@ -7,6 +8,7 @@ import { GithubButton } from './components/github-button'
 const RootLayout = () => {
   return (
     <>
+      <RouteSeo />
       <a
         href="#main-content"
         className="sr-only fixed left-3 top-3 z-50 rounded-sm bg-content1 px-3 py-2 text-sm text-foreground focus:not-sr-only focus-visible:ring-2 focus-visible:ring-focus"

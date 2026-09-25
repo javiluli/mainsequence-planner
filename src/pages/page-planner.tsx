@@ -60,7 +60,7 @@ const PlannerPageContent = () => {
           >
             <Typography variant="h2">Select an object to begin production</Typography>
             <Typography tone="soft">
-              Choose any item to see its production chain, or select a raw material to use it as a terminal target.
+              Choose any Main Sequence item to see its production chain, or select a raw material to use it as a terminal target.
             </Typography>
             <div className="order-first w-full">
               <RandomItemMarquee />
@@ -73,10 +73,7 @@ const PlannerPageContent = () => {
 }
 
 export const PagePlanner = () => (
-  <>
-    <link rel="canonical" href="https://mainsequence-planner.vercel.app/" />
-    <ProductionPlanProvider>
-      <PlannerPageContent />
-    </ProductionPlanProvider>
-  </>
+  <ProductionPlanProvider>
+    <PlannerPageContent />
+  </ProductionPlanProvider>
 )
