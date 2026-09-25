@@ -6,6 +6,7 @@ import {
   RandomItemMarquee,
   useProductionPlan,
 } from '@/features/planner'
+import { Seo } from '@/shared/seo'
 import { Flex, Grid, PageContainer, PageContent, PageHeader, Panel, Typography } from '@/shared/ui'
 import { Suspense } from 'react'
 import './page-planner.css'
@@ -41,7 +42,7 @@ const PlannerPageContent = () => {
     <PageContainer>
       <PageHeader>
         <Typography as="h1" variant="h2" className="sr-only">
-          Planner
+          Main Sequence Production Planner
         </Typography>
         <Suspense fallback={<PlannerToolbarFallback />}>
           <PlannerToolbar />
@@ -73,7 +74,14 @@ const PlannerPageContent = () => {
 }
 
 export const PagePlanner = () => (
-  <ProductionPlanProvider>
-    <PlannerPageContent />
-  </ProductionPlanProvider>
+  <>
+    <Seo
+      title="Main Sequence Planner — Production Calculator"
+      description="Plan Main Sequence production chains, calculate required machines and resources, and browse items, buildings, recipes, and research."
+      path="/"
+    />
+    <ProductionPlanProvider>
+      <PlannerPageContent />
+    </ProductionPlanProvider>
+  </>
 )

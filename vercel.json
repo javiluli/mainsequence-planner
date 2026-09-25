@@ -1,3 +1,10 @@
 {
-  "routes": [{ "src": "/[^.]+", "dest": "/", "status": 200 }]
+  "trailingSlash": false,
+  "routes": [
+    { "src": "^/items/?$", "dest": "/items.html", "status": 200 },
+    { "src": "^/recipes/?$", "dest": "/recipes.html", "status": 200 },
+    { "src": "^/research/?$", "dest": "/research.html", "status": 200 },
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html", "status": 404 }
+  ]
 }
