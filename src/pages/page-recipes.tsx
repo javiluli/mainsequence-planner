@@ -1,5 +1,4 @@
 import { RecipesAccordion, useRecipesSummary } from '@/features/recipes'
-import { Seo } from '@/shared/seo'
 import { Flex, PageContainer, PageContent, PageHeader, StatLabel, Typography } from '@/shared/ui'
 
 export const PageRecipes = () => {
@@ -7,11 +6,7 @@ export const PageRecipes = () => {
 
   return (
     <>
-      <Seo
-        title="Main Sequence Buildings & Recipes — Planner"
-        description="Browse Main Sequence buildings, machines, and recipes, including production inputs, outputs, and available crafting relationships."
-        path="/recipes"
-      />
+      <link rel="canonical" href="https://mainsequence-planner.vercel.app/recipes" />
       <PageContainer>
         <PageHeader>
           <Flex align="center" justify="between" gap="lg" wrap="wrap">

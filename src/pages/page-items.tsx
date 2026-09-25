@@ -7,7 +7,6 @@ import {
   useFilteredItemRows,
   useItemsTableRows,
 } from '@/features/items'
-import { Seo } from '@/shared/seo'
 import { Flex, PageContainer, PageContent, PageHeader, StatLabel, Typography } from '@/shared/ui'
 
 export const PageItems = () => {
@@ -16,11 +15,7 @@ export const PageItems = () => {
 
   return (
     <>
-      <Seo
-        title="Main Sequence Items & Resources — Planner"
-        description="Browse Main Sequence items and resources, filter the production catalog, and open any item directly in the production planner."
-        path="/items"
-      />
+      <link rel="canonical" href="https://mainsequence-planner.vercel.app/items" />
       <PageContainer>
         <PageHeader>
           <Typography as="h1" variant="h2" className="sr-only">

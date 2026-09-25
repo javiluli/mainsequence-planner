@@ -1,14 +1,9 @@
 import { ResearchGraph } from '@/features/research'
-import { Seo } from '@/shared/seo'
 import { PageContainer, PageContent, PageHeader, Typography } from '@/shared/ui'
 
 export const PageResearch = () => (
   <>
-    <Seo
-      title="Main Sequence Research Tree — Planner"
-      description="Explore the Main Sequence research tree, technologies, prerequisites, science costs, progression paths, and unlock relationships."
-      path="/research"
-    />
+    <link rel="canonical" href="https://mainsequence-planner.vercel.app/research" />
     <PageContainer>
       <PageHeader>
         <Typography as="h1" variant="h2">
