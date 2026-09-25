@@ -32,10 +32,19 @@ const NOT_FOUND_METADATA = {
   description: 'The requested address does not match any page in Main Sequence Planner.',
 }
 
+const normalizePath = (pathname: string) => {
+  if (pathname === ROUTE.HOME) {
+    return ROUTE.HOME
+  }
+
+  return pathname.replace(/\/+$/, '').toLowerCase()
+}
+
 export const RouteSeo = () => {
   const { pathname } = useLocation()
-  const isIndexable = Object.hasOwn(ROUTE_METADATA, pathname)
-  const metadata = isIndexable ? ROUTE_METADATA[pathname as keyof typeof ROUTE_METADATA] : NOT_FOUND_METADATA
+  const normalizedPath = normalizePath(pathname)
+  const isIndexable = Object.hasOwn(ROUTE_METADATA, normalizedPath)
+  const metadata = isIndexable ? ROUTE_METADATA[normalizedPath as keyof typeof ROUTE_METADATA] : NOT_FOUND_METADATA
 
   useEffect(() => {
     document.title = metadata.title
@@ -43,7 +52,7 @@ export const RouteSeo = () => {
   }, [metadata.description, metadata.title])
 
   return isIndexable ? (
-    <link rel="canonical" href={new URL(pathname, SITE_URL).toString()} />
+    <link rel="canonical" href={new URL(normalizedPath, SITE_URL).toString()} />
   ) : (
     <meta name="robots" content="noindex, nofollow" />
   )
