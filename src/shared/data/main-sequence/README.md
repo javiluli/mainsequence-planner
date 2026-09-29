@@ -3,7 +3,7 @@
 These generated files deliberately expose only the data needed by the planner:
 
 - `items.json`: item ID, display name and planner type;
-- `buildings_and_recipes.json`: the eight source crafters, verified MW power consumption and their per-minute recipes;
+- `buildings_and_recipes.json`: the eight source crafters, their MJ energy use and per-minute recipes;
 - `research.json`: science branches, items that contribute points, technology costs, prerequisites, rewards and source icon IDs.
 
 Item IDs retain the existing project convention because they resolve directly to the curated icon filenames. The few items that share artwork keep their existing presentation aliases.

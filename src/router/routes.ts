@@ -1,4 +1,4 @@
-import { Factory, FlaskConical, Package, Waypoints } from 'lucide-react'
+import { Factory, FlaskConical, LayoutGrid, Package, Waypoints } from 'lucide-react'
 import type { ComponentType } from 'react'
 
 export const ROUTE = {
@@ -6,6 +6,7 @@ export const ROUTE = {
   ITEMS: '/items',
   RECIPES: '/recipes',
   RESEARCH: '/research',
+  BASES: '/bases',
 }
 
 interface PrimaryNavigationItem {
@@ -19,4 +20,5 @@ export const PRIMARY_NAVIGATION: PrimaryNavigationItem[] = [
   { path: ROUTE.ITEMS, icon: Package, label: 'Items' },
   { path: ROUTE.RECIPES, icon: Factory, label: 'Buildings' },
   { path: ROUTE.RESEARCH, icon: FlaskConical, label: 'Research' },
+  { path: ROUTE.BASES, icon: LayoutGrid, label: 'Bases' },
 ]

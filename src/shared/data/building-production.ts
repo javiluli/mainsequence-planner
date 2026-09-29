@@ -1,12 +1,10 @@
 import type { Building } from '@/shared/@types/building.type'
 import type { Item } from '@/shared/@types/item.type'
 
-const NON_PRODUCING_BUILDING_TYPES = new Set(['generator', 'transport', 'temperature', 'habitat', 'defense', 'storage', 'core'])
+/** El selector de Items solo muestra Crafters con al menos una receta exportada del juego. */
+export const isProductionBuilding = (building: Building): boolean => building.recipes.length > 0
 
-/** Regla compartida que identifica los buildings capaces de producir items. */
-export const isProductionBuilding = (building: Building) => !NON_PRODUCING_BUILDING_TYPES.has(building.type)
-
-/** Indexa todos los productores de cada output respetando el orden del catálogo. */
+/** Relaciona cada resultado principal con sus máquinas, sin repetir una máquina que tenga varias recetas para el mismo objeto. */
 export const indexProducerBuildingsByItemId = (buildings: readonly Building[]): ReadonlyMap<string, readonly Building[]> => {
   const producersByItemId = new Map<string, Building[]>()
 
@@ -23,7 +21,7 @@ export const indexProducerBuildingsByItemId = (buildings: readonly Building[]): 
   return producersByItemId
 }
 
-/** Secondary outputs are real products, but are not standalone production routes. */
+/** Los subproductos también tienen productor, pero no constituyen una receta independiente para ese objeto. */
 export const indexByproductBuildingsByItemId = (buildings: readonly Building[]): ReadonlyMap<string, readonly Building[]> => {
   const byproductBuildingsByItemId = new Map<string, Building[]>()
 
@@ -42,7 +40,7 @@ export const indexByproductBuildingsByItemId = (buildings: readonly Building[]):
   return byproductBuildingsByItemId
 }
 
-/** Existing non-raw items with no primary or secondary machine output need external acquisition. */
+/** Los objetos que no son materias primas y carecen de salida conocida se tratan como suministro externo, no como máquinas ficticias. */
 export const getExternallyAcquiredItemIds = (items: readonly Item[], buildings: readonly Building[]): ReadonlySet<string> => {
   const producedIds = new Set(
     buildings.flatMap((building) =>

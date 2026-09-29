@@ -14,7 +14,7 @@ export function FlowNodeStats({ buildingPower }: { buildingPower?: number }) {
   return (
     <span className="inline-flex items-center gap-1 text-xs font-medium text-foreground/75">
       <Zap size={12} aria-hidden className="text-warning" />
-      {buildingPower === undefined ? 'Power unknown' : `${buildingPower} MW / machine`}
+      {buildingPower === undefined ? 'Energy use unknown' : `${buildingPower} MJ / machine`}
     </span>
   )
 }

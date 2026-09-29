@@ -1,12 +1,5 @@
-import {
-  PlannerSidebar,
-  PlannerToolbar,
-  ProductionDiagramTabs,
-  ProductionPlanProvider,
-  RandomItemMarquee,
-  useProductionPlan,
-} from '@/features/planner'
-import { Flex, Grid, PageContainer, PageContent, PageHeader, Panel, Typography } from '@/shared/ui'
+import { PlannerToolbar, ProductionDiagramTabs, ProductionPlanProvider, RandomItemMarquee, useProductionPlan } from '@/features/planner'
+import { Flex, PageContainer, PageContent, PageHeader, Typography } from '@/shared/ui'
 import { Suspense } from 'react'
 import './page-planner.css'
 
@@ -16,30 +9,20 @@ const PlannerToolbarFallback = () => (
   </div>
 )
 
-const PlannerPanels = () => (
-  <Grid
-    gap="lg"
-    className="h-full min-h-0 min-w-0 grid-cols-1 grid-rows-[minmax(32rem,1fr)_22rem] items-stretch lg:grid-cols-[minmax(0,1fr)_24rem] lg:grid-rows-1"
-  >
-    <Panel padding="none" variant="muted" className="min-h-0 min-w-0 overflow-hidden">
-      <Suspense fallback={null}>
-        <ProductionDiagramTabs />
-      </Suspense>
-    </Panel>
-    <Panel padding="none" variant="muted" className="min-h-0 min-w-0 overflow-hidden">
-      <Suspense fallback={null}>
-        <PlannerSidebar />
-      </Suspense>
-    </Panel>
-  </Grid>
+const PlannerDiagram = () => (
+  <div className="h-full min-h-0 min-w-0 overflow-hidden">
+    <Suspense fallback={null}>
+      <ProductionDiagramTabs />
+    </Suspense>
+  </div>
 )
 
 const PlannerPageContent = () => {
   const plan = useProductionPlan()
 
   return (
-    <PageContainer>
-      <PageHeader>
+    <PageContainer className="gap-0 p-0 sm:p-0 lg:p-0">
+      <PageHeader variant="plain" padding="none" className="mb-2 border-b border-divider/60 bg-content1 p-3 sm:p-4 lg:px-6">
         <Typography as="h1" variant="h2" className="sr-only">
           Main Sequence Production Planner
         </Typography>
@@ -48,9 +31,9 @@ const PlannerPageContent = () => {
         </Suspense>
       </PageHeader>
 
-      <PageContent className="lg:overflow-hidden">
+      <PageContent overflow="hidden">
         {plan ? (
-          <PlannerPanels />
+          <PlannerDiagram />
         ) : (
           <Flex
             direction="col"

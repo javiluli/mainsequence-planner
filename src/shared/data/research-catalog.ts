@@ -1,6 +1,7 @@
 import type { ResearchItem, ResearchScienceType, ResearchTechnology, ResearchUnlock, ScienceTypeId } from '@/shared/@types/research.type'
 import researchCatalog from './main-sequence/research.json'
 
+/** Contrato del JSON generado; si FModel cambia estos campos, ajustar el generador y este adaptador juntos. */
 interface SourceResearchComponent {
   id: string
   points: number
@@ -23,21 +24,25 @@ interface SourceTechnology {
   rewards: readonly SourceResearchReward[]
 }
 
+/** La clave del objeto JSON es el nombre visible; `id` es la referencia estable. */
 interface SourceResearchBranch {
   id: string
   components: readonly SourceResearchComponent[]
   technologies: readonly SourceTechnology[]
 }
 
+// TypeScript amplía rewards[].type a string al importar JSON; la aserción queda limitada a esta frontera.
+// Las pruebas de integridad comprueban los tipos y referencias que el compilador no puede inferir aquí.
 const sourceBranches = Object.entries(researchCatalog) as [string, SourceResearchBranch][]
 const scienceBranches = sourceBranches.filter(([, branch]) => branch.id !== 'general')
 
-/** Research branches and point-bearing items are derived from the compact FModel catalog. */
+/** Ramas que aceptan puntos: General contiene tecnologías sin coste, no un tipo de ciencia. */
 export const researchScienceTypes: readonly ResearchScienceType[] = scienceBranches.map(([name, branch]) => ({
   id: branch.id as ScienceTypeId,
   name,
 }))
 
+/** Valor en puntos de cada objeto investigable, conservando la rama a la que contribuye. */
 export const researchItems: readonly ResearchItem[] = scienceBranches.flatMap(([, branch]) =>
   branch.components.map((component) => ({
     item_id: component.id,
@@ -47,8 +52,9 @@ export const researchItems: readonly ResearchItem[] = scienceBranches.flatMap(([
 )
 
 /**
- * A technology can require several science branches. The compact source lists one
- * branch cost per occurrence, so the runtime model merges those occurrences by ID.
+ * El JSON repite una tecnología en cada rama que le cobra puntos. Se unifica por ID:
+ * la primera aparición aporta nombre, icono, requisitos y desbloqueos; las siguientes añaden costes.
+ * Si el JSON pasa a contener una sola entrada con todos los costes, adaptar esta unión.
  */
 export const researchTechnologies: readonly ResearchTechnology[] = (() => {
   const technologies = new Map<string, ResearchTechnology>()
@@ -89,7 +95,7 @@ export const researchScienceTypeById: ReadonlyMap<string, ResearchScienceType> =
 
 export const researchItemById: ReadonlyMap<string, ResearchItem> = new Map(researchItems.map((item) => [item.item_id, item]))
 
-/** Multiple technologies can unlock one recipe, so every source relationship is retained. */
+/** Una receta puede desbloquearse por varias tecnologías; el índice conserva todas las relaciones. */
 export const researchTechnologiesByRecipeId: ReadonlyMap<string, readonly ResearchTechnology[]> = (() => {
   const index = new Map<string, ResearchTechnology[]>()
 

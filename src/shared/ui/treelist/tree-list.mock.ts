@@ -23,7 +23,7 @@ export const treeListMockData: TreeListMockNode[] = [
         label: 'Smelter',
         description: 'Transforms raw ore into usable ingots.',
         category: 'building',
-        stats: [{ label: 'Power', value: '5 MW' }],
+        stats: [{ label: 'Energy', value: '5 MJ' }],
         children: [
           {
             id: 'titanium-bar',
@@ -46,7 +46,7 @@ export const treeListMockData: TreeListMockNode[] = [
         label: 'Fabricator',
         description: 'Assembles intermediate parts from processed materials.',
         category: 'building',
-        stats: [{ label: 'Power', value: '10 MW' }],
+        stats: [{ label: 'Energy', value: '10 MJ' }],
         children: [
           {
             id: 'stator',

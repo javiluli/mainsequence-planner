@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @plugin './hero.ts';
-/* Note: You may need to change the path to fit your project structure */
 @source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
 
@@ -66,7 +65,7 @@
 @layer base {
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(160 166 169 / 42%) transparent;
+    scrollbar-color: hsl(var(--heroui-default-600) / 0.65) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -79,12 +78,12 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: rgb(160 166 169 / 42%);
+    background: hsl(var(--heroui-default-600) / 0.65);
     border-radius: 2px;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: rgb(228 165 44 / 75%);
+    background: hsl(var(--heroui-primary) / 0.75);
   }
 
   *::-webkit-scrollbar-button {

@@ -17,13 +17,16 @@ const ROUTE_METADATA = {
   },
   [ROUTE.RECIPES]: {
     title: 'Main Sequence Buildings & Recipes — Main Sequence Planner',
-    description:
-      'Browse Main Sequence buildings, machines, and recipes, including production inputs, outputs, and crafting relationships.',
+    description: 'Browse Main Sequence buildings, machines, and recipes, including production inputs, outputs, and crafting relationships.',
   },
   [ROUTE.RESEARCH]: {
     title: 'Main Sequence Research Tree — Main Sequence Planner',
     description:
       'Explore the Main Sequence research tree, technologies, prerequisites, science costs, progression paths, and unlock relationships.',
+  },
+  [ROUTE.BASES]: {
+    title: 'Main Sequence Base Designer — Main Sequence Planner',
+    description: 'Sketch Main Sequence station layouts on a measured grid with machines, conveyors, underground belts and splitters.',
   },
 } as const
 

@@ -7,7 +7,7 @@ import './index.css'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HeroUIProvider>
-      <div className="dark text-foreground bg-background">
+      <div className="min-h-dvh bg-background text-foreground">
         <App />
       </div>
     </HeroUIProvider>

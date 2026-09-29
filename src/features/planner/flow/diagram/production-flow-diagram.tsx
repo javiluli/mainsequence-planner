@@ -11,6 +11,7 @@ import { useProductionPlan } from '@/features/planner/hooks/use-production-plan'
 import type { PlannerFlowEdge, PlannerFlowNode } from '@/features/planner/flow/types'
 import { getFlowNeighborhood } from '@/features/planner/flow/interaction/flow-neighborhood'
 import type { ProductionFlowLayout } from '@/features/planner/flow/plan-to-flow'
+import { SupplyRateDialogProvider } from '@/features/planner/ui/supply/supply-rate-dialog'
 import { FlowViewControls } from './flow-view-controls'
 import './production-flow.css'
 
@@ -115,7 +116,9 @@ function ProductionFlowDiagramInner() {
 export function ProductionFlowDiagram() {
   return (
     <ReactFlowProvider>
-      <ProductionFlowDiagramInner />
+      <SupplyRateDialogProvider>
+        <ProductionFlowDiagramInner />
+      </SupplyRateDialogProvider>
     </ReactFlowProvider>
   )
 }

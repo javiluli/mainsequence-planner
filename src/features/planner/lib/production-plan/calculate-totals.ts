@@ -94,9 +94,8 @@ export const calculateTotals = (
 
     const recipe = resolver.getRecipeForItem(itemId)
     if (!recipe) {
-      if (!deferMissingRecipes) {
-        fail('missing-recipe', itemId, `No production recipe found for ${itemId}. Check the catalog or provide external supply.`)
-      }
+      // The first pass still waits for verified coproducts; any remainder is an external input.
+      if (!deferMissingRecipes) totals.set(itemId, (totals.get(itemId) ?? 0) + debt)
       return
     }
 

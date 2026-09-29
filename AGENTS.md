@@ -12,7 +12,7 @@ This Vite, React and TypeScript application follows a feature-first structure.
 - Application shells live in src/layouts/.
 - Game data crosses the application boundary through src/shared/data/.
 
-Active product features are Planner, Items, Buildings & Recipes and the Research graph. Research metadata also integrates into existing recipe flows.
+Active product features are Planner, Items, Buildings & Recipes, the Research graph and the Bases layout prototype. Research metadata also integrates into existing recipe flows.
 
 Feature root index.ts files define public APIs. Consumers outside a feature should use that API rather than private implementation paths.
 
@@ -34,7 +34,9 @@ Agents must:
 
 Only source `Crafter` records may appear as production buildings. Raw resources are external/infinite inputs in the planner and must never be represented by synthetic `_supply` machines. Real ore-synthesis recipes remain attached to their source crafter.
 
-Power values come from `Buildable.ItemDetails` entries whose detail key is `ConsumePower`; the source unit is MW. A missing value means unknown, not zero. Do not change the total-power formula without confirming whether the game scales consumption with machine utilization.
+An item without a standalone recipe remains a normal external-input leaf in every planner view, even if it is also a coproduct elsewhere. This preserves known recipe chains without inventing a machine or blocking the graph. Only genuinely invalid rates or circular dependencies prevent calculation.
+
+Energy-use values come from `Buildable.ItemDetails` entries whose detail key is `ConsumePower`; the game's displayed unit is MJ. A missing value means unknown, not zero. Do not change the total-energy formula without confirming whether the game scales consumption with machine utilization.
 
 `scripts/build-main-sequence-catalog.mjs` is a maintenance tool for game updates, not a runtime dependency. Keep stable IDs because they are also used by exported icon mappings. Update presentation aliases instead of changing gameplay IDs to fit filenames.
 
@@ -85,6 +87,8 @@ Impeccable is opt-in: use it for explicit UI/UX design, critique or polish work 
 
 Depth is subtle and selective. Prefer borders and surface tones over shadows. Avoid broad gradients, glassmorphism, decorative animation and excessive variants.
 
+The main product pages use an edge-to-edge shell: no outer page margins, internally padded headers and controls, and subtle dividers between sections. Keep HeroUI as the base for interactive controls, dialogs and popovers.
+
 Check keyboard focus, reduced motion, responsive behavior and readable contrast as part of UI work.
 
 ## Skills
@@ -114,6 +118,9 @@ Opt-in workflow skills:
 - Playwright skills when an active browser suite exists.
 
 ## Testing
+
+Vitest tests live in `test/`, mirroring the relevant `src/` feature or shared-data path. Keep production modules in `src/` and test-only files in `test/`.
+Catalog integrity inspectors live in `test/shared/data/`; they are not part of the runtime data boundary.
 
 Tests should protect real behavior. Do not add artificial assertions only to increase coverage and do not weaken/delete useful regression tests to make CI green.
 

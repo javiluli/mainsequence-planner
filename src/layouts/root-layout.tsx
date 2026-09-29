@@ -2,10 +2,12 @@ import { PRIMARY_NAVIGATION, ROUTE } from '@/router/routes'
 import { RouteSeo } from '@/router/route-seo'
 import { Flex, Typography } from '@/shared/ui'
 import { cn, Navbar, NavbarBrand, NavbarContent, NavbarItem } from '@heroui/react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { GithubButton } from './components/github-button'
 
 const RootLayout = () => {
+  const { pathname } = useLocation()
+  const currentSection = PRIMARY_NAVIGATION.find((item) => item.path === pathname)?.label ?? 'Planner'
   return (
     <>
       <RouteSeo />
@@ -23,7 +25,7 @@ const RootLayout = () => {
         >
           <NavbarBrand className="hidden space-x-2 lg:flex">
             <Typography variant="h2" as="span" className="text-base font-semibold tracking-[0.08em] uppercase">
-              Main Sequence <span className="text-primary">/</span> Planner
+              Main Sequence <span className="text-primary">/</span> {currentSection}
             </Typography>
           </NavbarBrand>
 

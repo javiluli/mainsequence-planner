@@ -2,6 +2,8 @@ import { Flex } from '@/shared/ui'
 import { PlannerStats } from './planner-stats'
 import { TargetItemSelect } from './target-item-select'
 import { TargetRateInput } from './target-rate-input'
+import { RecipeOptionsPopover } from './recipe-options-popover'
+import { SupplyPopover } from './supply/supply-popover'
 
 /** Complete control bar for selecting and inspecting the active production target. */
 export const PlannerToolbar = () => (
@@ -11,5 +13,8 @@ export const PlannerToolbar = () => (
       <TargetRateInput />
     </Flex>
     <PlannerStats />
+
+    <SupplyPopover />
+    <RecipeOptionsPopover />
   </Flex>
 )

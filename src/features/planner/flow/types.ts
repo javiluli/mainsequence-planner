@@ -3,7 +3,7 @@ import type { Edge, Node } from '@xyflow/react'
 export type ProductionNodeData = {
   buildingId: string
   buildingName: string
-  /** Source power per machine in MW; undefined means unknown. */
+  /** Source energy use per machine in MJ; undefined means unknown. */
   buildingPower?: number
   buildingLoad: number
   buildingCount: number
@@ -32,7 +32,7 @@ export type RawResourceNodeData = {
   isRawMaterial?: boolean
   /** Derived demand rate, not a claim about extraction throughput. */
   demandIpm?: number
-  /** User-entered external supply; its precise rate/stock semantics are handled in H3.4. */
+  /** User-entered continuous external delivery in items/min. */
   supplyAmount?: number
 }
 
