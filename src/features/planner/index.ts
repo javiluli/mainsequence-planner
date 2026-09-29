@@ -4,5 +4,5 @@ export const ProductionDiagramTabs = lazy(() => import('./flow/diagram').then((m
 export { useOpenPlanner } from './hooks/use-open-planner'
 export { useProductionPlan } from './hooks/use-production-plan'
 export { ProductionPlanProvider } from './providers/production-plan-provider'
-export { RandomItemMarquee } from './ui/random-item-marquee'
+export { ItemNetworkBackground } from './ui/item-network-background'
 export const PlannerToolbar = lazy(() => import('./ui/toolbar/planner-toolbar').then((module) => ({ default: module.PlannerToolbar })))
