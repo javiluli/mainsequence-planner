@@ -52,7 +52,8 @@ export function ItemNetworkBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   /**
-   * Una única instancia durante toda la vida del componente.
+   * La instancia del motor permanece estable durante
+   * toda la vida del componente.
    */
   const [engine] = useState(() => new NetworkEngine(items))
 
@@ -68,6 +69,11 @@ export function ItemNetworkBackground() {
 
   const reducedMotionRef = useRef(false)
 
+  /**
+   * Caché de imágenes.
+   *
+   * Un icono se crea una sola vez por item.
+   */
   const imagesRef = useRef(new Map<string, HTMLImageElement>())
 
   const { selectTargetItem } = usePlannerTarget()
@@ -141,8 +147,8 @@ export function ItemNetworkBackground() {
     }
 
     /**
-     * El componente puede montarse antes de que su padre tenga
-     * dimensiones definitivas.
+     * El padre puede no tener tamaño todavía durante
+     * el primer layout.
      */
     const measureInitialSize = () => {
       const rect = container.getBoundingClientRect()
@@ -179,7 +185,7 @@ export function ItemNetworkBackground() {
 
   /**
    * =============================================================
-   * CANVAS / LOOP
+   * RENDER LOOP
    * =============================================================
    */
   useEffect(() => {
@@ -215,7 +221,8 @@ export function ItemNetworkBackground() {
     motionQuery.addEventListener('change', handleMotionChange)
 
     /**
-     * Actualiza automáticamente la paleta si cambia HeroUI.
+     * Si cambia el theme, reconstruimos únicamente
+     * la paleta Canvas.
      */
     let paletteFrame = 0
 
@@ -255,7 +262,8 @@ export function ItemNetworkBackground() {
       previousTime = now
 
       /**
-       * Evita grandes saltos después de volver a una pestaña.
+       * Evita un salto enorme al volver a una pestaña
+       * que estuvo oculta.
        */
       if (document.hidden) {
         animationFrame = requestAnimationFrame(renderFrame)
@@ -286,9 +294,8 @@ export function ItemNetworkBackground() {
       )
 
       /**
-       * El backing store sólo cambia justo antes del render.
-       *
-       * Así evitamos el flash transparente durante resize.
+       * Cambiamos el backing store justo antes del render
+       * para reducir flashes transparentes durante resize.
        */
       if (canvas.width !== physicalWidth || canvas.height !== physicalHeight) {
         canvas.width = physicalWidth
@@ -301,7 +308,7 @@ export function ItemNetworkBackground() {
       context.clearRect(0, 0, canvas.width, canvas.height)
 
       /**
-       * Desde aquí trabajamos en CSS pixels.
+       * A partir de aquí dibujamos en CSS pixels.
        */
       context.setTransform(dpr, 0, 0, dpr, 0, 0)
 
@@ -351,8 +358,9 @@ export function ItemNetworkBackground() {
    * POINTER
    * =============================================================
    *
-   * El cursor modifica únicamente el aspecto visual.
-   * Nunca empuja ni atrae nodos.
+   * El cursor sólo modifica presentación.
+   *
+   * Nunca altera la física.
    */
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLCanvasElement>) => {

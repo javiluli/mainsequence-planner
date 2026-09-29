@@ -8,19 +8,29 @@ import {
   CENTER_RADIUS_Y_RATIO,
   DEFAULT_NETWORK_PALETTE,
   IMPACT_BEAD_ALPHA,
+  IMPACT_BEAD_DECAY_POWER,
+  IMPACT_BEAD_HOLD_LEVEL,
   IMPACT_BEAD_RADIUS,
   IMPACT_CORONA_ALPHA,
   IMPACT_CORONA_ARC_SPAN,
   IMPACT_CORONA_BLUR,
+  IMPACT_CORONA_DECAY_POWER,
   IMPACT_CORONA_EXPANSION,
   IMPACT_CORONA_FALLOFF,
+  IMPACT_CORONA_HOLD_LEVEL,
   IMPACT_DURATION_SECONDS,
+  IMPACT_GLINT_DECAY_POWER,
+  IMPACT_GLINT_HOLD_LEVEL,
   IMPACT_GLINT_LENGTH,
+  IMPACT_HOLD_END,
   IMPACT_LIMB_ALPHA,
   IMPACT_LIMB_ARC_SPAN,
   IMPACT_LIMB_BLUR,
+  IMPACT_LIMB_DECAY_POWER,
   IMPACT_LIMB_FALLOFF,
+  IMPACT_LIMB_HOLD_LEVEL,
   IMPACT_PEAK,
+  IMPACT_SETTLE_END,
   MAX_POINTER_RADIUS,
   MIN_POINTER_RADIUS,
   SIGNAL_EASING_STRENGTH,
@@ -34,29 +44,52 @@ import type { NetworkEngine } from './network-engine'
 
 type NetworkRenderOptions = {
   context: CanvasRenderingContext2D
+
   engine: NetworkEngine
 
   width: number
   height: number
 
   time: number
+
   nodeRadius: number
 
   pointer: Point | null
   hoveredUid: number | null
 
   palette: NetworkPalette
+
   reducedMotion: boolean
 
   getImage: (itemId: string) => HTMLImageElement | null
+}
+
+type CinematicImpactEnvelope = {
+  corona: number
+  limb: number
+  bead: number
+  glint: number
 }
 
 type NodeImpact = {
   source: NetworkNode
   target: NetworkNode
 
-  intensity: number
+  /**
+   * Opacidad estructural derivada del link y ambos nodos.
+   */
+  baseAlpha: number
+
+  /**
+   * Progreso normalizado 0 → 1 de la animación completa.
+   */
   progress: number
+
+  /**
+   * Se utiliza únicamente para resolver dos impactos simultáneos
+   * sobre un mismo nodo.
+   */
+  strength: number
 }
 
 const clamp = (value: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, value))
@@ -90,7 +123,12 @@ const mixRgb = (first: RGB, second: RGB, amount: number): RGB => {
   }
 }
 
-const distance = (first: Point, second: Point) => Math.hypot(second.x - first.x, second.y - first.y)
+const distance = (first: Point, second: Point) =>
+  Math.hypot(
+    second.x - first.x,
+
+    second.y - first.y,
+  )
 
 const getPointerRadius = (width: number, height: number) =>
   clamp(
@@ -172,12 +210,11 @@ const getNodeColor = (node: NetworkNode, palette: NetworkPalette) => {
 }
 
 /**
- * Mezcla movimiento lineal y smootherstep.
+ * Movimiento de la señal.
  *
- * De este modo:
- * - no parte prácticamente detenido;
- * - no parece una partícula mecánica;
- * - la llegada al nodo es suave.
+ * Mezclamos movimiento lineal y smootherstep para evitar
+ * una velocidad completamente mecánica sin introducir
+ * una aceleración exagerada.
  */
 const getSignalTravelProgress = (progress: number) => {
   const smooth = smootherstep(progress)
@@ -186,10 +223,7 @@ const getSignalTravelProgress = (progress: number) => {
 }
 
 /**
- * La partícula sigue visible prácticamente hasta tocar el nodo.
- *
- * En el tramo final pierde sólo parte de su intensidad para que
- * el punto de impacto pueda tomar el relevo.
+ * La propia partícula conserva presencia hasta el contacto.
  */
 const getSignalAlpha = (progress: number) => {
   const fadeIn = smootherstep(
@@ -201,7 +235,12 @@ const getSignalAlpha = (progress: number) => {
     ),
   )
 
-  const endBlend = smootherstep(
+  /**
+   * Sólo reducimos ligeramente el pulso al final.
+   *
+   * El impacto toma el relevo justo al tocar el borde.
+   */
+  const arrivalBlend = smootherstep(
     clamp(
       (progress - 0.94) / 0.06,
 
@@ -210,36 +249,111 @@ const getSignalAlpha = (progress: number) => {
     ),
   )
 
-  return fadeIn * (1 - endBlend * 0.42)
+  return fadeIn * (1 - arrivalBlend * 0.38)
 }
 
 /**
- * Flash de ataque muy rápido seguido de una cola luminosa lenta.
- *
- * La subida ocurre casi inmediatamente.
- * Después la energía desaparece progresivamente durante
- * prácticamente toda la duración restante del impacto.
+ * Decay independiente de una capa del impacto.
  */
-const getImpactEnvelope = (progress: number) => {
+const getImpactDecay = (decayProgress: number, holdLevel: number, power: number) => {
+  const remaining = 1 - smootherstep(decayProgress)
+
+  return holdLevel * Math.pow(remaining, power)
+}
+
+/**
+ * Timeline cinematográfica completa.
+ *
+ * Las capas comparten:
+ *
+ * FLASH -> SETTLE -> HOLD -> DECAY
+ *
+ * pero cada una mantiene y pierde energía a distinta velocidad.
+ */
+const getCinematicImpactEnvelope = (progress: number): CinematicImpactEnvelope => {
   const t = clamp(progress, 0, 1)
 
   /**
-   * Ataque rápido.
+   * -----------------------------------------------------------
+   * FLASH
+   * -----------------------------------------------------------
+   *
+   * Todas las capas alcanzan su máximo prácticamente a la vez.
    */
   if (t <= IMPACT_PEAK) {
-    return smootherstep(t / IMPACT_PEAK)
+    const attack = smootherstep(t / IMPACT_PEAK)
+
+    return {
+      corona: attack,
+
+      limb: attack,
+
+      bead: attack,
+
+      glint: attack,
+    }
   }
 
   /**
-   * Decay largo.
+   * -----------------------------------------------------------
+   * SETTLE
+   * -----------------------------------------------------------
+   *
+   * El flash inicial baja ligeramente hasta la intensidad
+   * estable de cada capa.
    */
-  const decay = (t - IMPACT_PEAK) / (1 - IMPACT_PEAK)
+  if (t <= IMPACT_SETTLE_END) {
+    const settle = smootherstep((t - IMPACT_PEAK) / (IMPACT_SETTLE_END - IMPACT_PEAK))
 
-  return Math.pow(
-    1 - smootherstep(decay),
+    return {
+      corona: lerp(1, IMPACT_CORONA_HOLD_LEVEL, settle),
 
-    0.68,
+      limb: lerp(1, IMPACT_LIMB_HOLD_LEVEL, settle),
+
+      bead: lerp(1, IMPACT_BEAD_HOLD_LEVEL, settle),
+
+      glint: lerp(1, IMPACT_GLINT_HOLD_LEVEL, settle),
+    }
+  }
+
+  /**
+   * -----------------------------------------------------------
+   * HOLD
+   * -----------------------------------------------------------
+   */
+  if (t <= IMPACT_HOLD_END) {
+    return {
+      corona: IMPACT_CORONA_HOLD_LEVEL,
+
+      limb: IMPACT_LIMB_HOLD_LEVEL,
+
+      bead: IMPACT_BEAD_HOLD_LEVEL,
+
+      glint: IMPACT_GLINT_HOLD_LEVEL,
+    }
+  }
+
+  /**
+   * -----------------------------------------------------------
+   * DECAY
+   * -----------------------------------------------------------
+   */
+  const decay = clamp(
+    (t - IMPACT_HOLD_END) / (1 - IMPACT_HOLD_END),
+
+    0,
+    1,
   )
+
+  return {
+    corona: getImpactDecay(decay, IMPACT_CORONA_HOLD_LEVEL, IMPACT_CORONA_DECAY_POWER),
+
+    limb: getImpactDecay(decay, IMPACT_LIMB_HOLD_LEVEL, IMPACT_LIMB_DECAY_POWER),
+
+    bead: getImpactDecay(decay, IMPACT_BEAD_HOLD_LEVEL, IMPACT_BEAD_DECAY_POWER),
+
+    glint: getImpactDecay(decay, IMPACT_GLINT_HOLD_LEVEL, IMPACT_GLINT_DECAY_POWER),
+  }
 }
 
 const getCenterLinkVisibility = (start: Point, end: Point, width: number, height: number) => {
@@ -316,9 +430,8 @@ const parseComputedColor = (value: string): RGB | null => {
 }
 
 /**
- * Arco cuya intensidad decrece progresivamente hacia ambos lados.
- *
- * Se usa tanto para la corona como para el limbo delantero.
+ * Dibuja un arco cuya intensidad cae progresivamente
+ * desde el punto central hacia ambos extremos.
  */
 const drawTaperedArc = ({
   context,
@@ -363,11 +476,6 @@ const drawTaperedArc = ({
 
     const distanceFromCenter = Math.abs(middle - 0.5) / 0.5
 
-    /**
-     * Curva tipo campana.
-     *
-     * Más natural que una caída lineal.
-     */
     const cosineEnvelope = Math.cos((Math.min(1, distanceFromCenter) * Math.PI) / 2)
 
     const envelope = Math.pow(
@@ -380,6 +488,10 @@ const drawTaperedArc = ({
       continue
     }
 
+    /**
+     * Pequeño solapamiento para eliminar micro-separaciones
+     * visibles entre segmentos.
+     */
     const overlap = (span / segments) * 0.1
 
     context.beginPath()
@@ -468,7 +580,7 @@ export const renderNetwork = ({
 
   /**
    * =============================================================
-   * LINKS + SIGNALS
+   * CONEXIONES + TRANSFERENCIAS
    * =============================================================
    */
   for (const link of engine.getLinks()) {
@@ -488,7 +600,11 @@ export const renderNetwork = ({
 
     const dy = target.y - source.y
 
-    const centerDistance = Math.max(Math.hypot(dx, dy), 0.001)
+    const centerDistance = Math.max(
+      Math.hypot(dx, dy),
+
+      0.001,
+    )
 
     const directionX = dx / centerDistance
 
@@ -499,7 +615,7 @@ export const renderNetwork = ({
     const targetRadius = nodeRadius * target.sizeScale
 
     /**
-     * La señal recorre únicamente el espacio entre bordes.
+     * La señal viaja de borde a borde.
      */
     const startX = source.x + directionX * sourceRadius
 
@@ -559,10 +675,6 @@ export const renderNetwork = ({
 
     context.stroke()
 
-    /**
-     * prefers-reduced-motion mantiene la red visible,
-     * pero elimina transferencias animadas.
-     */
     if (reducedMotion || !link.signal || combinedAlpha < 0.12) {
       continue
     }
@@ -573,16 +685,21 @@ export const renderNetwork = ({
      * ===========================================================
      *
      * TRAVEL -> IMPACT -> GAP -> TRAVEL
-     *
-     * No existe trigger independiente.
      */
     const cycleProgress = (time * link.signalSpeed + link.signalPhase) % 1
 
+    /**
+     * Convertimos segundos reales a una fracción
+     * del ciclo de esta conexión.
+     *
+     * Con las velocidades actuales, 3.6 s quedan dentro
+     * de este rango y no se recortan.
+     */
     const impactFraction = clamp(
       IMPACT_DURATION_SECONDS * link.signalSpeed,
 
-      0.02,
-      0.05,
+      0.12,
+      0.48,
     )
 
     const gapFraction = clamp(
@@ -598,7 +715,7 @@ export const renderNetwork = ({
 
     /**
      * -----------------------------------------------------------
-     * TRAVEL
+     * VIAJE
      * -----------------------------------------------------------
      */
     if (cycleProgress < travelEnd) {
@@ -620,7 +737,7 @@ export const renderNetwork = ({
       const signalRadius = 1.65 + proximity * 0.9 + pointerInfluence * 0.55 + (hovered ? 0.3 : 0)
 
       /**
-       * TRAIL
+       * Estela.
        */
       const rawTrailProgress = Math.max(
         0,
@@ -676,7 +793,7 @@ export const renderNetwork = ({
       context.stroke()
 
       /**
-       * HALO EXTERIOR
+       * Halo exterior.
        */
       context.beginPath()
 
@@ -691,7 +808,7 @@ export const renderNetwork = ({
       context.fill()
 
       /**
-       * HALO INTERMEDIO
+       * Halo intermedio.
        */
       context.beginPath()
 
@@ -706,7 +823,7 @@ export const renderNetwork = ({
       context.fill()
 
       /**
-       * NÚCLEO
+       * Núcleo.
        */
       context.beginPath()
 
@@ -725,10 +842,8 @@ export const renderNetwork = ({
 
     /**
      * -----------------------------------------------------------
-     * IMPACT
+     * IMPACTO
      * -----------------------------------------------------------
-     *
-     * Empieza inmediatamente después del último frame del viaje.
      */
     if (cycleProgress < impactEnd) {
       const impactProgress = clamp(
@@ -738,16 +853,24 @@ export const renderNetwork = ({
         1,
       )
 
-      const intensity = combinedAlpha * centerVisibility * getImpactEnvelope(impactProgress)
+      const envelope = getCinematicImpactEnvelope(impactProgress)
+
+      const baseAlpha = combinedAlpha * centerVisibility
+
+      const strength = baseAlpha * envelope.limb
 
       const existing = impacts.get(target.uid)
 
-      if (!existing || intensity > existing.intensity) {
+      if (!existing || strength > existing.strength) {
         impacts.set(target.uid, {
           source,
           target,
-          intensity,
+
+          baseAlpha,
+
           progress: impactProgress,
+
+          strength,
         })
       }
     }
@@ -759,7 +882,11 @@ export const renderNetwork = ({
    * =============================================================
    */
   for (const impact of impacts.values()) {
-    const { source, target, intensity, progress } = impact
+    const { source, target, baseAlpha, progress } = impact
+
+    const envelope = getCinematicImpactEnvelope(progress)
+
+    const intensity = baseAlpha * envelope.corona
 
     if (intensity <= 0.001) {
       continue
@@ -773,7 +900,12 @@ export const renderNetwork = ({
       source.x - target.x,
     )
 
-    const coronaRadius = targetRadius * (1.035 + progress * IMPACT_CORONA_EXPANSION)
+    /**
+     * Expansión muy lenta durante toda la cola.
+     */
+    const expansionProgress = smootherstep(progress)
+
+    const coronaRadius = targetRadius * (1.035 + expansionProgress * IMPACT_CORONA_EXPANSION)
 
     const warmCorona = mixRgb(
       palette.primary,
@@ -824,7 +956,7 @@ export const renderNetwork = ({
     })
 
     /**
-     * Corona exterior todavía más difusa.
+     * Segunda corona mucho más amplia y tenue.
      */
     context.shadowBlur = IMPACT_CORONA_BLUR * 1.45
 
@@ -937,7 +1069,7 @@ export const renderNetwork = ({
     context.fill()
 
     /**
-     * Borde principal.
+     * Borde.
      */
     context.beginPath()
 
@@ -986,9 +1118,17 @@ export const renderNetwork = ({
    * =============================================================
    */
   for (const impact of impacts.values()) {
-    const { source, target, intensity, progress } = impact
+    const { source, target, baseAlpha, progress } = impact
 
-    if (intensity <= 0.001) {
+    const envelope = getCinematicImpactEnvelope(progress)
+
+    const limbIntensity = baseAlpha * envelope.limb
+
+    const beadIntensity = baseAlpha * envelope.bead
+
+    const glintIntensity = baseAlpha * envelope.glint
+
+    if (limbIntensity <= 0.001 && beadIntensity <= 0.001) {
       continue
     }
 
@@ -1044,14 +1184,11 @@ export const renderNetwork = ({
      * -----------------------------------------------------------
      * LIMBO
      * -----------------------------------------------------------
-     *
-     * Máxima intensidad en el punto de contacto.
-     * Caída continua hacia ambos lados.
      */
     context.shadowColor = rgba(
       warmColor,
 
-      intensity * IMPACT_LIMB_ALPHA,
+      limbIntensity * IMPACT_LIMB_ALPHA,
     )
 
     context.shadowBlur = IMPACT_LIMB_BLUR
@@ -1063,7 +1200,7 @@ export const renderNetwork = ({
 
       y: target.y,
 
-      radius: targetRadius * (1.008 + progress * 0.016),
+      radius: targetRadius * (1.008 + smootherstep(progress) * 0.014),
 
       centerAngle: incomingAngle,
 
@@ -1071,85 +1208,96 @@ export const renderNetwork = ({
 
       segments: 34,
 
-      lineWidth: 1.12 + intensity * 0.72,
+      lineWidth: 1.12 + limbIntensity * 0.72,
 
       color: warmColor,
 
-      peakAlpha: intensity * IMPACT_LIMB_ALPHA,
+      peakAlpha: limbIntensity * IMPACT_LIMB_ALPHA,
 
       falloff: IMPACT_LIMB_FALLOFF,
     })
 
     /**
      * -----------------------------------------------------------
-     * PUNTO DE CONTACTO
+     * DIAMOND POINT
      * -----------------------------------------------------------
+     *
+     * Desaparece antes que el limbo y la corona.
      */
-    context.shadowColor = rgba(
-      hotColor,
+    if (beadIntensity > 0.002) {
+      context.shadowColor = rgba(
+        hotColor,
 
-      intensity * IMPACT_BEAD_ALPHA,
-    )
+        beadIntensity * IMPACT_BEAD_ALPHA,
+      )
 
-    context.shadowBlur = 5 + intensity * 7
+      context.shadowBlur = 5 + beadIntensity * 7
 
-    context.beginPath()
+      context.beginPath()
 
-    context.arc(
-      contactX,
-      contactY,
+      context.arc(
+        contactX,
+        contactY,
 
-      IMPACT_BEAD_RADIUS + intensity * 0.4,
+        IMPACT_BEAD_RADIUS + beadIntensity * 0.4,
 
-      0,
-      Math.PI * 2,
-    )
+        0,
+        Math.PI * 2,
+      )
 
-    context.fillStyle = rgba(
-      hotColor,
+      context.fillStyle = rgba(
+        hotColor,
 
-      intensity * IMPACT_BEAD_ALPHA,
-    )
+        beadIntensity * IMPACT_BEAD_ALPHA,
+      )
 
-    context.fill()
+      context.fill()
+    }
 
     /**
      * -----------------------------------------------------------
-     * GLINT
+     * GLINT TANGENCIAL
      * -----------------------------------------------------------
+     *
+     * Es la primera parte del impacto que desaparece.
      */
-    const glintLength = IMPACT_GLINT_LENGTH * intensity
+    if (glintIntensity > 0.002) {
+      const glintLength = IMPACT_GLINT_LENGTH * glintIntensity
 
-    context.shadowBlur = 3
+      context.shadowBlur = 3
 
-    context.beginPath()
+      context.beginPath()
 
-    context.moveTo(
-      contactX - (tangentX * glintLength) / 2,
+      context.moveTo(
+        contactX - (tangentX * glintLength) / 2,
 
-      contactY - (tangentY * glintLength) / 2,
-    )
+        contactY - (tangentY * glintLength) / 2,
+      )
 
-    context.lineTo(
-      contactX + (tangentX * glintLength) / 2,
+      context.lineTo(
+        contactX + (tangentX * glintLength) / 2,
 
-      contactY + (tangentY * glintLength) / 2,
-    )
+        contactY + (tangentY * glintLength) / 2,
+      )
 
-    context.strokeStyle = rgba(
-      hotColor,
+      context.strokeStyle = rgba(
+        hotColor,
 
-      intensity * IMPACT_BEAD_ALPHA * 0.5,
-    )
+        glintIntensity * IMPACT_BEAD_ALPHA * 0.5,
+      )
 
-    context.lineWidth = 0.7
+      context.lineWidth = 0.7
 
-    context.stroke()
+      context.stroke()
+    }
 
     /**
      * -----------------------------------------------------------
-     * MICRO EXPANSIÓN
+     * RESIDUO DEL LIMBO
      * -----------------------------------------------------------
+     *
+     * Una segunda capa muy tenue se separa unos píxeles del borde
+     * mientras desaparece.
      */
     drawTaperedArc({
       context,
@@ -1158,7 +1306,7 @@ export const renderNetwork = ({
 
       y: target.y,
 
-      radius: targetRadius * (1.024 + smootherstep(progress) * 0.05),
+      radius: targetRadius * (1.024 + smootherstep(progress) * 0.048),
 
       centerAngle: incomingAngle,
 
@@ -1170,7 +1318,7 @@ export const renderNetwork = ({
 
       color: warmColor,
 
-      peakAlpha: intensity * 0.11,
+      peakAlpha: limbIntensity * 0.105,
 
       falloff: IMPACT_LIMB_FALLOFF,
     })

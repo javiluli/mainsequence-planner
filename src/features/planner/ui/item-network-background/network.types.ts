@@ -34,10 +34,10 @@ export type NetworkCatalogItem = {
 }
 
 /**
- * Nodo mutable utilizado únicamente por el motor Canvas.
+ * Estado mutable de un nodo del fondo.
  *
- * React no observa estas propiedades, por lo que pueden
- * actualizarse en cada frame sin provocar renders.
+ * React no observa estas propiedades; el motor puede modificarlas
+ * directamente en cada frame sin provocar renders React.
  */
 export type NetworkNode = {
   uid: number
@@ -53,16 +53,16 @@ export type NetworkNode = {
   vy: number
 
   /**
-   * Región base del nodo expresada relativamente al viewport.
+   * Región base del nodo, relativa al viewport.
    *
-   * Puede quedar ligeramente fuera de [0, 1] para que la red
-   * continúe visualmente más allá de los bordes.
+   * Puede quedar ligeramente fuera de [0, 1] para mantener
+   * la sensación de una red que continúa fuera de pantalla.
    */
   homeXRatio: number
   homeYRatio: number
 
   /**
-   * Oscilación individual de corto alcance.
+   * Movimiento individual de corto alcance.
    */
   phase: number
   secondaryPhase: number
@@ -72,10 +72,10 @@ export type NetworkNode = {
   orbitSpeed: number
 
   /**
-   * Movimiento de largo alcance.
+   * Movimiento lento de largo alcance.
    *
-   * Es muy lento, pero suficientemente amplio para que los
-   * vecinos de un nodo cambien con el paso del tiempo.
+   * Permite que cambien los vecinos y, por tanto,
+   * que la topología evolucione.
    */
   roamPhase: number
   roamSecondaryPhase: number
@@ -87,7 +87,7 @@ export type NetworkNode = {
   sizeScale: number
 
   /**
-   * Número máximo de conexiones simultáneas.
+   * Máximo de conexiones simultáneas.
    */
   maxLinks: number
 
@@ -107,12 +107,12 @@ export type NetworkLink = {
   targetAlpha: number
 
   /**
-   * Sólo una parte de los enlaces transportan señales.
+   * Sólo una parte de las conexiones transporta pulsos.
    */
   signal: boolean
 
   /**
-   * Desfase para que todos los pulsos no comiencen a la vez.
+   * Desfase para evitar que todos los pulsos estén sincronizados.
    */
   signalPhase: number
 

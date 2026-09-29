@@ -93,42 +93,48 @@ const hashString = (value: string) => {
 const distanceSquared = (first: Point, second: Point) => {
   const dx = second.x - first.x
   const dy = second.y - first.y
-
   return dx * dx + dy * dy
 }
 
 /**
- * Motor ambiental del fondo neuronal.
+ * Motor ambiental del fondo.
  *
- * Tiene tres escalas de movimiento:
+ * Se mantiene completamente separado de React y Canvas.
  *
- * 1. Campo compartido:
- *    pequeñas regiones "respiran" juntas.
- *
- * 2. Roaming:
- *    cada nodo explora lentamente una región amplia.
- *
- * 3. Micro movimiento:
- *    rompe trayectorias excesivamente matemáticas.
- *
- * El roaming permite que cambien realmente los vecinos y,
- * por tanto, las conexiones de la red.
+ * Sus responsabilidades son:
+ * - población;
+ * - movimiento;
+ * - distribución;
+ * - repulsión;
+ * - resize;
+ * - topología dinámica.
  */
 export class NetworkEngine {
   private readonly catalog: readonly NetworkCatalogItem[]
+
   private readonly nodes: NetworkNode[] = []
+
   private readonly nodesByUid = new Map<number, NetworkNode>()
+
   private readonly links = new Map<string, NetworkLink>()
+
   private viewport: NetworkViewport = {
     width: 0,
     height: 0,
   }
+
   private nodeRadius = 28
+
   private targetNodeCount = 0
+
   private nextUid = 1
+
   private initialized = false
+
   private spawnBudget = 0
+
   private linkRefreshTimer = 0
+
   private resizeSettleRemaining = 0
 
   constructor(catalog: readonly NetworkCatalogItem[]) {
@@ -141,39 +147,50 @@ export class NetworkEngine {
     }
 
     const previousWidth = this.viewport.width
+
     const previousHeight = this.viewport.height
+
     const hadViewport = previousWidth > 0 && previousHeight > 0
+
     const widthDelta = Math.abs(width - previousWidth)
+
     const heightDelta = Math.abs(height - previousHeight)
 
     /**
-     * Adaptamos inmediatamente la simulación existente.
+     * Conservamos la red existente durante resize.
      *
-     * No reconstruimos nada.
+     * No regeneramos posiciones.
      */
     if (hadViewport && (widthDelta > RESIZE_SETTLE_THRESHOLD || heightDelta > RESIZE_SETTLE_THRESHOLD)) {
       const scaleX = width / previousWidth
+
       const scaleY = height / previousHeight
 
       for (const node of this.nodes) {
         node.x *= scaleX
+
         node.y *= scaleY
+
         node.vx *= Math.sqrt(clamp(scaleX, 0.5, 2))
+
         node.vy *= Math.sqrt(clamp(scaleY, 0.5, 2))
       }
+
       this.resizeSettleRemaining = RESIZE_SETTLE_DURATION
     }
 
-    this.viewport = { width, height }
+    this.viewport = {
+      width,
+      height,
+    }
+
     this.nodeRadius = nodeRadius
 
     const nextTargetNodeCount = this.calculateTargetNodeCount(width, height)
 
-    /**
-     * Primera construcción.
-     */
     if (!this.initialized) {
       this.targetNodeCount = nextTargetNodeCount
+
       this.initialized = true
 
       for (let index = 0; index < this.targetNodeCount; index += 1) {
@@ -186,7 +203,8 @@ export class NetworkEngine {
     }
 
     /**
-     * Histeresis de población durante resize.
+     * Evitamos añadir/quitar nodos constantemente
+     * durante pequeños cambios de viewport.
      */
     if (Math.abs(nextTargetNodeCount - this.targetNodeCount) >= NODE_COUNT_HYSTERESIS) {
       this.targetNodeCount = nextTargetNodeCount
@@ -202,16 +220,23 @@ export class NetworkEngine {
 
     const delta = clamp(deltaSeconds, 0, 0.04)
 
-    this.resizeSettleRemaining = Math.max(0, this.resizeSettleRemaining - delta)
+    this.resizeSettleRemaining = Math.max(
+      0,
+
+      this.resizeSettleRemaining - delta,
+    )
 
     this.updatePopulation(delta)
+
     this.updateAlpha(delta)
 
     if (!reducedMotion) {
       this.updateWander(delta, timeSeconds)
 
       this.applyPairForces(delta)
+
       this.applyBounds(delta)
+
       this.integrate(delta)
     }
 
@@ -219,6 +244,7 @@ export class NetworkEngine {
 
     if (this.linkRefreshTimer >= LINK_REFRESH_INTERVAL) {
       this.linkRefreshTimer = 0
+
       this.refreshLinks()
     }
 
@@ -258,12 +284,17 @@ export class NetworkEngine {
         continue
       }
 
-      const currentDistance = Math.hypot(point.x - node.x, point.y - node.y)
+      const currentDistance = Math.hypot(
+        point.x - node.x,
+
+        point.y - node.y,
+      )
 
       const radius = baseRadius * node.sizeScale * 1.35
 
       if (currentDistance <= radius && currentDistance < selectedDistance) {
         selected = node
+
         selectedDistance = currentDistance
       }
     }
@@ -351,17 +382,10 @@ export class NetworkEngine {
   }
 
   /**
-   * -------------------------------------------------------------
-   * DISTRIBUCIÓN INICIAL
-   * -------------------------------------------------------------
-   *
-   * En lugar de aceptar el primer punto aleatorio válido,
-   * generamos varios candidatos y elegimos el que esté mejor
-   * separado del resto.
-   *
-   * Esto reduce muchísimo la aparición de huecos enormes.
+   * Genera varias posiciones y escoge la que cubra mejor
+   * una región poco ocupada.
    */
-  private createHomePosition() {
+  private createHomePosition(): Point {
     const horizontalOverscan = this.getHorizontalOverscan()
 
     const verticalOverscan = this.getVerticalOverscan()
@@ -371,7 +395,7 @@ export class NetworkEngine {
     let bestScore = Number.NEGATIVE_INFINITY
 
     for (let attempt = 0; attempt < NODE_PLACEMENT_CANDIDATES; attempt += 1) {
-      const point = {
+      const point: Point = {
         x: randomBetween(
           -horizontalOverscan * 0.48,
 
@@ -389,9 +413,6 @@ export class NetworkEngine {
         continue
       }
 
-      /**
-       * Primer nodo: cualquier candidato válido sirve.
-       */
       if (this.nodes.length === 0) {
         return point
       }
@@ -411,9 +432,8 @@ export class NetworkEngine {
       }
 
       /**
-       * Permitimos nodos fuera de pantalla para conservar
-       * sensación de infinito, pero damos una ligera preferencia
-       * al área visible.
+       * Los candidatos visibles reciben una ligera ventaja,
+       * sin impedir nodos parcialmente fuera del viewport.
        */
       const insideViewport = point.x >= 0 && point.x <= this.viewport.width && point.y >= 0 && point.y <= this.viewport.height
 
@@ -423,23 +443,24 @@ export class NetworkEngine {
 
       if (score > bestScore) {
         bestScore = score
+
         bestPoint = point
       }
     }
 
-    /**
-     * Caso extremadamente raro:
-     * todos los candidatos coincidían con el centro.
-     */
-    if (!bestPoint) {
-      return {
-        x: randomBetween(0, this.viewport.width),
-
-        y: randomBetween(0, this.viewport.height),
-      }
+    if (bestPoint) {
+      return bestPoint
     }
 
-    return bestPoint
+    /**
+     * Fallback extremadamente raro:
+     * todos los candidatos estaban dentro de la zona central.
+     */
+    return {
+      x: randomBetween(0, this.viewport.width),
+
+      y: randomBetween(0, this.viewport.height),
+    }
   }
 
   private spawnNode(fadeIn: boolean) {
@@ -536,10 +557,21 @@ export class NetworkEngine {
 
       const centerY = this.viewport.height / 2
 
+      /**
+       * Retiramos primero los más alejados del área central.
+       */
       const candidates = [...activeNodes].sort((first, second) => {
-        const firstDistance = Math.hypot(first.x - centerX, first.y - centerY)
+        const firstDistance = Math.hypot(
+          first.x - centerX,
 
-        const secondDistance = Math.hypot(second.x - centerX, second.y - centerY)
+          first.y - centerY,
+        )
+
+        const secondDistance = Math.hypot(
+          second.x - centerX,
+
+          second.y - centerY,
+        )
 
         return secondDistance - firstDistance
       })
@@ -554,6 +586,9 @@ export class NetworkEngine {
     if (activeNodes.length < this.targetNodeCount) {
       let missing = this.targetNodeCount - activeNodes.length
 
+      /**
+       * Recuperamos primero nodos que estuvieran retirándose.
+       */
       for (const node of this.nodes) {
         if (missing <= 0) {
           break
@@ -564,6 +599,7 @@ export class NetworkEngine {
         }
 
         node.retiring = false
+
         node.targetAlpha = 1
 
         missing -= 1
@@ -620,9 +656,11 @@ export class NetworkEngine {
   }
 
   /**
-   * -------------------------------------------------------------
-   * MOVIMIENTO AMBIENTAL
-   * -------------------------------------------------------------
+   * Tres escalas de movimiento:
+   *
+   * 1. campo compartido;
+   * 2. roaming amplio;
+   * 3. micro movimiento individual.
    */
   private updateWander(delta: number, time: number) {
     const { width, height } = this.viewport
@@ -631,7 +669,11 @@ export class NetworkEngine {
 
     const centerY = height / 2
 
-    const { radiusX: safeRadiusX, radiusY: safeRadiusY } = this.getCenterZone()
+    const {
+      radiusX: safeRadiusX,
+
+      radiusY: safeRadiusY,
+    } = this.getCenterZone()
 
     const springStrength = ORBIT_SPRING_STRENGTH * (this.resizeSettleRemaining > 0 ? RESIZE_SPRING_MULTIPLIER : 1)
 
@@ -641,9 +683,7 @@ export class NetworkEngine {
       const homeY = node.homeYRatio * height
 
       /**
-       * ---------------------------------------------------------
-       * CAMPO COMPARTIDO
-       * ---------------------------------------------------------
+       * Campo compartido.
        */
       const fieldX =
         (Math.sin(time * FIELD_SPEED_X + homeY * 0.0034) * 0.66 +
@@ -656,12 +696,9 @@ export class NetworkEngine {
         FIELD_AMPLITUDE_Y
 
       /**
-       * ---------------------------------------------------------
-       * ROAMING DE LARGO ALCANCE
-       * ---------------------------------------------------------
+       * Roaming lento.
        *
-       * Dos frecuencias distintas impiden que se perciba una
-       * órbita elíptica perfecta.
+       * Las dos frecuencias evitan una órbita elíptica evidente.
        */
       const roamX =
         (Math.sin(time * node.roamSpeed + node.roamPhase) * 0.72 +
@@ -674,9 +711,7 @@ export class NetworkEngine {
         node.roamRadiusY
 
       /**
-       * ---------------------------------------------------------
-       * MICRO MOVIMIENTO
-       * ---------------------------------------------------------
+       * Movimiento individual.
        */
       const orbitX = Math.sin(time * node.orbitSpeed + node.phase) * node.orbitRadiusX
 
@@ -695,11 +730,8 @@ export class NetworkEngine {
       node.vy += (targetY - node.y) * springStrength * delta
 
       /**
-       * ---------------------------------------------------------
-       * CENTRO
-       * ---------------------------------------------------------
+       * Evitación elíptica de la zona central.
        */
-
       const dx = node.x - centerX
 
       const dy = node.y - centerY
@@ -722,6 +754,8 @@ export class NetworkEngine {
 
   /**
    * Repulsión local.
+   *
+   * No intentamos simular una física completa.
    */
   private applyPairForces(delta: number) {
     for (let firstIndex = 0; firstIndex < this.nodes.length; firstIndex += 1) {
@@ -779,6 +813,11 @@ export class NetworkEngine {
     }
   }
 
+  /**
+   * Límites blandos.
+   *
+   * El nodo puede salir parcialmente del viewport sin rebotar.
+   */
   private applyBounds(delta: number) {
     const horizontalOverscan = this.getHorizontalOverscan()
 
@@ -818,6 +857,7 @@ export class NetworkEngine {
 
     for (const node of this.nodes) {
       node.vx *= damping
+
       node.vy *= damping
 
       const speed = Math.hypot(node.vx, node.vy)
@@ -826,6 +866,7 @@ export class NetworkEngine {
         const ratio = MAX_NODE_SPEED / speed
 
         node.vx *= ratio
+
         node.vy *= ratio
       }
 
@@ -836,12 +877,7 @@ export class NetworkEngine {
   }
 
   /**
-   * -------------------------------------------------------------
-   * TOPOLOGÍA DINÁMICA
-   * -------------------------------------------------------------
-   *
-   * Como ahora los nodos recorren distancias mayores, este método
-   * empezará realmente a seleccionar vecinos diferentes.
+   * Recalcula la topología según proximidad.
    */
   private refreshLinks() {
     const linkRadius = this.getLinkRadius()
@@ -866,7 +902,11 @@ export class NetworkEngine {
           continue
         }
 
-        const currentDistance = Math.hypot(target.x - source.x, target.y - source.y)
+        const currentDistance = Math.hypot(
+          target.x - source.x,
+
+          target.y - source.y,
+        )
 
         const minimumUid = Math.min(source.uid, target.uid)
 
@@ -890,6 +930,7 @@ export class NetworkEngine {
           id,
           source,
           target,
+
           distance: currentDistance,
 
           priority: currentDistance + seed * LINK_SELECTION_RANDOMNESS + persistenceBonus,
@@ -922,14 +963,14 @@ export class NetworkEngine {
     }
 
     /**
-     * Las relaciones que dejan de ser válidas hacen fade-out.
+     * Conexiones antiguas no seleccionadas comienzan fade-out.
      */
     for (const [id, link] of this.links) {
       link.targetAlpha = desired.has(id) ? 1 : 0
     }
 
     /**
-     * Nuevas relaciones.
+     * Creamos las nuevas.
      */
     for (const [id, candidate] of desired) {
       if (this.links.has(id)) {
