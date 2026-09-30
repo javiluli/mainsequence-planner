@@ -2,17 +2,14 @@ import { Tab, Tabs } from '@heroui/react'
 import { ListTree, Network, Package, type LucideIcon } from 'lucide-react'
 import { lazy, useCallback, useState, type ComponentType } from 'react'
 
-import { ProductionTreelistDiagram } from './production-treelist-diagram'
-import { ProductionItemsDiagram } from './production-items-diagram'
-import { RawTargetDiagram } from './raw-target-diagram'
+import { useProductionPlan } from '@/features/planner/hooks/use-production-plan'
 import { PlannerDiagramReveal } from './diagram-reveal'
 import { NoProductionRoute } from './no-production-route'
-import { useProductionPlan } from '@/features/planner/hooks/use-production-plan'
+import { ProductionItemsDiagram } from './production-items-diagram'
+import { ProductionTreelistDiagram } from './production-treelist-diagram'
+import { RawTargetDiagram } from './raw-target-diagram'
 
 const ProductionFlowDiagram = lazy(() => import('./production-flow-diagram').then((module) => ({ default: module.ProductionFlowDiagram })))
-const PartialProductionFlowDiagram = lazy(() =>
-  import('./partial-production-flow-diagram').then((module) => ({ default: module.PartialProductionFlowDiagram })),
-)
 
 type DiagramTab = {
   key: string
@@ -72,7 +69,7 @@ export function ProductionDiagramTabs() {
       aria-label="Production diagram views"
       classNames={{
         tabWrapper: 'flex h-full min-h-0 w-full flex-col overflow-hidden',
-        base: 'w-full shrink-0',
+        base: 'w-full shrink-0 border-b border-divider/60',
         tabList: 'w-full',
         panel: 'min-h-0 flex-1 overflow-hidden p-0',
       }}
@@ -88,9 +85,9 @@ export function ProductionDiagramTabs() {
           }
         >
           <PlannerDiagramReveal
-            key={`${plan.targetId}:${plan.issues.length ? 'incomplete' : 'complete'}:${key}`}
+            key={`${plan.targetId}:${plan.issues.length ? 'invalid' : 'ready'}:${key}`}
             label={label}
-            Content={plan.issues.length ? (key === 'network-graph' ? PartialProductionFlowDiagram : NoProductionRoute) : Content}
+            Content={plan.issues.length ? NoProductionRoute : Content}
             skipLoading={readyTargetId === plan.targetId}
             onRevealReady={markTargetReady}
           />

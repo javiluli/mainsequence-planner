@@ -39,13 +39,13 @@ export const PlannerStats = () => {
   }
 
   const { buildings = 0, power = 0 } = plan?.stats ?? {}
-  const powerLabel = power === null ? 'Unknown' : `${power} MW`
+  const powerLabel = power === null ? 'Unknown' : `${power} MJ`
 
   return (
     <Flex className="h-5 px-0 sm:px-3" gap="sm">
       <PlannerStat icon={<Factory aria-hidden size={18} />} value={buildings} tooltip="Production buildings required" />
       <Divider orientation="vertical" className="bg-foreground/60" />
-      <PlannerStat icon={<Zap aria-hidden size={18} />} value={powerLabel} tooltip="Total power consumption (MW)" />
+      <PlannerStat icon={<Zap aria-hidden size={18} />} value={powerLabel} tooltip="Total energy use (MJ)" />
     </Flex>
   )
 }

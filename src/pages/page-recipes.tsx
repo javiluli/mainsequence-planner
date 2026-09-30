@@ -5,8 +5,8 @@ export const PageRecipes = () => {
   const stats = useRecipesSummary()
 
   return (
-    <PageContainer>
-      <PageHeader>
+    <PageContainer className="gap-0 p-0 sm:p-0 lg:p-0">
+      <PageHeader variant="plain" padding="none" className="border-b border-divider/60 bg-content1 p-3 sm:p-4 lg:px-6">
         <Flex align="center" justify="between" gap="lg" wrap="wrap">
           <Typography as="h1" variant="h2">
             <span className="sr-only">Main Sequence </span>
@@ -20,7 +20,9 @@ export const PageRecipes = () => {
       </PageHeader>
 
       <PageContent>
-        <RecipesAccordion />
+        <div className="p-3 sm:p-4 lg:p-6">
+          <RecipesAccordion />
+        </div>
       </PageContent>
     </PageContainer>
   )

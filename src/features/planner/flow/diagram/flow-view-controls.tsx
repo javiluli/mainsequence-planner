@@ -1,4 +1,5 @@
 import { Panel } from '@xyflow/react'
+import { Button, ButtonGroup } from '@heroui/react'
 import { Columns3, Workflow } from 'lucide-react'
 import type { ProductionFlowLayout } from '../plan-to-flow'
 
@@ -10,30 +11,30 @@ interface FlowViewControlsProps {
 export function FlowViewControls({ layoutMode, onLayoutChange }: FlowViewControlsProps) {
   return (
     <Panel position="top-right" className="!m-3">
-      <div
-        role="group"
+      <ButtonGroup
         aria-label="Graph layout"
-        className="flex gap-0.5 rounded-sm border border-divider bg-content1 p-1 shadow-md shadow-black/20"
+        size="sm"
+        variant="light"
+        radius="sm"
+        className="rounded-sm border border-divider bg-content1 p-1"
       >
-        <button
-          type="button"
+        <Button
           aria-pressed={layoutMode === 'network'}
           onClick={() => onLayoutChange('network')}
-          className="flex min-h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-default/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary/15 aria-pressed:text-primary"
+          className={layoutMode === 'network' ? 'bg-primary/15 text-primary' : 'text-foreground/70'}
         >
           <Workflow size={14} aria-hidden />
           Network
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
           aria-pressed={layoutMode === 'stages'}
           onClick={() => onLayoutChange('stages')}
-          className="flex min-h-8 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium text-foreground/70 transition-colors hover:bg-default/40 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary aria-pressed:bg-primary/15 aria-pressed:text-primary"
+          className={layoutMode === 'stages' ? 'bg-primary/15 text-primary' : 'text-foreground/70'}
         >
           <Columns3 size={14} aria-hidden />
           Stages
-        </button>
-      </div>
+        </Button>
+      </ButtonGroup>
     </Panel>
   )
 }

@@ -43,7 +43,7 @@ const pruneSteps = (steps: ProductionStep[], targetId: string) => {
   return steps.filter((step) => reachable.has(step.itemId))
 }
 
-/** Refuses to publish incomplete or cyclic calculations as valid production figures. */
+/** Known recipes stay calculable with external leaves; only invalid rates or cycles invalidate totals. */
 export const buildProductionPlan = ({
   buildings,
   producerBuildingsByItemId,
@@ -71,7 +71,10 @@ export const buildProductionPlan = ({
   const rawInputs = issues.length
     ? []
     : [...totals]
-        .filter(([itemId, amountPerMinute]) => terminalItemIds.has(itemId) && !producedRawItemIds.has(itemId) && amountPerMinute > 0)
+        .filter(
+          ([itemId, amountPerMinute]) =>
+            (terminalItemIds.has(itemId) || !resolver.getRecipeForItem(itemId)) && !producedRawItemIds.has(itemId) && amountPerMinute > 0,
+        )
         .map(([itemId, amountPerMinute]) => ({ itemId, amountPerMinute }))
   const externalRawItemIds = new Set(rawInputs.map((input) => input.itemId))
   const steps = issues.length ? [] : pruneSteps(buildSteps(resolver, totals, normalizedSupplyCountByItem, externalRawItemIds), targetId)

@@ -3,6 +3,7 @@ import type { ProductionNodeData } from '@/features/planner/flow/types'
 import { AssetImage } from '@/shared/ui'
 import { FlowNodeShell } from './flow-node-shell'
 import { FlowNodeCountBadge, FlowNodeHeader, FlowNodeStats } from './node-parts'
+import { EditSupplyAction } from '@/features/planner/ui/supply/supply-node-actions'
 
 interface ProductionNodeCardProps {
   children?: ReactNode
@@ -23,6 +24,7 @@ export function ProductionNodeCard({ children, data, selected = false }: Product
           <FlowNodeHeader title={buildingName} className="truncate" />
           <FlowNodeStats buildingPower={buildingPower} />
         </div>
+        <EditSupplyAction itemId={itemId} itemName={itemName} suggestedRate={targetIpm} />
         <FlowNodeCountBadge buildingCount={buildingCount} />
       </div>
 
@@ -31,7 +33,7 @@ export function ProductionNodeCard({ children, data, selected = false }: Product
         <div className="flex min-h-24 min-w-0 flex-col justify-between py-1">
           <div className="flex min-w-0 items-center gap-1.5">
             <AssetImage kind="items" id={itemId} width={32} alt="" loading="eager" />
-            <span className="line-clamp-2 min-w-0 break-words text-xs leading-tight font-medium text-foreground/80" title={itemName}>
+            <span className="line-clamp-2 min-w-0 wrap-break-word text-xs leading-tight font-medium text-foreground/80" title={itemName}>
               {itemName}
             </span>
           </div>

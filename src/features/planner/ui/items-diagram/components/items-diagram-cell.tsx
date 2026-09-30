@@ -14,7 +14,7 @@ export const ItemsDiagramCell = ({ row, columnKey, itemNameMap }: CellProps) => 
       return (
         <div className="flex min-w-0 items-center gap-3">
           <AssetImage kind="items" id={row.itemId} width={44} alt="" />
-          <Typography as="span" className="min-w-0 break-words">
+          <Typography as="span" className="min-w-0 wrap-break-word">
             {itemNameMap.get(row.itemId) ?? row.itemId}
           </Typography>
         </div>

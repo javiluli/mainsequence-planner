@@ -1,5 +1,5 @@
 import type { ItemResearchInfo } from '@/features/items/types'
-import { useOpenPlanner } from '@/features/planner'
+import { useOpenBases, useOpenPlanner } from '@/features/planner'
 import type { Item } from '@/shared/@types/item.type'
 import { AssetImage, Flex, Typography } from '@/shared/ui'
 import { Button, Chip } from '@heroui/react'
@@ -84,11 +84,15 @@ export const ProductionCell = ({
 
 export const ActionsCell = ({ item }: { item: Item }) => {
   const openPlanner = useOpenPlanner()
+  const openBases = useOpenBases()
 
   return (
     <Flex>
       <Button size="sm" onPress={() => openPlanner(item.id)}>
         Planner
+      </Button>
+      <Button size="sm" variant="flat" onPress={() => openBases(item.id)}>
+        Compare in Bases
       </Button>
     </Flex>
   )

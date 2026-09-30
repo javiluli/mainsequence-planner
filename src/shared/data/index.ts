@@ -1,5 +1,5 @@
 import type { RawBuilding } from '@/shared/@types/building.type'
-import type { RawItem } from '@/shared/@types/item.type'
+import type { Item, RawItem } from '@/shared/@types/item.type'
 import buildingsCatalog from './main-sequence/buildings_and_recipes.json'
 import itemsCatalog from './main-sequence/items.json'
 import {
@@ -8,40 +8,35 @@ import {
   indexProducerBuildingsByItemId,
   isProductionBuilding,
 } from './building-production'
-import { createCatalogIndex, createItemNameIndex } from './catalog-indexes'
 import { normalizeBuildings, normalizeItems } from './catalog-normalization'
 
-/** Compact source records; optional source values such as power stay optional. */
+// Frontera de datos: el generador produce los JSON; este módulo solo los adapta e indexa una vez al cargarse.
+// Si cambia su estructura, actualizar los tipos Raw*, la normalización y el generador juntos.
 const rawBuildings: readonly RawBuilding[] = buildingsCatalog
-
-/** Items before validating the categories supported by the application. */
 const rawItems: readonly RawItem[] = itemsCatalog
 
-/** Normalized buildings. Missing power means unknown, never zero. */
+/** Todas las máquinas del catálogo proceden de Crafter; una potencia ausente sigue siendo desconocida. */
 export const buildings = normalizeBuildings(rawBuildings)
 
-/** Items normalized exclusively from the generated game catalog. */
+/** Objetos del JSON con la categoría admitida por la aplicación. */
 export const items = normalizeItems(rawItems)
 
-/** Stable item lookup derived from the source data. */
-export const itemById = createCatalogIndex(items)
+/** Consulta de objetos por ID estable, sin depender del nombre visible. */
+export const itemById: ReadonlyMap<string, Item> = new Map(items.map((item) => [item.id, item]))
 
-/** Stable building lookup derived from the source data. */
-export const buildingById = createCatalogIndex(buildings)
+/** Solo los nombres necesarios para etiquetas del planner. */
+export const itemNameById: ReadonlyMap<string, string> = new Map(items.map((item) => [item.id, item.name]))
 
-/** Lightweight display-name lookup. */
-export const itemNameById = createItemNameIndex(items)
-
-/** Every real producer for an item, in source order. */
+/** Productores de resultados principales, en el orden del JSON. */
 export const producerBuildingsByItemId = indexProducerBuildingsByItemId(buildings)
 
-/** Secondary outputs are listed separately because they are not standalone recipes. */
+/** Productores de subproductos; separados de las rutas principales. */
 export const byproductBuildingsByItemId = indexByproductBuildingsByItemId(buildings)
 
-/** Existing game items acquired outside machine production, derived from every recipe output. */
+/** Objetos que no son materias primas y no salen de ninguna receta conocida. */
 export const externallyAcquiredItemIds = getExternallyAcquiredItemIds(items, buildings)
 
-/** Real production machines exposed to filters and recipe views. */
+/** Máquinas con recetas reales para el filtro de Items; no usa categorías heredadas de otros juegos. */
 export const productionBuildings = buildings.filter(isProductionBuilding)
 
 export {
@@ -51,7 +46,7 @@ export {
   isProductionBuilding,
 } from './building-production'
 
-// Science points are metadata, not production recipes.
+// La ciencia aporta puntos y desbloqueos; no crea recetas de producción adicionales.
 export {
   researchScienceTypes,
   researchItems,
@@ -61,4 +56,3 @@ export {
   researchTechnologyById,
   researchTechnologiesByRecipeId,
 } from './research-catalog'
-export { inspectResearchCatalog } from './research-integrity'

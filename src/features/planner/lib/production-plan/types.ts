@@ -2,7 +2,7 @@ import type { Building, Recipe, RecipeInput, RecipeOutput } from '@/shared/@type
 
 /** An invalid plan has no trustworthy production totals or graph. */
 export interface ProductionPlanIssue {
-  code: 'cycle' | 'missing-recipe' | 'invalid-rate'
+  code: 'cycle' | 'invalid-rate'
   itemId: string
   message: string
   path?: readonly string[]
@@ -30,7 +30,7 @@ export interface ProductionStep {
   targetIpm: number
   buildingLoad: number
   buildingCount: number
-  /** Source power per machine in MW; undefined means unknown. */
+  /** Source energy use per machine in MJ; undefined means unknown. */
   buildingPower?: number
   supplyCount: number
   /** Self-input is handled internally and excluded from external dependencies. */

@@ -10,6 +10,7 @@ import { createBrowserRouter } from 'react-router-dom'
 const PageItems = lazy(() => import('@/pages/page-items').then((m) => ({ default: m.PageItems })))
 const PageRecipes = lazy(() => import('@/pages/page-recipes').then((m) => ({ default: m.PageRecipes })))
 const PageResearch = lazy(() => import('@/pages/page-research').then((m) => ({ default: m.PageResearch })))
+const PageBases = lazy(() => import('@/pages/page-bases').then((m) => ({ default: m.PageBases })))
 
 const withSuspense = (Component: React.ComponentType) => (
   <Suspense fallback={<PageLoadingSkeleton />}>
@@ -42,6 +43,10 @@ const productionRoutes = [
   {
     path: ROUTE.RESEARCH,
     element: withSuspense(PageResearch),
+  },
+  {
+    path: ROUTE.BASES,
+    element: withSuspense(PageBases),
   },
 ]
 

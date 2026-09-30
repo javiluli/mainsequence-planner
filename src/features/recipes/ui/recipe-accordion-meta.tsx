@@ -24,7 +24,7 @@ export const RecipeAccordionMeta = ({ building }: { building: Building }) => (
     <RecipesChip count={building.recipes.length} />
     <StatBadge
       icon={<Zap aria-hidden size={14} className="text-warning" />}
-      value={building.power === undefined ? 'Unknown power' : `${building.power} MW`}
+      value={building.power === undefined ? 'Unknown energy use' : `${building.power} MJ`}
     />
   </Flex>
 )

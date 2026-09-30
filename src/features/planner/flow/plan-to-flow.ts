@@ -55,7 +55,7 @@ export const planToFlow = ({ plan, items, layoutMode = 'network' }: PlanToFlowPa
   })
 
   if (layoutMode === 'stages') {
-    return { nodes: layoutByProductionStage(layoutedNodes), edges }
+    return { nodes: layoutByProductionStage(layoutedNodes, edges), edges }
   }
 
   return { nodes: layoutedNodes, edges }
