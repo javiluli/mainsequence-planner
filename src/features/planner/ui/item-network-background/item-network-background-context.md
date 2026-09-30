@@ -60,83 +60,54 @@ La jerarquía visual buscada es:
 
 ## 3. Arquitectura actual
 
-La implementación está dividida para separar responsabilidades:
+La API pública permanece en la raíz. La implementación está dividida por responsabilidad, sin módulos genéricos fuera de la feature:
 
 ```text
 src/features/planner/ui/item-network-background/
 ├── index.ts
 ├── item-network-background.tsx
 ├── network.config.ts
-├── network-engine.ts
-├── network-renderer.ts
-└── network.types.ts
+├── network.types.ts
+├── hooks/
+│   ├── use-network-canvas.ts
+│   └── use-network-interaction.ts
+├── runtime/
+│   ├── network-runtime.ts
+│   ├── observe-surface.ts
+│   └── item-image-cache.ts
+├── simulation/
+│   ├── network-engine.ts
+│   ├── node-population.ts
+│   ├── node-motion.ts
+│   └── network-topology.ts
+├── animation/
+│   ├── network-animation.ts
+│   └── impact-envelope.ts
+├── rendering/
+│   ├── network-renderer.ts
+│   ├── render.types.ts
+│   ├── links.ts
+│   ├── nodes.ts
+│   ├── signal.ts
+│   ├── impacts.ts
+│   └── arc-cache.ts
+└── lib/
+    ├── math.ts
+    └── palette.ts
 ```
 
-### `item-network-background.tsx`
+- `index.ts`: API pública. El Planner carga el componente de forma diferida, sólo para su estado vacío.
+- `item-network-background.tsx`: composición del Canvas y sus instrucciones/estado accesibles; no contiene simulación ni observadores.
+- `hooks/`: puente entre React y el runtime; selección por teclado/puntero sin actualizaciones React por frame.
+- `runtime/`: reloj activo, RAF, medidas, suspensión automática, observadores y recursos de imagen. Cada montaje posee un único motor, animación y caché de efectos; el cleanup libera todos.
+- `simulation/`: el motor coordina el orden de población, fuerzas ambientales e integración y actualización topológica. No conoce Canvas ni React. Los IDs y los parámetros aleatorios sobreviven al resize.
+- `animation/`: viajes y eventos independientes de impacto, más sus envolventes temporales. El renderer no inicia ni finaliza sus ciclos.
+- `rendering/`: capas separadas para enlaces/señales, corona trasera, cuerpos e impacto frontal. `arc-cache.ts` prerenderiza arcos y sombras en superficies pequeñas reutilizables.
+- `lib/`: geometría y easing, radio visual compartido, lectura de tokens CSS y colores derivados. El theme se consulta fuera del frame.
+- `network.config.ts`: parámetros visuales y de movimiento.
+- `network.types.ts`: contratos compartidos.
 
-Responsabilidades:
-
-- integrar el componente con React;
-- crear una única instancia de `NetworkEngine`;
-- medir el viewport;
-- observar resize;
-- gestionar `requestAnimationFrame`;
-- adaptar Canvas a `devicePixelRatio`;
-- leer cambios de theme;
-- gestionar cursor / hover / click;
-- cargar iconos de items;
-- respetar `prefers-reduced-motion`.
-
-No debe convertirse en el lugar donde viva la lógica física o de dibujo.
-
-### `network-engine.ts`
-
-Responsabilidades:
-
-- mantener el estado mutable de nodos y links;
-- distribuir nodos;
-- actualizar movimiento;
-- separación / repulsión;
-- adaptar posiciones al resize;
-- calcular conexiones dinámicas;
-- añadir y retirar nodos suavemente.
-
-No depende de React ni del Canvas.
-
-### `network-renderer.ts`
-
-Responsabilidades:
-
-- dibujar links;
-- dibujar nodos;
-- dibujar señales;
-- dibujar el impacto de absorción;
-- aplicar respuesta visual al cursor;
-- convertir colores del theme en colores Canvas;
-- gestionar opacidad visual de la zona central.
-
-No debe modificar la física de la red.
-
-### `network.config.ts`
-
-Contiene todos los valores ajustables:
-
-- densidad;
-- tamaños;
-- velocidades;
-- radio de roaming;
-- separación;
-- conexiones;
-- señales;
-- impacto;
-- cursor;
-- límites de Canvas.
-
-La intención es que el aspecto pueda afinarse principalmente modificando constantes, sin reescribir el motor.
-
-### `network.types.ts`
-
-Contiene los tipos compartidos entre motor y renderer.
+Las dependencias avanzan desde tipos/configuración y helpers hacia motor/animación, dibujo y React. Las referencias de animación y dibujo al motor son de tipo. No hay una simulación de recetas dentro del fondo.
 
 ---
 
@@ -373,19 +344,18 @@ La intención original de repeler nodos con el cursor fue descartada porque resu
 
 ---
 
-## 13. Click sobre nodos
+## 13. Selección e interacción accesible
 
-Los nodos pueden actuar como acceso rápido a un item.
+Un click o toque corto sobre un nodo llama a `selectTargetItem(node.itemId)` mediante el hook real `usePlannerTarget`. Un arrastre o gesto de scroll no debe convertirse en selección.
 
-Al hacer click:
+El Canvas es una única parada de teclado:
 
-```ts
-selectTargetItem(node.itemId)
-```
+- flechas, Home y End recorren los nodos visibles;
+- Enter o Espacio seleccionan el item activo;
+- el nombre se anuncia mediante un estado accesible;
+- mientras se navega por teclado, el movimiento queda detenido para conservar un objetivo estable.
 
-El fondo no es únicamente decorativo; sigue siendo una superficie interactiva secundaria.
-
-Esto no debe perjudicar el papel principal del selector de items de la toolbar.
+No hay un modo de pausa manual. La suspensión automática por movimiento reducido, foco de teclado o falta de visibilidad conserva la accesibilidad y evita trabajo innecesario.
 
 ---
 
@@ -423,27 +393,26 @@ Buscamos:
 - sin sensación robótica;
 - llegada exacta al receptor.
 
+### Estela de cometa
+
+La esfera lleva una cola ámbar corta, afinada y transparente en el extremo posterior. Se calcula a partir del mismo progreso de viaje, con un máximo de 26 píxeles CSS; nunca rebasa el emisor ni crea partículas independientes. El cuerpo de la esfera y el contacto con el receptor conservan su geometría y timing. La cola no mantiene buffers de posiciones ni añade desenfoque. Sólo se dibuja durante el viaje, no durante la espera o con movimiento reducido.
+
 ---
 
 ## 15. Timeline de señal e impacto
 
-La señal y el impacto forman una única timeline.
-
-Conceptualmente:
+`NetworkAnimation` controla un único reloj que sólo avanza durante frames activos. Cada enlace con señal alterna entre espera y viaje:
 
 ```text
-TRAVEL → IMPACT → GAP → TRAVEL
+WAIT → TRAVEL → CONTACT → WAIT
+                     ↘ impacto independiente
 ```
 
-No deben existir dos sistemas independientes que intenten decidir cuándo ocurrió el impacto.
+La llegada crea un evento con identidad, receptor, ángulo congelado, instante de inicio, duración e intensidad propios. El impacto completa su timeline aunque desaparezca el enlace o se mueva el emisor. Varias llegadas al mismo receptor no se sustituyen ni reinician entre sí.
 
-La señal termina exactamente en el punto donde empieza el impacto.
+El renderer utiliza el mismo radio visual del nodo para terminar la señal y dibujar el punto de contacto. No deduce llegadas mediante un módulo temporal, ni selecciona sólo el impacto más fuerte de cada nodo.
 
-Esto evita:
-
-- retrasos visuales;
-- impactos antes de tiempo;
-- la sensación de recorrer espacio invisible dentro del nodo.
+Foco de teclado, pestaña oculta y salida del viewport congelan el tiempo sin provocar un salto al volver. Movimiento reducido elimina señales e impactos y conserva una superficie estática.
 
 ---
 
@@ -478,33 +447,22 @@ No buscamos un aro completo.
 
 ## 17. Forma temporal del impacto
 
-La forma buscada es:
+La referencia vigente es la auditoría `codex-item-network-background-audit.md`, no la duración antigua de 1–1.5 segundos.
 
-**ataque muy rápido + decay lento**.
-
-No una animación simétrica.
-
-Representación conceptual:
+La duración total es de **3.6 segundos**, con fases compartidas:
 
 ```text
-intensidad
-
-1.0        ╭─
-          ╱  ╲
-         ╱    ╲
-        ╱      ╲
-0.0 ───╯        ╲____________
-       ↑
-       impacto
+FLASH (90 ms) → SETTLE (270 ms) → HOLD (900 ms) → DECAY (2.34 s)
 ```
 
-Actualmente el objetivo es una duración total aproximada de:
+El ataque es rápido y la cola larga; no es una animación simétrica. Las capas tienen finales diferentes, medidos desde el contacto:
 
-**1–1.5 segundos máximo**
+- glint: aproximadamente 2.09 s;
+- punto brillante: aproximadamente 2.59 s;
+- limbo: aproximadamente 3.38 s;
+- corona: 3.6 s.
 
-con un pico alcanzado muy rápidamente, aproximadamente durante los primeros ~80 ms.
-
-El usuario debe percibir un flash y después una desaparición gradual.
+Cada capa pierde intensidad suavemente antes de su final. Estos valores están centralizados en configuración; afinarlos requiere comparar el resultado visual, no cambiar simultáneamente física y dibujo.
 
 ---
 
@@ -594,69 +552,57 @@ No queremos estética cyberpunk/neón.
 
 ## 20. Resize
 
-El componente debe responder correctamente al resize.
+El resize conserva nodos, identidades, seeds y caché de imágenes. Cada cambio real de medida adapta proporcionalmente las posiciones existentes, incluidos cambios sucesivos de uno o dos píxeles.
 
-Requisitos importantes:
+La población usa histéresis para no añadir y quitar nodos continuamente. Las conexiones se recalculan con sus reglas de proximidad; no se reconstruye la red completa.
 
-- no reconstruir toda la red;
-- no cambiar random seeds innecesariamente;
-- no parpadear;
-- no desaparecer;
-- no esperar a que el usuario redimensione para aparecer;
-- conservar las posiciones relativas existentes;
-- recolocar rápidamente tras cambios grandes de tamaño.
+Canvas usa píxeles CSS para geometría y un backing store con DPR limitado a 2. Su tamaño físico cambia inmediatamente antes de dibujar, para no dejar un Canvas borrado esperando otro frame. Cambios de DPR invalidan el dibujo sin recrear el motor.
 
-El Canvas modifica su backing store dentro del propio frame de render para reducir flashes transparentes.
+En modo estático, la población y conexiones se resuelven una sola vez tras un resize, sin un bucle permanente de asentamiento.
 
 ---
 
-## 21. Primer render
+## 21. Primer render y cleanup
 
-Hubo anteriormente un bug donde la red no aparecía al entrar hasta realizar un resize.
+La medida inicial ocurre en `useLayoutEffect`. Si el contenedor todavía mide cero, se permiten hasta tres intentos; `ResizeObserver` atiende cualquier medida posterior. No se mantiene un RAF de polling indefinido.
 
-La solución actual:
+La carga de un icono invalida el dibujo, también en modo estático. Un error de imagen conserva el cuerpo del nodo sin intentar recargar el mismo recurso en cada frame.
 
-- mide mediante `useLayoutEffect`;
-- si el padre todavía mide `0x0`, reintenta mediante `requestAnimationFrame`;
-- posteriormente utiliza `ResizeObserver`.
-
-No eliminar esta protección sin verificar que el primer render sigue siendo correcto.
+Cada montaje posee sus recursos y su cleanup: RAF de dibujo/medida, observadores, listeners, callbacks de imágenes y controller de interacción. Strict Mode y cambios rápidos de ruta utilizan la misma ruta de liberación.
 
 ---
 
 ## 22. `prefers-reduced-motion`
 
-Debe respetarse.
+El sistema se observa mediante `useReducedMotion` de la dependencia existente `framer-motion`.
 
-Con reduced motion:
+En este modo:
 
-- la superficie sigue visible;
-- los nodos permanecen renderizados;
-- no debe ser necesario ejecutar animación ambiental intensa;
-- las transferencias pueden desactivarse.
+- nodos y conexiones siguen visibles y seleccionables;
+- no avanzan la física ni las timelines;
+- señales e impactos se eliminan;
+- no existe un RAF permanente;
+- medidas, carga de iconos, theme e interacción pueden solicitar un único dibujo.
 
-No romper esta accesibilidad durante la simplificación.
+Un cambio de preferencia se aplica sin desmontar el fondo. Al reactivar el movimiento, las señales comienzan de nuevo sin reproducir tiempo pasado.
 
 ---
 
 ## 23. Rendimiento
 
-El componente está destinado a ejecutarse continuamente mediante Canvas.
+La animación activa usa Canvas y un único RAF; React sólo actualiza controles e información accesible al interactuar.
 
-La intención es mantenerlo relativamente ligero.
+Se conserva una población acotada de 26–94 nodos y la topología se revisa cada 0.13 s, no cada frame. Las pruebas de distancia descartan pares mediante distancia al cuadrado antes de calcular raíces o candidatos.
 
-Evitar:
+Las imágenes se cachean por ID y los colores derivados se reutilizan. Los arcos afinados y sus sombras se prerenderizan en una caché LRU de hasta 64 superficies pequeñas, con una máscara de trabajo compartida. El Canvas principal compone esas imágenes sin volver a aplicarles `shadowBlur`. Radio, grosor, opacidad y blur se discretizan; posición, rotación y opacidad final se compensan al componer para mantener continuidad. La caché distingue colores y DPR y se libera al desmontar. El punto de contacto y el glint conservan sus sombras nativas pequeñas.
 
-- `setState` a 60 FPS;
-- recrear nodos en cada frame;
-- recrear el engine;
-- componentes React por nodo;
-- DOM individual para cada conexión;
-- simulaciones físicas innecesariamente pesadas;
-- allocations masivas dentro del render loop;
-- observers duplicados.
+No se crea un Map de impactos por frame ni se consultan estilos del DOM dentro del dibujo. Nodos, enlaces e impactos fuera de la superficie se omiten.
 
-El estado de simulación debe seguir fuera del ciclo de render de React.
+El RAF se suspende con foco de teclado, movimiento reducido, pestaña oculta, contenedor de tamaño cero y salida del viewport.
+
+La ralentización sostenida se reprodujo en producción: el coste principal era rasterizar miles de segmentos con sombra por frame, no el tiempo de física JavaScript. El informe `item-network-background-implementation.md` distingue las mediciones anteriores y finales, con tamaños, DPR y limitaciones. No se certifica rendimiento en cualquier dispositivo ni ausencia de fugas de memoria. La repulsión sigue siendo O(n²) y las estelas utilizan un gradiente de geometría dinámica; no se añade un índice espacial o WebGL sin evidencia de otro cuello de botella.
+
+El easing compartido acota tanto la entrada como el resultado del polinomio. Un pequeño overshoot por redondeo cerca de 1 no puede generar energía restante negativa: las potencias fraccionarias del decay deben permanecer finitas hasta desaparecer. Esta invariancia evita que un final de impacto genere dimensiones `NaN` en la caché y detenga el RAF.
 
 ---
 

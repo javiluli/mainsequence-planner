@@ -33,7 +33,9 @@ const PlannerEmptyState = () => (
       text-center
     "
   >
-    <ItemNetworkBackground />
+    <Suspense fallback={null}>
+      <ItemNetworkBackground />
+    </Suspense>
 
     <div
       className="

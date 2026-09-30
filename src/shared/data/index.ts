@@ -1,4 +1,4 @@
-import type { Building, RawBuilding } from '@/shared/@types/building.type'
+import type { RawBuilding } from '@/shared/@types/building.type'
 import type { Item, RawItem } from '@/shared/@types/item.type'
 import buildingsCatalog from './main-sequence/buildings_and_recipes.json'
 import itemsCatalog from './main-sequence/items.json'

@@ -19,7 +19,6 @@ export type NetworkViewport = {
 export type NetworkPalette = {
   primary: RGB
   secondary: RGB
-  divider: RGB
   content: RGB
 
   raw: RGB
@@ -120,4 +119,20 @@ export type NetworkLink = {
    * Ciclos por segundo.
    */
   signalSpeed: number
+}
+
+export type NetworkSignal = {
+  startedAt: number
+  duration: number
+  progress: number
+}
+
+export type NetworkImpact = {
+  id: number
+  targetUid: number
+  angle: number
+  startedAt: number
+  duration: number
+  strength: number
+  progress: number
 }
