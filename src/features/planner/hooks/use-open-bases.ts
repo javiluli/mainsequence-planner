@@ -8,6 +8,6 @@ export const useOpenBases = () => {
 
   return (itemId: string) => {
     selectTargetItem(itemId)
-    navigate('/bases')
+    navigate('/bases?compare=planner')
   }
 }

@@ -1,9 +1,9 @@
-import { cn } from '@heroui/react'
+import { Button, cn } from '@heroui/react'
 import { itemNameById } from '@/shared/data'
 import { AssetImage } from '@/shared/ui/asset-image'
 import { type NodeProps } from '@xyflow/react'
-import { ArrowRight, Box, LockKeyhole, LockKeyholeOpen, Plus, X } from 'lucide-react'
-import { useMemo, type CSSProperties } from 'react'
+import { Box, LockKeyhole, LockKeyholeOpen, Package, Split } from 'lucide-react'
+import { memo, useCallback, useMemo, type CSSProperties } from 'react'
 import {
   beltConnection,
   beltIncoming,
@@ -18,24 +18,25 @@ import { indexPlacements, type BasePlacement } from '../lib/placement'
 import { recipeForPlaceable, recipeOutputs } from '../lib/machine-recipes'
 import { machinePortKey, machinePorts, oppositeDirection, portOutsideCell } from '../lib/ports'
 import { type RouteAnchor } from '../lib/route'
-import { canCrossStationBoundary, droneOutputPorts } from '../lib/stations'
+import { canCrossStationBoundary } from '../lib/stations'
 import { canMoveInLayout, canMoveRouteInLayout, canPlaceInLayout, routeCellOwner } from '../lib/world-layout'
-import {
-  CELL_SIZE,
-  PLACEABLES,
-  STATION_GATE_CELLS,
-  STATION_TYPES,
-  isRouteTool,
-  isSplitterType,
-  type Direction,
-  type PlaceableType,
-} from '../model/catalog'
+import { CELL_SIZE, PLACEABLES, STATION_TYPES, isRouteTool, isSplitterType, type PlaceableType } from '../model/catalog'
 
-import { MACHINE_BODY_INSET, cellInStation, edgePoints, faceSteps, portPosition } from '../lib/station-spatial'
+import {
+  MACHINE_BODY_INSET,
+  beltEndAnchor,
+  cellInStation,
+  corridorLockPosition,
+  edgePoints,
+  faceSteps,
+  portPosition,
+} from '../lib/station-spatial'
 import { type StationFlowNode } from '../model/station-node'
 import { useStationInteractions } from './use-station-interactions'
+import { DroneStationArtwork, StationFrame } from './station-artwork'
+import { PortArrow, PortMarker } from './port-marker'
 
-const arrowAngles: Record<Direction, number> = { north: -90, east: 0, south: 90, west: 180 }
+const unrestrictedEdge: CanTraverseEdge = () => true
 
 const machineMarkings: Partial<Record<PlaceableType, string>> = {
   reactor: 'REACTOR',
@@ -47,41 +48,7 @@ const machineMarkings: Partial<Record<PlaceableType, string>> = {
   computation_lab: 'COMPUTATION LAB',
 }
 
-/** These optical insets do not change the snapped, buildable cell footprints. */
-const STATION_FRAME_CLEARANCE = 4
-
-function stationFramePath(footprintCells: number, gateStarts: readonly number[], openFaces: readonly string[]): string {
-  const outer = footprintCells * CELL_SIZE
-  const frameSize = outer + STATION_FRAME_CLEARANCE * 2
-  const segments = (face: Direction): [number, number][] => {
-    if (!openFaces.includes(face)) return [[0, footprintCells]]
-    const rails: [number, number][] = []
-    let start = 0
-    for (const gate of gateStarts) {
-      rails.push([start, gate])
-      start = gate + STATION_GATE_CELLS
-    }
-    rails.push([start, footprintCells])
-    return rails
-  }
-  const coordinate = (cell: number) =>
-    cell === 0 ? 1.5 : cell === footprintCells ? frameSize - 1.5 : STATION_FRAME_CLEARANCE + cell * CELL_SIZE
-  return (['north', 'south', 'west', 'east'] as const)
-    .flatMap((face) =>
-      segments(face).map(([from, to]) =>
-        face === 'north'
-          ? `M${coordinate(from)} 1.5 H${coordinate(to)}`
-          : face === 'south'
-            ? `M${coordinate(from)} ${frameSize - 1.5} H${coordinate(to)}`
-            : face === 'west'
-              ? `M1.5 ${coordinate(from)} V${coordinate(to)}`
-              : `M${frameSize - 1.5} ${coordinate(from)} V${coordinate(to)}`,
-      ),
-    )
-    .join(' ')
-}
-
-function beltPath(placement: BasePlacement, connectedInput: boolean, connectedOutput: boolean) {
+function beltPath(placement: BasePlacement) {
   const entering = beltIncoming(placement)
   if (isSplitterType(placement.type)) {
     const [inputX, inputY] = edgePoints[entering]
@@ -92,11 +59,10 @@ function beltPath(placement: BasePlacement, connectedInput: boolean, connectedOu
       })
       .join(' ')}`
   }
-  const [startX, startY] = connectedInput || !connectedOutput ? edgePoints[entering] : [10, 10]
-  const [endX, endY] = connectedOutput || !connectedInput ? edgePoints[placement.direction] : [10, 10]
+  const [startX, startY] = edgePoints[entering]
+  const [endX, endY] = edgePoints[placement.direction]
   const bend = entering !== oppositeDirection(placement.direction)
-  const main =
-    bend && connectedInput === connectedOutput ? `M${startX} ${startY} Q10 10 ${endX} ${endY}` : `M${startX} ${startY} L${endX} ${endY}`
+  const main = bend ? `M${startX} ${startY} Q10 10 ${endX} ${endY}` : `M${startX} ${startY} L${endX} ${endY}`
   const branches = (placement.extraIncoming ?? []).map((face) => {
     const [x, y] = edgePoints[face]
     return `M${x} ${y} L10 10`
@@ -115,7 +81,7 @@ function beltFlowPath(placement: BasePlacement, flow: BeltFlow): string {
     : `M${startX} ${startY} Q10 10 ${endX} ${endY}`
 }
 
-export function BeltTile({
+export const BeltTile = memo(function BeltTile({
   occupied,
   placement,
   canTraverse,
@@ -140,10 +106,7 @@ export function BeltTile({
   sourceInput?: boolean
   hoveredPort?: RouteAnchor | null
 }) {
-  const tunnel = placement.type.startsWith('underground')
-  const connectedInput = tunnel || sourceInput || Boolean(beltConnection(occupied, placement, beltIncoming(placement), canTraverse))
-  const connectedOutput = tunnel || beltOutputs(placement).some((face) => Boolean(beltConnection(occupied, placement, face, canTraverse)))
-  const path = beltPath(placement, connectedInput, connectedOutput)
+  const path = beltPath(placement)
   const splitter = isSplitterType(placement.type)
   const incoming = beltIncoming(placement)
   const inputDescription = splitter ? ` · Input ${incoming}; outputs ${beltOutputs(placement).join(', ')}` : ''
@@ -184,7 +147,7 @@ export function BeltTile({
       {splitter ? (
         <>
           <span className="base-splitter-center absolute" aria-hidden>
-            S
+            <Split size={10} strokeWidth={2.5} />
           </span>
           {(['north', 'east', 'south', 'west'] as const).map((face) => {
             const input = face === incoming
@@ -206,21 +169,43 @@ export function BeltTile({
                 title={`${face} · ${input ? 'Input' : 'Output'} · ${connected ? 'Connected' : 'No connection'}`}
                 aria-hidden
               >
-                <ArrowRight
-                  size={8}
-                  strokeWidth={3}
-                  style={{ transform: `rotate(${arrowAngles[input ? oppositeDirection(face) : face]}deg)` }}
-                />
+                <PortArrow direction={input ? oppositeDirection(face) : face} />
               </span>
             )
           })}
         </>
       ) : null}
+      {!splitter && !preview && !placement.buried
+        ? (['input', 'output'] as const).map((role) => {
+            if (role === 'input' && sourceInput) return null
+            const anchor = beltEndAnchor(occupied, placement.x, placement.y, placement.type, role, canTraverse ?? unrestrictedEdge)
+            if (!anchor || anchor.kind !== 'port') return null
+            const [left, top] = edgePoints[anchor.face]
+            const hovered =
+              hoveredPort?.kind === 'port' &&
+              hoveredPort.x === anchor.x &&
+              hoveredPort.y === anchor.y &&
+              hoveredPort.face === anchor.face &&
+              hoveredPort.routeId === anchor.routeId
+            return (
+              <PortMarker
+                key={role}
+                className="base-belt-end"
+                face={anchor.face}
+                flow="unconnected"
+                arrowDirection={role === 'input' ? oppositeDirection(anchor.face) : anchor.face}
+                hovered={hovered}
+                style={{ left, top }}
+                title={role === 'input' ? 'Join belt here' : 'Continue belt here'}
+              />
+            )
+          })
+        : null}
     </div>
   )
-}
+})
 
-export function MachineTile({
+export const MachineTile = memo(function MachineTile({
   occupied,
   placement,
   canTraverse,
@@ -231,6 +216,7 @@ export function MachineTile({
   hoveredPort,
   selected = false,
   interactive = false,
+  onOpenItem,
 }: {
   occupied: OccupiedCells
   placement: BasePlacement
@@ -242,10 +228,11 @@ export function MachineTile({
   hoveredPort?: RouteAnchor | null
   selected?: boolean
   interactive?: boolean
+  onOpenItem?: (placementId: string) => void
 }) {
   const info = PLACEABLES[placement.type]
   const compact = info.width <= 3
-  const markerSize = compact ? 14 : 28
+  const markerSize = Math.min(88, Math.min(info.width, info.height) * CELL_SIZE * 0.5)
   const storage = placement.type === 'container'
   const recipe = recipeForPlaceable(placement.type, placement.recipeId)
   const products = recipe ? recipeOutputs(recipe) : []
@@ -266,7 +253,7 @@ export function MachineTile({
       title={
         preview
           ? undefined
-          : `${info.label} · ${placement.x + 1}, ${placement.y + 1} · ${info.width}×${info.height}${productNames ? ` · Produces ${productNames}` : ''}`
+          : `${info.label} · ${placement.x + 1}, ${placement.y + 1} · ${info.width}×${info.height}${productNames ? ` · Produces ${productNames} · Right-click to clear product` : ''}`
       }
       className={cn(
         'base-placement base-placement--machine absolute',
@@ -280,18 +267,22 @@ export function MachineTile({
         selected && 'base-placement--selected-machine',
       )}
       style={machineStyle}
+      onDragStart={(event) => event.preventDefault()}
     >
-      <span className={cn('base-machine-shell absolute', products.length && 'base-machine-shell--has-products')} aria-hidden>
+      <span
+        className={cn('base-machine-shell pointer-events-none absolute', products.length && 'base-machine-shell--has-products')}
+        aria-hidden
+      >
         <span className="base-machine-panel absolute inset-[4px]" />
         {products.length ? (
           <span className="base-machine-products absolute" aria-hidden>
             {visibleProducts.map((product, index) => (
               <span
                 key={`${product.id}:${index}`}
-                className="base-machine-product"
+                className={cn('base-machine-product', index === 0 && 'base-machine-product--primary')}
                 title={`${index === 0 ? 'Primary product' : 'Co-product'}: ${itemNameById.get(product.id) ?? product.id}`}
               >
-                <AssetImage kind="items" id={product.id} width={compact ? 12 : 22} alt="" />
+                <AssetImage kind="items" id={product.id} width={index === 0 ? markerSize : compact ? 12 : 22} alt="" />
               </span>
             ))}
             {hiddenProductCount ? (
@@ -305,20 +296,29 @@ export function MachineTile({
         ) : (
           <span className="base-machine-vent absolute top-[14%] right-[13%]" />
         )}
-        <span className="base-machine-band absolute right-[4px] left-[4px]">{machineMarkings[placement.type] ?? info.label}</span>
-        {placement.inputItemId ? (
-          <span
-            className="base-machine-item absolute"
-            title={`Input marker: ${itemNameById.get(placement.inputItemId) ?? placement.inputItemId}`}
-          >
-            <AssetImage kind="items" id={placement.inputItemId} width={compact ? 12 : 22} alt="" />
-          </span>
+        {!products.length ? (
+          <span className="base-machine-band absolute right-[4px] left-[4px]">{machineMarkings[placement.type] ?? info.label}</span>
         ) : null}
         <span className="base-machine-fastener base-machine-fastener--tl" />
         <span className="base-machine-fastener base-machine-fastener--tr" />
         <span className="base-machine-fastener base-machine-fastener--bl" />
         <span className="base-machine-fastener base-machine-fastener--br" />
       </span>
+      {interactive && onOpenItem && !storage && !products.length ? (
+        <Button
+          isIconOnly
+          size="sm"
+          variant="flat"
+          aria-label={`Choose product for ${info.label}`}
+          title="Choose product"
+          className="base-machine-item-button nodrag nopan absolute h-5 min-h-0 w-5 min-w-0 rounded-sm p-0"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => event.stopPropagation()}
+          onPress={() => onOpenItem(placement.id)}
+        >
+          <Package size={12} aria-hidden />
+        </Button>
+      ) : null}
       {machinePorts(placement)
         .filter((port) => !canTraverse || canAccessMachinePort(placement, port, canTraverse))
         .map((port) => {
@@ -334,33 +334,26 @@ export function MachineTile({
               {flow && flow !== 'disabled-output' ? (
                 <span className="base-machine-port-bridge absolute" data-face={port.face} style={position} />
               ) : null}
-              <span
+              <PortMarker
                 className={cn(
                   'base-machine-port absolute',
                   routeable && 'base-machine-port--routeable',
                   portHovered && 'base-machine-port--hovered',
                 )}
-                data-face={port.face}
-                data-flow={flow ?? 'unconnected'}
-                data-output-enabled={outputEnabled}
+                face={port.face}
+                flow={flow ?? (outputEnabled ? 'unconnected' : 'disabled-output')}
+                outputEnabled={outputEnabled}
+                connected={Boolean(flow && flow !== 'disabled-output')}
+                hovered={portHovered}
                 title={portDescription}
                 style={position}
-              >
-                {flow === 'disabled-output' || (!flow && !outputEnabled) ? (
-                  <X size={8} strokeWidth={3} />
-                ) : flow ? (
-                  <ArrowRight
-                    size={8}
-                    style={{ transform: `rotate(${arrowAngles[flow === 'output' ? port.face : oppositeDirection(port.face)]}deg)` }}
-                  />
-                ) : null}
-              </span>
+              />
             </span>
           )
         })}
     </div>
   )
-}
+})
 
 export function StationNode({ data }: NodeProps<StationFlowNode>) {
   const {
@@ -384,24 +377,28 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
     routePreviewValid,
     onActivate,
     onOpenDroneOutput,
+    onOpenMachineItem,
     onToggleStationLock,
   } = data
-  const { footprintCells, gateStarts, openFaces } = STATION_TYPES[station.type]
+  const { footprintCells } = STATION_TYPES[station.type]
   const outerSize = footprintCells * CELL_SIZE
-  const frameSize = outerSize + STATION_FRAME_CLEARANCE * 2
   const worldX = station.position.x / CELL_SIZE
   const worldY = station.position.y / CELL_SIZE
-  const canTraverse: CanTraverseEdge = (x, y, face) => {
-    const [dx, dy] = faceSteps[face]
-    return canCrossStationBoundary(
-      layoutStations,
-      { x: worldX + x, y: worldY + y },
-      { x: worldX + x + dx, y: worldY + y + dy },
-      layoutCorridors,
-    )
-  }
+  const openMachineItem = useCallback((placementId: string) => onOpenMachineItem(station.id, placementId), [station.id, onOpenMachineItem])
+  // Route hover does not change walls or placed machines. Keep their render inputs stable.
+  const canTraverse: CanTraverseEdge = useCallback(
+    (x, y, face) => {
+      const [dx, dy] = faceSteps[face]
+      return canCrossStationBoundary(
+        layoutStations,
+        { x: worldX + x, y: worldY + y },
+        { x: worldX + x + dx, y: worldY + y + dy },
+        layoutCorridors,
+      )
+    },
+    [layoutStations, layoutCorridors, worldX, worldY],
+  )
   const ownedCorridors = layoutCorridors.filter((corridor) => corridor.ownerId === station.id)
-  const framePath = stationFramePath(footprintCells, gateStarts, openFaces)
   const {
     cursor,
     hovered,
@@ -440,6 +437,14 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
     })
     return cells
   }, [occupied, worldPreviewRoute, worldX, worldY, routeActive, routeDraft])
+  const joinAnchor = routeDraft?.hover
+  const joinPreview =
+    routeActive &&
+    joinAnchor?.kind === 'port' &&
+    joinAnchor.mergeTargetId &&
+    previewRoute.some((cell) => cell.x === joinAnchor.x - worldX && cell.y === joinAnchor.y - worldY)
+      ? joinAnchor
+      : null
 
   const ghostType = station.type !== 'drone_station' && tool !== 'select' && tool !== 'erase' && !isRouteTool(tool) ? tool : null
   const ghost: BasePlacement | null = ghostType
@@ -506,27 +511,14 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
       )}
       style={{ width: outerSize, height: outerSize }}
     >
-      <svg
-        className={cn('base-station-frame absolute', tool === 'select' && !pasteActive && 'base-station-frame--interactive')}
-        style={{ left: -STATION_FRAME_CLEARANCE, top: -STATION_FRAME_CLEARANCE }}
-        width={frameSize}
-        height={frameSize}
-        viewBox={`0 0 ${frameSize} ${frameSize}`}
-        aria-hidden
-      >
-        <path className="base-station-frame-hit" d={framePath} />
-        <path d={framePath} />
-        <circle cx="7" cy="7" r="2" />
-        <circle cx={frameSize - 7} cy="7" r="2" />
-        <circle cx="7" cy={frameSize - 7} r="2" />
-        <circle cx={frameSize - 7} cy={frameSize - 7} r="2" />
-      </svg>
+      <StationFrame station={station} corridors={layoutCorridors} interactive={tool === 'select' && !pasteActive} />
       <div
-        role="button"
+        role="group"
+        aria-roledescription="station grid"
         tabIndex={0}
         aria-label={
           station.type === 'drone_station'
-            ? `${station.name}, ${footprintCells} by ${footprintCells} module, no internal building area, two output ports on its south face.`
+            ? `${station.name}, ${footprintCells} by ${footprintCells} module, no internal building area, two output ports on its ${station.direction ?? 'south'} face.`
             : `${station.name}, ${footprintCells} by ${footprintCells} buildable cells, with walls between stations except at doorways. Shift-drag selects parts only, not stations or notes. Click to place, arrow keys and Enter for keyboard placement, Escape or right-click to stop.`
         }
         className={cn(
@@ -548,67 +540,19 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
         onFocus={handleFocus}
       >
         {station.type === 'drone_station' ? (
-          <>
-            <svg className="base-drone-art pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 280 280" aria-hidden>
-              <path d="M119 28h42l10 22H109z" fill="#3a4b56" stroke="#7f939e" strokeWidth="2" />
-              <path d="M88 54h104l58 43v86l-58 43H88l-58-43V97z" fill="#aebbc4" stroke="#526672" strokeWidth="5" />
-              <path d="M91 62h98l53 39v78l-53 39H91l-53-39v-78z" fill="#d1d8dc" stroke="#eff2f1" strokeWidth="2" />
-              <path d="M106 58h68l-11 42h-46zM83 190h114l-11 29H94z" fill="#899aa5" opacity=".8" />
-              <rect x="29" y="119" width="47" height="46" rx="12" fill="#e7bd66" stroke="#956b35" strokeWidth="3" />
-              <rect x="38" y="127" width="29" height="30" rx="8" fill="#8797a1" stroke="#50626e" strokeWidth="2" />
-              <rect x="204" y="119" width="47" height="46" rx="12" fill="#e7bd66" stroke="#956b35" strokeWidth="3" />
-              <rect x="213" y="127" width="29" height="30" rx="8" fill="#8797a1" stroke="#50626e" strokeWidth="2" />
-              <path d="M118 91h44l17 38-17 60h-44l-17-60z" fill="#81909a" stroke="#5a6b76" strokeWidth="3" />
-              <path d="M112 121h56l13 16-13 18h-56l-13-18z" fill="#eaa53d" stroke="#a76f24" strokeWidth="3" />
-              <circle cx="140" cy="138" r="13" fill="#536673" stroke="#f6c766" strokeWidth="4" />
-              <circle cx="140" cy="138" r="5" fill="#b3c4cb" />
-              <path d="M105 205v73h70v-73" fill="#758894" stroke="#526672" strokeWidth="3" />
-              <text x="140" y="187" textAnchor="middle" fill="#364b56" fontSize="10" fontWeight="800" letterSpacing="2">
-                DRONE
-              </text>
-            </svg>
-            {([0, 1] as const).map((slot) => {
-              const itemId = station.droneOutputs?.[slot]
-              const label = itemId ? (itemNameById.get(itemId) ?? itemId) : 'unassigned'
-              return (
-                <span
-                  key={`drone-cargo-${slot}`}
-                  className={cn('base-drone-item absolute', (tool !== 'select' || pasteActive) && 'pointer-events-none')}
-                  style={{ left: slot === 0 ? 29 : 204, top: 119 }}
-                >
-                  {itemId ? <AssetImage kind="items" id={itemId} width={28} alt="" /> : <Plus size={16} aria-hidden />}
-                  {tool === 'select' && !pasteActive ? (
-                    <button
-                      type="button"
-                      className="nodrag nopan absolute inset-0 rounded-[10px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                      aria-label={`Assign item to drone ${slot + 1}, currently ${label}`}
-                      title={`Drone ${slot + 1}: ${label}. Click to assign.`}
-                      onPointerDown={(event) => event.stopPropagation()}
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        onActivate(station.id)
-                        onOpenDroneOutput(station.id, slot)
-                      }}
-                    />
-                  ) : null}
-                </span>
-              )
-            })}
-            {droneOutputPorts(station).map((port) => (
-              <span
-                key={port.slot}
-                className="base-drone-port pointer-events-none absolute"
-                style={{ left: (port.x - worldX + 0.5) * CELL_SIZE, top: outerSize }}
-                title={
-                  port.itemId
-                    ? `Output ${port.slot + 1}: ${itemNameById.get(port.itemId) ?? port.itemId}`
-                    : `Output ${port.slot + 1}: unassigned`
-                }
-              >
-                <ArrowRight size={9} style={{ transform: 'rotate(90deg)' }} aria-hidden />
-              </span>
-            ))}
-          </>
+          <DroneStationArtwork
+            station={station}
+            corridors={layoutCorridors}
+            hoveredPort={hoveredPort}
+            onAssign={
+              tool === 'select' && !pasteActive
+                ? (slot) => {
+                    onActivate(station.id)
+                    onOpenDroneOutput(station.id, slot)
+                  }
+                : undefined
+            }
+          />
         ) : null}
         {ownedCorridors.map((corridor) => (
           <span
@@ -634,6 +578,15 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
             (selectionPreview && selectedAreaIds.has(placed.id))
           )
             return null
+          const footprint = PLACEABLES[placed.type]
+          const nearbyPort =
+            hoveredPort &&
+            hoveredPort.x >= placed.x - 1 &&
+            hoveredPort.x <= placed.x + footprint.width &&
+            hoveredPort.y >= placed.y - 1 &&
+            hoveredPort.y <= placed.y + footprint.height
+              ? hoveredPort
+              : null
           return PLACEABLES[placed.type].category === 'logistics' ? (
             <BeltTile
               key={placed.id}
@@ -643,7 +596,7 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
               flows={animatedBelts.get(placed.id)}
               sourceInput={droneSourceCells.has(`${worldX + placed.x},${worldY + placed.y}`)}
               selected={placed.id === selectedPlacementId || placed.routeId === selectedRouteId || selectedAreaIds.has(placed.id)}
-              hoveredPort={hoveredPort}
+              hoveredPort={nearbyPort}
               interactive={tool === 'select' && !pasteActive}
             />
           ) : (
@@ -653,9 +606,10 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
               placement={placed}
               canTraverse={canTraverse}
               routeable={isRouteTool(tool)}
-              hoveredPort={hoveredPort}
+              hoveredPort={nearbyPort}
               selected={placed.id === selectedPlacementId || selectedAreaIds.has(placed.id)}
               interactive={tool === 'select' && !pasteActive}
+              onOpenItem={openMachineItem}
             />
           )
         })}
@@ -686,6 +640,20 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
                 />
               ))
           : null}
+        {joinPreview ? (
+          <PortMarker
+            className="base-belt-join-preview"
+            face={joinPreview.face}
+            flow={routePreviewValid ? 'unconnected' : 'disabled-output'}
+            arrowDirection={oppositeDirection(joinPreview.face)}
+            hovered={routePreviewValid}
+            style={{
+              left: (joinPreview.x - worldX + 0.5 - faceSteps[joinPreview.face][0] / 2) * CELL_SIZE,
+              top: (joinPreview.y - worldY + 0.5 - faceSteps[joinPreview.face][1] / 2) * CELL_SIZE,
+            }}
+            title={routePreviewValid ? 'Join conveyor' : 'Cannot join conveyor here'}
+          />
+        ) : null}
         {ghost && hovered ? (
           PLACEABLES[ghost.type].category === 'machine' ? (
             <MachineTile
@@ -785,32 +753,39 @@ export function StationNode({ data }: NodeProps<StationFlowNode>) {
         />
       </div>
       {tool === 'select' && !pasteActive
-        ? ownedCorridors
-            .filter((corridor, index) => ownedCorridors.findIndex((other) => other.otherId === corridor.otherId) === index)
-            .map((corridor) => {
+        ? ownedCorridors.flatMap((corridor) =>
+            (['near', 'far'] as const).map((side) => {
               const locked = station.lockedTo.includes(corridor.otherId)
               return (
-                <button
-                  key={`lock-${corridor.otherId}`}
-                  type="button"
-                  className="base-corridor-lock nodrag nopan absolute"
-                  style={{
-                    left: (corridor.x - worldX + corridor.width / 2) * CELL_SIZE,
-                    top: (corridor.y - worldY + corridor.height / 2) * CELL_SIZE,
-                  }}
+                <Button
+                  key={`lock-${corridor.id}-${side}`}
+                  isIconOnly
+                  disableAnimation
+                  disableRipple
+                  variant="flat"
+                  className="base-corridor-lock nodrag nopan absolute h-5 min-h-0 w-5 min-w-0 rounded-sm p-0"
+                  style={corridorLockPosition(
+                    corridor,
+                    { x: worldX, y: worldY },
+                    station.type === 'drone_station'
+                      ? 'start'
+                      : layoutStations.find((other) => other.id === corridor.otherId)?.type === 'drone_station'
+                        ? 'end'
+                        : undefined,
+                    side,
+                  )}
                   aria-label={locked ? 'Unlock stations' : 'Lock stations together'}
                   aria-pressed={locked}
                   title={locked ? 'Unlock stations' : 'Lock stations together'}
                   onPointerDown={(event) => event.stopPropagation()}
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    onToggleStationLock(station.id, corridor.otherId)
-                  }}
+                  onClick={(event) => event.stopPropagation()}
+                  onPress={() => onToggleStationLock(station.id, corridor.otherId)}
                 >
-                  {locked ? <LockKeyhole size={13} aria-hidden /> : <LockKeyholeOpen size={13} aria-hidden />}
-                </button>
+                  {locked ? <LockKeyhole size={10} aria-hidden /> : <LockKeyholeOpen size={10} aria-hidden />}
+                </Button>
               )
-            })
+            }),
+          )
         : null}
     </section>
   )

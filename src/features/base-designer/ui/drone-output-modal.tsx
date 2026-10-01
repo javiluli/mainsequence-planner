@@ -23,7 +23,7 @@ export function DroneOutputModal({ station, activeSlot, onSlotChange, onOpenChan
       open={Boolean(station)}
       onOpenChange={onOpenChange}
       title="Drone station outputs"
-      description="Each drone delivers one selected item through its own output. Choose a drone, then assign its cargo."
+      description="Choose each drone’s cargo as a visual label. No delivery rate is calculated."
       items={itemChoices}
       selectedItemId={selectedItemId}
       onSelect={(itemId) => {

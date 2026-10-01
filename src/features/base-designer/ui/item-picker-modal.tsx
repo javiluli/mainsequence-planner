@@ -14,9 +14,10 @@ interface ItemPickerModalProps {
   onSelect: (itemId: string | null) => void
   closeOnSelect?: boolean
   context?: ReactNode
+  emptyMessage?: string
 }
 
-/** Catalog-backed picker shared by drone outputs and machine input markers. */
+/** Catalog-backed visual item picker shared by drones and machines. */
 export function ItemPickerModal({
   open,
   onOpenChange,
@@ -27,6 +28,7 @@ export function ItemPickerModal({
   onSelect,
   closeOnSelect = false,
   context,
+  emptyMessage = 'No eligible items are available.',
 }: ItemPickerModalProps) {
   const [query, setQuery] = useState('')
   const normalizedQuery = query.trim().toLocaleLowerCase()
@@ -83,7 +85,7 @@ export function ItemPickerModal({
               )}
             </>
           ) : (
-            <p className="border border-divider bg-content2 p-3 text-sm text-foreground/65">No eligible items are available.</p>
+            <p className="border border-divider bg-content2 p-3 text-sm text-foreground/75">{emptyMessage}</p>
           )}
         </ModalBody>
         <ModalFooter className="border-t border-divider">

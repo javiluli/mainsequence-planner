@@ -41,7 +41,10 @@ export interface StationNodeData extends Record<string, unknown> {
     mergeTargetId?: string,
   ) => void
   onPickTool: (type: PlaceableType) => void
+  onStartBelt?: (stationId: string, anchor: Extract<RouteAnchor, { kind: 'port' }>) => void
   onOpenDroneOutput: (stationId: string, slot: 0 | 1) => void
+  onOpenMachineItem: (stationId: string, placementId: string) => void
+  onClearMachineItem: (stationId: string, placementId: string) => void
   onAreaSelect: (ids: string[]) => void
   onMoveArea: (ids: readonly string[], dx: number, dy: number) => boolean
   onSelectionPreview: (sourceStationId: string, dx: number, dy: number) => void

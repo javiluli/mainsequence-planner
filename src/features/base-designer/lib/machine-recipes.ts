@@ -1,4 +1,5 @@
-import { buildings, itemNameById } from '@/shared/data'
+import { buildings, itemById } from '@/shared/data'
+import type { Item } from '@/shared/@types/item.type'
 import type { Recipe, RecipeOutput } from '@/shared/@types/building.type'
 import type { PlaceableType } from '../model/catalog'
 
@@ -25,6 +26,18 @@ export function recipeOutputs(recipe: Recipe): readonly RecipeOutput[] {
   return [recipe.output, ...(recipe.extra_outputs ?? [])]
 }
 
-export function recipeLabel(recipe: Recipe): string {
-  return itemNameById.get(recipe.output.id) ?? recipe.output.id
+/** The visual picker lists each primary product once, regardless of alternative recipes. */
+export function machineProductItems(type: PlaceableType): Item[] {
+  const products = new Map<string, Item>()
+  for (const recipe of recipesForPlaceable(type)) {
+    const item = itemById.get(recipe.output.id)
+    if (recipe.id && item) products.set(item.id, item)
+  }
+  return [...products.values()]
+}
+
+/** Keep an existing alternative when relabeling the same product; no rates are calculated. */
+export function recipeForProduct(type: PlaceableType, itemId: string, currentRecipeId?: string): Recipe | undefined {
+  const current = recipeForPlaceable(type, currentRecipeId)
+  return current?.output.id === itemId ? current : recipesForPlaceable(type).find((recipe) => recipe.id && recipe.output.id === itemId)
 }

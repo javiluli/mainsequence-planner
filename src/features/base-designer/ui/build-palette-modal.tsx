@@ -12,6 +12,7 @@ import {
   type StationType,
 } from '../model/catalog'
 import { BeltTile, MachineTile } from './station-node'
+import { DroneStationArtwork } from './station-artwork'
 
 interface BuildPaletteModalProps {
   open: boolean
@@ -44,6 +45,7 @@ function PartButton({ type, active, onSelect }: { type: PlaceableType; active: b
       )}
       onPress={() => onSelect(type)}
       aria-pressed={active}
+      title={part.label}
     >
       <span className="flex h-16 w-full items-center justify-center" aria-hidden>
         <span className="relative block shrink-0" style={{ width: width * scale, height: height * scale }}>
@@ -61,9 +63,6 @@ function PartButton({ type, active, onSelect }: { type: PlaceableType; active: b
       </span>
       <span className="flex w-full flex-col items-center gap-0.5">
         <span className="w-full truncate text-[11px] font-semibold uppercase tracking-wide">{part.label}</span>
-        {'capacityPerMinute' in part ? (
-          <span className="text-[10px] tabular-nums text-foreground/60">{part.capacityPerMinute}/min</span>
-        ) : null}
       </span>
     </Button>
   )
@@ -74,13 +73,13 @@ function StationThumbnail({ type }: { type: StationType }) {
   const patternId = `station-palette-grid-${type}`
   if (type === 'drone_station') {
     return (
-      <svg viewBox="0 0 48 48" className="size-11 shrink-0" aria-hidden>
-        <rect x="17" y="30" width="14" height="17" rx="2" fill="#788b97" stroke="#526672" />
-        <path d="M14 7h20l10 9v17l-10 8H14L4 33V16z" fill="#c9d2d6" stroke="#728894" strokeWidth="2" />
-        <rect x="4" y="19" width="8" height="11" rx="3" fill="#e3a344" />
-        <rect x="36" y="19" width="8" height="11" rx="3" fill="#e3a344" />
-        <rect x="17" y="20" width="14" height="9" rx="2" fill="#e3a344" />
-      </svg>
+      <span className="relative block size-11 shrink-0" aria-hidden>
+        <span className="absolute left-0 top-0 size-[280px] origin-top-left scale-[0.15714]">
+          <DroneStationArtwork
+            station={{ id: 'palette-drone', type, name: 'Drone Station', position: { x: 0, y: 0 }, placements: [], lockedTo: [] }}
+          />
+        </span>
+      </span>
     )
   }
   return (
@@ -144,7 +143,14 @@ export function BuildPaletteModal({ open, onOpenChange, tool, onSelect, onAddSta
   )
 
   return (
-    <Modal isOpen={open} onOpenChange={onOpenChange} size="5xl" scrollBehavior="inside" classNames={{ base: 'rounded-sm bg-content1' }}>
+    <Modal
+      disableAnimation
+      isOpen={open}
+      onOpenChange={onOpenChange}
+      size="5xl"
+      scrollBehavior="inside"
+      classNames={{ base: 'rounded-sm bg-content1' }}
+    >
       <ModalContent>
         <ModalHeader className="border-b border-divider">Build menu</ModalHeader>
         <ModalBody className="gap-5 py-5">

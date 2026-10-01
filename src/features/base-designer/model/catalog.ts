@@ -53,6 +53,7 @@ export type RouteTool = 'conveyor' | 'conveyor_mk2' | 'underground' | 'undergrou
 export const CELL_SIZE = 20
 export const STATION_GATE_CELLS = 6
 export const STATION_CORRIDOR_CELLS = 2
+export const DRONE_CORRIDOR_CELLS = 1
 
 export function isRouteTool(tool: EditorTool): tool is RouteTool {
   return tool === 'conveyor' || tool === 'conveyor_mk2' || tool === 'underground' || tool === 'underground_mk2'

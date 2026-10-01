@@ -99,22 +99,6 @@ export function machinePortFlow(
   return null
 }
 
-export interface MachinePortState extends MachinePort {
-  flow: ReturnType<typeof machinePortFlow>
-  accessible: boolean
-  outputEnabled: boolean
-}
-
-/** Connectivity and output permission are independent: a disabled outlet still admits an input. */
-export function machinePortStates(occupied: OccupiedCells, machine: BasePlacement, canTraverse: CanTraverseEdge): MachinePortState[] {
-  return machinePorts(machine).map((port) => ({
-    ...port,
-    flow: machinePortFlow(occupied, machine, port, canTraverse),
-    accessible: canAccessMachinePort(machine, port, canTraverse),
-    outputEnabled: !machine.disabledOutputPorts?.includes(machinePortKey(port)),
-  }))
-}
-
 /** The phase keeps moving slats continuous across straight cells and rounded corners. */
 function beltLength(belt: BasePlacement, entering: Direction, leaving: Direction): number {
   if (isSplitterType(belt.type) || belt.extraIncoming?.includes(entering)) return 20

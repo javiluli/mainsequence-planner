@@ -9,7 +9,12 @@ import { items } from '@/shared/data'
 import { CELL_SIZE, PLACEABLES, STATION_TYPES } from '@/features/base-designer/model/catalog'
 import type { BaseStation } from '@/features/base-designer/lib/placement'
 import { useBaseDesignerStore } from '@/store/base-designer.store'
-import { recipeForPlaceable, recipesForPlaceable } from '@/features/base-designer/lib/machine-recipes'
+import {
+  machineProductItems,
+  recipeForPlaceable,
+  recipeForProduct,
+  recipesForPlaceable,
+} from '@/features/base-designer/lib/machine-recipes'
 
 function station(id: string, type: BaseStation['type'], x: number): BaseStation {
   return { id, type, name: id, position: { x: x * CELL_SIZE, y: 0 }, lockedTo: [], placements: [] }
@@ -20,6 +25,97 @@ afterEach(() => {
 })
 
 describe('base layout catalog', () => {
+  it('keeps a cross-station route whole when deleting from either module', () => {
+    useBaseDesignerStore.setState({ stations: [station('a', 'station_1x1', 0), station('b', 'station_1x1', 16)], past: [], future: [] })
+    const cells = routeCells([
+      { kind: 'floor', x: 10, y: 6 },
+      { kind: 'floor', x: 19, y: 6 },
+    ])
+    expect(useBaseDesignerStore.getState().placeRoute('a', 'conveyor', cells)).toBe(true)
+    const placed = useBaseDesignerStore.getState().stations.flatMap((entry) => entry.placements)
+    expect(placed).toHaveLength(10)
+    expect(new Set(placed.map((piece) => piece.routeId)).size).toBe(1)
+    useBaseDesignerStore.getState().removeAt('b', 1, 6)
+    expect(useBaseDesignerStore.getState().stations.flatMap((entry) => entry.placements)).toEqual([])
+    useBaseDesignerStore.getState().undo()
+    expect(useBaseDesignerStore.getState().stations.flatMap((entry) => entry.placements)).toEqual(placed)
+  })
+
+  it('rejects a route through a wall or a disconnected gap without partial state or history', () => {
+    const stations = [station('a', 'station_1x1', 0), station('b', 'station_1x1', 17)]
+    useBaseDesignerStore.setState({ stations, past: [], future: [] })
+    const cells = routeCells([
+      { kind: 'floor', x: 10, y: 6 },
+      { kind: 'floor', x: 20, y: 6 },
+    ])
+    expect(useBaseDesignerStore.getState().placeRoute('a', 'conveyor', cells)).toBe(false)
+    expect(useBaseDesignerStore.getState().stations).toBe(stations)
+    expect(useBaseDesignerStore.getState().past).toEqual([])
+    const aligned = [station('a', 'station_1x1', 0), station('b', 'station_1x1', 16)]
+    expect(
+      canPlaceRouteInLayout(
+        aligned,
+        'a',
+        routeCells([
+          { kind: 'floor', x: 10, y: 2 },
+          { kind: 'floor', x: 19, y: 2 },
+        ]),
+      ),
+    ).toBe(false)
+  })
+
+  it('cancels a station drag without adding undo history or accepting a late finish', () => {
+    const stations = [station('a', 'station_1x1', 0)]
+    useBaseDesignerStore.setState({ stations, past: [], future: [] })
+    useBaseDesignerStore.getState().beginMoveStation()
+    useBaseDesignerStore.getState().moveStation('a', { x: 40, y: 20 })
+    useBaseDesignerStore.getState().cancelMove()
+    useBaseDesignerStore.getState().endMoveStation()
+    expect(useBaseDesignerStore.getState().stations).toBe(stations)
+    expect(useBaseDesignerStore.getState().past).toEqual([])
+    expect(useBaseDesignerStore.getState().dragStartStations).toBeNull()
+  })
+
+  it('keeps a disabled reactor port attached to the same opening through four rotations', () => {
+    const piece: BasePlacement = { id: 'reactor', type: 'reactor', x: 2, y: 2, direction: 'east', disabledOutputPorts: ['west:2'] }
+    useBaseDesignerStore.setState({ stations: [{ ...station('a', 'station_1x1', 0), placements: [piece] }], past: [], future: [] })
+    for (let index = 0; index < 4; index++) useBaseDesignerStore.getState().rotateAt('a', 2, 2)
+    expect(useBaseDesignerStore.getState().stations[0].placements[0]).toEqual(piece)
+    expect(useBaseDesignerStore.getState().past).toHaveLength(4)
+  })
+
+  it('lists a visual product only once and preserves an already assigned alternative', () => {
+    const alternatives = recipesForPlaceable('refinery').filter((recipe) => recipe.output.id === 'T_CobaltPlates')
+    expect(alternatives).toHaveLength(2)
+    expect(machineProductItems('refinery').filter((item) => item.id === 'T_CobaltPlates')).toHaveLength(1)
+    expect(recipeForProduct('refinery', 'T_CobaltPlates', alternatives[1].id)).toBe(alternatives[1])
+  })
+
+  it('offers only catalog products associated with this machine, without inventing missing building data', () => {
+    const products = machineProductItems('refinery')
+    expect(products.length).toBeGreaterThan(0)
+    expect(products.every((item) => recipesForPlaceable('refinery').some((recipe) => recipe.output.id === item.id))).toBe(true)
+    expect(machineProductItems('reactor')).toEqual([])
+    expect(recipeForProduct('refinery', 'not-in-catalog')).toBeUndefined()
+  })
+
+  it('assigns and clears a visual product without any belts or supplied ingredients', () => {
+    useBaseDesignerStore.setState({ stations: [station('a', 'station_1x1', 0)], past: [], future: [] })
+    useBaseDesignerStore.getState().place('a', 'refinery', 1, 1)
+    const piece = useBaseDesignerStore.getState().stations[0].placements[0]
+    expect(useBaseDesignerStore.getState().setMachineProduct('a', piece.id, 'T_CobaltPlates')).toBe(true)
+    const assigned = useBaseDesignerStore.getState().stations[0].placements[0]
+    expect(recipeForPlaceable(assigned.type, assigned.recipeId)?.output.id).toBe('T_CobaltPlates')
+    const before = useBaseDesignerStore.getState().past.length
+    expect(useBaseDesignerStore.getState().setMachineProduct('a', piece.id, 'T_CobaltPlates')).toBe(true)
+    expect(useBaseDesignerStore.getState().past).toHaveLength(before)
+    expect(useBaseDesignerStore.getState().setMachineProduct('a', piece.id, 'T_CobaltOre')).toBe(false)
+    expect(useBaseDesignerStore.getState().setMachineProduct('a', piece.id, null)).toBe(true)
+    expect(useBaseDesignerStore.getState().stations[0].placements[0].recipeId).toBeUndefined()
+    useBaseDesignerStore.getState().undo()
+    expect(useBaseDesignerStore.getState().stations[0].placements[0].recipeId).toBe(assigned.recipeId)
+  })
+
   it('preserves buildable station footprints and two-cell passages', () => {
     expect(STATION_TYPES.station_1x1.footprintCells).toBe(14)
     expect(STATION_TYPES.station_2x2_a.footprintCells).toBe(30)
@@ -92,8 +188,8 @@ describe('base layout catalog', () => {
 
   it('opens only the drone face with two central item outlets', () => {
     const drone = station('drone', 'drone_station', 0)
-    const south = { ...station('south', 'station_1x1', 0), position: { x: 0, y: 16 * CELL_SIZE } }
-    expect(connectedCorridors([drone, south])).toMatchObject([{ x: 4, y: 14, width: 6, height: 2 }])
+    const south = { ...station('south', 'station_1x1', 0), position: { x: 0, y: 15 * CELL_SIZE } }
+    expect(connectedCorridors([drone, south])).toMatchObject([{ x: 4, y: 14, width: 6, height: 1 }])
     expect(connectedCorridors([drone, station('east', 'station_1x1', 16)])).toEqual([])
     expect(droneOutputPorts(drone)).toMatchObject([
       { slot: 0, x: 6, y: 14, face: 'south', itemId: null },

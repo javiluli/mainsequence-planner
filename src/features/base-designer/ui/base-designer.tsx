@@ -1,5 +1,5 @@
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@heroui/react'
-import { Background, BackgroundVariant, ReactFlow, type ReactFlowInstance } from '@xyflow/react'
+import { Background, BackgroundVariant, ReactFlow, ViewportPortal, type NodeChange, type ReactFlowInstance } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
   Box,
@@ -8,12 +8,11 @@ import {
   Eraser,
   Factory,
   Hand,
-  List,
+  Package,
   Plus,
   Redo2,
   RotateCw,
   Scan,
-  Settings2,
   StickyNote,
   Trash2,
   Undo2,
@@ -23,15 +22,24 @@ import {
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useBaseDesignerStore, type BaseNote } from '@/store/base-designer.store'
+import type { ProductionPlan } from '@/features/planner'
 import { buildings } from '@/shared/data'
-import { CELL_SIZE, PLACEABLES, STATION_TYPES, isRouteTool, type EditorTool, type Direction, type StationType } from '../model/catalog'
+import {
+  CELL_SIZE,
+  PLACEABLES,
+  STATION_TYPES,
+  isRouteTool,
+  type EditorTool,
+  type Direction,
+  type RouteTool,
+  type StationType,
+} from '../model/catalog'
 import { indexPlacements, type BasePlacement, type BaseStation } from '../lib/placement'
 import { externalStationRouteIds } from '../lib/station-clone'
 import { clipboardPlacementsAt } from '../lib/clipboard'
-import { buildLayoutInventory, inventoryEntryKey, type LayoutInventoryEntry } from '../lib/inventory'
-import { connectedProductionBelts, machinePortStates, type CanTraverseEdge } from '../lib/connections'
-import { machinePortKey } from '../lib/ports'
-import { canCrossStationBoundary, connectedCorridors, droneOutputPorts } from '../lib/stations'
+import { beltIncoming, connectedProductionBelts, type CanTraverseEdge } from '../lib/connections'
+import { machinePortKey, oppositeDirection } from '../lib/ports'
+import { canCrossStationBoundary, connectedCorridors, droneOutputPorts, stationPreviewCorridors } from '../lib/stations'
 import {
   canMovePlacementsInLayout,
   checkRouteInLayout,
@@ -40,16 +48,17 @@ import {
   withoutStationOwner,
   worldPlacements,
 } from '../lib/world-layout'
-import { draftRouteCells, routeCells, sameRouteAnchor, type RouteAnchor, type RouteDraft } from '../lib/route'
+import { draftRouteCells, routeCells, routeMergeIds, sameRouteAnchor, type RouteAnchor, type RouteDraft } from '../lib/route'
 import { type PastePreview, type RoutePreviewCell, type SelectionPreview, type StationFlowNode } from '../model/station-node'
 import { StationNode } from './station-node'
 import { NoteNode, type NoteFlowNode } from './note-node'
 import { BuildPaletteModal } from './build-palette-modal'
-import { MachineRecipePanel } from './machine-recipe-panel'
+import { MachineItemModal } from './machine-item-modal'
 import { DroneOutputModal } from './drone-output-modal'
-import { BasePlanComparison } from './base-plan-comparison'
+import { BaseBuildingsPanel } from './base-buildings-panel'
+import { StationPreview } from './station-artwork'
+import { useStationPlacement } from './use-station-interactions'
 import { routeIssueMessage } from './route-issue-message'
-import { LayoutInventoryPanel, type LayoutInventoryHandle } from './layout-inventory-panel'
 import './base-designer.css'
 
 const nodeTypes = { station: StationNode, note: NoteNode }
@@ -90,7 +99,7 @@ function focusStationGrid(canvas: HTMLElement | null, stationId: string) {
   return Boolean(grid)
 }
 
-export function BaseDesigner() {
+export function BaseDesigner({ referencePlan = null }: { referencePlan?: ProductionPlan | null }) {
   const stations = useBaseDesignerStore((state) => state.stations)
   const notes = useBaseDesignerStore((state) => state.notes)
   const addNote = useBaseDesignerStore((state) => state.addNote)
@@ -99,6 +108,7 @@ export function BaseDesigner() {
   const moveNote = useBaseDesignerStore((state) => state.moveNote)
   const removeNote = useBaseDesignerStore((state) => state.removeNote)
   const addStation = useBaseDesignerStore((state) => state.addStation)
+  const rotateStation = useBaseDesignerStore((state) => state.rotateStation)
   const moveStation = useBaseDesignerStore((state) => state.moveStation)
   const toggleStationLock = useBaseDesignerStore((state) => state.toggleStationLock)
   const removeStation = useBaseDesignerStore((state) => state.removeStation)
@@ -111,8 +121,7 @@ export function BaseDesigner() {
   const place = useBaseDesignerStore((state) => state.place)
   const placeRoute = useBaseDesignerStore((state) => state.placeRoute)
   const movePlacement = useBaseDesignerStore((state) => state.movePlacement)
-  const assignRecipe = useBaseDesignerStore((state) => state.assignRecipe)
-  const setMachineInputItem = useBaseDesignerStore((state) => state.setMachineInputItem)
+  const setMachineProduct = useBaseDesignerStore((state) => state.setMachineProduct)
   const setDroneOutput = useBaseDesignerStore((state) => state.setDroneOutput)
   const toggleMachineOutput = useBaseDesignerStore((state) => state.toggleMachineOutput)
   const moveRoute = useBaseDesignerStore((state) => state.moveRoute)
@@ -137,13 +146,9 @@ export function BaseDesigner() {
     [routeDraft, worldPreviewRoute, stations],
   )
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const [inventoryOpen, setInventoryOpen] = useState(false)
-  const inventoryRef = useRef<LayoutInventoryHandle>(null)
-  const inventoryToggleRef = useRef<HTMLButtonElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
-  const inspectorRef = useRef<HTMLElement>(null)
-  const inspectorToggleRef = useRef<HTMLButtonElement>(null)
-  const [hiddenInspectorId, setHiddenInspectorId] = useState<string | null>(null)
+  const productToggleRef = useRef<HTMLButtonElement>(null)
+  const [machineModalPart, setMachineModalPart] = useState<SelectedPart | null>(null)
   const initialFitDone = useRef(false)
   const [activeStationId, setActiveStationId] = useState<string | null>(null)
   const [selectedPart, setSelectedPart] = useState<SelectedPart | null>(null)
@@ -159,15 +164,63 @@ export function BaseDesigner() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
   const [flow, setFlow] = useState<ReactFlowInstance<StationFlowNode | NoteFlowNode> | null>(null)
+  const [nodeMeasurements, setNodeMeasurements] = useState<ReadonlyMap<string, { width: number; height: number }>>(() => new Map())
+  const handleNodesChange = useCallback((changes: NodeChange<StationFlowNode | NoteFlowNode>[]) => {
+    // Controlled nodes must retain DOM measurements across previews; otherwise React Flow hides and remeasures them.
+    const measurements = changes.filter((change) => change.type === 'dimensions' && change.dimensions)
+    if (!measurements.length) return
+    setNodeMeasurements((current) => {
+      let next: Map<string, { width: number; height: number }> | undefined
+      for (const change of measurements) {
+        if (change.type !== 'dimensions' || !change.dimensions) continue
+        const previous = current.get(change.id)
+        if (previous?.width === change.dimensions.width && previous.height === change.dimensions.height) continue
+        next ??= new Map(current)
+        next.set(change.id, change.dimensions)
+      }
+      return next ?? current
+    })
+  }, [])
+  const stationPlacement = useStationPlacement({
+    stations,
+    project: (point) => flow?.screenToFlowPosition(point) ?? point,
+    getBounds: () => canvasRef.current?.getBoundingClientRect(),
+    onConfirm: (station) => {
+      const id = addStation(station.type, station.position, station.direction)
+      if (!id) {
+        setNotice('Station overlaps another module. Choose empty space.')
+        return false
+      }
+      initialFitDone.current = true
+      setActiveStationId(id)
+      setNotice('Station placed. Click to place another; Escape or right-click returns to Select.')
+      return true
+    },
+  })
+  const stationBuildActive = stationPlacement.active
+  const stationCorridorPreview = useMemo(
+    () => (stationPlacement.draft ? stationPreviewCorridors(stations, stationPlacement.draft) : []),
+    [stations, stationPlacement.draft],
+  )
+  const cancelStationPlacement = stationPlacement.cancel
+  useEffect(() => {
+    if (paletteOpen || !stationBuildActive) return
+    const frame = requestAnimationFrame(() => canvasRef.current?.focus({ preventScroll: true }))
+    return () => cancelAnimationFrame(frame)
+  }, [paletteOpen, stationBuildActive])
   const activeStation = stations.find((station) => station.id === activeStationId)
   const droneModalStation = stations.find((station) => station.id === droneModalStationId && station.type === 'drone_station') ?? null
+  const machineModalPlacement = machineModalPart
+    ? stations
+        .find((station) => station.id === machineModalPart.stationId)
+        ?.placements.find((piece) => piece.id === machineModalPart.placementId)
+    : undefined
   const selectedStation = selectedPart && stations.find((station) => station.id === selectedPart.stationId)
   const selectedPlacement = selectedStation?.placements.find((piece) => piece.id === selectedPart?.placementId)
-  const hasSelectedMachine = Boolean(selectedPlacement && PLACEABLES[selectedPlacement.type].category === 'machine')
-  const inspectorVisible = hasSelectedMachine && !inventoryOpen && selectedPlacement?.id !== hiddenInspectorId
+  const canChooseProduct = Boolean(
+    selectedPlacement && selectedPlacement.type !== 'container' && PLACEABLES[selectedPlacement.type].category === 'machine',
+  )
   const hasStations = stations.length > 0
-  const inventoryEntries = useMemo(() => buildLayoutInventory(stations), [stations])
-  const selectedInventoryKey = selectedPlacement ? inventoryEntryKey(selectedPlacement) : null
   const selectedNote = notes.find((note) => note.id === selectedNoteId)
   const selectedAreaSet = useMemo(() => new Set(selectedAreaIds), [selectedAreaIds])
   const machines = useMemo(
@@ -189,8 +242,20 @@ export function BaseDesigner() {
     () => new Map(stations.map((station) => [station.id, neighboringPlacements(station, corridors, worldPieces)])),
     [stations, corridors, worldPieces],
   )
-  const dronePorts = useMemo(() => stations.flatMap(droneOutputPorts).filter((port) => port.itemId), [stations])
-  const droneSourceCells = useMemo(() => new Set(dronePorts.map((port) => `${port.x},${port.y}`)), [dronePorts])
+  const allDronePorts = useMemo(() => stations.flatMap(droneOutputPorts), [stations])
+  const dronePorts = useMemo(() => allDronePorts.filter((port) => port.itemId), [allDronePorts])
+  const droneSourceCells = useMemo(
+    () =>
+      new Set(
+        allDronePorts
+          .filter((port) => {
+            const belt = worldOccupied.get(`${port.x},${port.y}`)
+            return belt && PLACEABLES[belt.type].category === 'logistics' && beltIncoming(belt) === oppositeDirection(port.face)
+          })
+          .map((port) => `${port.x},${port.y}`),
+      ),
+    [allDronePorts, worldOccupied],
+  )
   const canTraverseWorld = useCallback<CanTraverseEdge>(
     (x, y, face) => {
       const [dx, dy] = directionSteps[face]
@@ -202,8 +267,6 @@ export function BaseDesigner() {
     () => connectedProductionBelts(worldPieces, worldOccupied, canTraverseWorld, dronePorts),
     [worldPieces, worldOccupied, canTraverseWorld, dronePorts],
   )
-  const selectedWorldPlacement = selectedPart ? worldPieces.find((piece) => piece.id === selectedPart.placementId) : undefined
-  const selectedPorts = selectedWorldPlacement ? machinePortStates(worldOccupied, selectedWorldPlacement, canTraverseWorld) : []
   const pastePreview = useMemo<PastePreview | null>(() => {
     if (!pendingPaste || !pasteCursor) return null
     const station = stations.find((candidate) => candidate.id === pasteCursor.stationId)
@@ -220,66 +283,70 @@ export function BaseDesigner() {
       : routePreviewCheck?.ok === false && routeDraft
         ? routeIssueMessage(routePreviewCheck.issue, routeDraft.type)
         : notice
-  const activeToolLabel = pendingPaste
-    ? 'Place copied parts · click to confirm · Esc to cancel'
-    : tool === 'select'
-      ? 'Select parts · Shift-drag for an area (parts only)'
-      : tool === 'erase'
-        ? 'Erase'
-        : PLACEABLES[tool].label
+  const activeToolLabel = stationPlacement.draft
+    ? `${STATION_TYPES[stationPlacement.draft.type].label} · click to place · arrows to move · Esc to cancel${stationPlacement.draft.type === 'drone_station' ? ' · R to rotate' : ''}`
+    : pendingPaste
+      ? 'Place copied parts · click to confirm · Esc to cancel'
+      : tool === 'select'
+        ? 'Select parts · Shift-drag for an area (parts only)'
+        : tool === 'erase'
+          ? 'Erase'
+          : PLACEABLES[tool].label
 
-  const selectTool = useCallback((next: EditorTool) => {
-    useBaseDesignerStore.getState().cancelMove()
-    setInteractionRevision((revision) => revision + 1)
-    setTool(next)
-    setRouteDraft(null)
-    setNotice(null)
-    setSelectionPreview(null)
-    setPendingPaste(null)
-    setPasteCursor(null)
-    if (next !== 'select') setSelectedAreaIds([])
-  }, [])
+  const selectTool = useCallback(
+    (next: EditorTool) => {
+      useBaseDesignerStore.getState().cancelMove()
+      setInteractionRevision((revision) => revision + 1)
+      setTool(next)
+      setRouteDraft(null)
+      setNotice(null)
+      setSelectionPreview(null)
+      setPendingPaste(null)
+      setPasteCursor(null)
+      cancelStationPlacement()
+      if (next !== 'select') setSelectedAreaIds([])
+    },
+    [cancelStationPlacement],
+  )
 
   const clearSelectionPreview = useCallback(() => setSelectionPreview(null), [])
 
-  const selectInventoryEntry = useCallback(
-    (entry: LayoutInventoryEntry) => {
+  const clearMachineItem = useCallback(
+    (stationId: string, placementId: string) => {
+      selectTool('select')
+      if (setMachineProduct(stationId, placementId, null)) setNotice('Product cleared. Choose another item from the machine button.')
+    },
+    [selectTool, setMachineProduct],
+  )
+
+  const openMachineItem = useCallback(
+    (stationId: string, placementId: string) => {
+      const placement = useBaseDesignerStore
+        .getState()
+        .stations.find((station) => station.id === stationId)
+        ?.placements.find((piece) => piece.id === placementId)
+      if (!placement || placement.type === 'container') return
       selectTool('select')
       setSelectedAreaIds([])
       setSelectedNoteId(null)
-      setSelectedPart({ stationId: entry.stationId, placementId: entry.placement.id })
-      setActiveStationId(entry.stationId)
-      setNotice(
-        `${PLACEABLES[entry.placement.type].label}${entry.kind === 'route' ? ` route · ${entry.cellCount} cells` : ''} selected from inventory.`,
-      )
+      setSelectedPart({ stationId, placementId })
+      setActiveStationId(stationId)
+      setDroneModalStationId(null)
+      setMachineModalPart({ stationId, placementId })
     },
     [selectTool],
   )
 
-  const locateInventoryEntry = useCallback(
-    (entry: LayoutInventoryEntry) => {
-      selectInventoryEntry(entry)
-      if (flow) void flow.fitBounds(entry.bounds, { padding: 0.35, duration: 0 })
-      requestAnimationFrame(() => focusStationGrid(canvasRef.current, entry.stationId))
-    },
-    [flow, selectInventoryEntry],
-  )
-
-  const closeInventory = useCallback(() => {
-    setInventoryOpen(false)
-    requestAnimationFrame(() => inventoryToggleRef.current?.focus({ preventScroll: true }))
-  }, [])
-
-  const openInspector = useCallback(() => {
-    setInventoryOpen(false)
-    setHiddenInspectorId(null)
-    requestAnimationFrame(() => inspectorRef.current?.focus({ preventScroll: true }))
-  }, [])
-
-  const closeInspector = useCallback(() => {
-    setHiddenInspectorId(selectedPlacement?.id ?? null)
-    requestAnimationFrame(() => inspectorToggleRef.current?.focus({ preventScroll: true }))
-  }, [selectedPlacement?.id])
+  const closeMachineItem = useCallback(() => {
+    setMachineModalPart(null)
+    requestAnimationFrame(() => {
+      // Let the modal's focus scope finish restoring its trigger before returning to the editor.
+      requestAnimationFrame(() => {
+        if (!machineModalPart || !focusStationGrid(canvasRef.current, machineModalPart.stationId))
+          productToggleRef.current?.focus({ preventScroll: true })
+      })
+    })
+  }, [machineModalPart])
 
   const handlePasteHover = useCallback(
     (stationId: string, x: number, y: number) => {
@@ -344,6 +411,39 @@ export function BaseDesigner() {
     return () => cancelAnimationFrame(frame)
   }, [flow, hasStations])
 
+  const beginRoute = useCallback(
+    (stationId: string, type: RouteTool, point: RouteAnchor) => {
+      if (point.kind === 'port' && point.role === 'input') {
+        setNotice('Start from an output, or from an empty floor cell.')
+        return
+      }
+      const startCheck = checkRouteInLayout(stations, stationId, routeCells([point]), new Set(), type)
+      if (!startCheck.ok) {
+        setNotice(routeIssueMessage(startCheck.issue, type))
+        return
+      }
+      selectTool(type)
+      setSelectedPart(null)
+      setRouteDraft({ stationId, type, anchors: [point], hover: point })
+      setNotice('Click to add anchors, click a machine port to connect, or click the last anchor again to finish.')
+    },
+    [stations, selectTool],
+  )
+
+  const handleStartBelt = useCallback(
+    (stationId: string, anchor: Extract<RouteAnchor, { kind: 'port' }>) => {
+      const station = stations.find((candidate) => candidate.id === stationId)
+      if (!station) return
+      const source = anchor.routeId ? worldPieces.find((piece) => piece.routeId === anchor.routeId) : undefined
+      beginRoute(stationId, source && isRouteTool(source.type) ? source.type : 'conveyor', {
+        ...anchor,
+        x: anchor.x + station.position.x / CELL_SIZE,
+        y: anchor.y + station.position.y / CELL_SIZE,
+      })
+    },
+    [stations, worldPieces, beginRoute],
+  )
+
   const handleCell = useCallback(
     (
       stationId: string,
@@ -364,17 +464,7 @@ export function BaseDesigner() {
           ? { kind: 'port', x: worldX, y: worldY, face: portFace, role: portRole, routeId: portRouteId, mergeTargetId }
           : { kind: 'floor', x: worldX, y: worldY }
         if (!routeDraft || routeDraft.type !== tool) {
-          if (point.kind === 'port' && point.role === 'input') {
-            setNotice('Start from an output, or from an empty floor cell.')
-            return
-          }
-          const startCheck = checkRouteInLayout(stations, stationId, routeCells([point]), new Set(), tool)
-          if (!startCheck.ok) {
-            setNotice(routeIssueMessage(startCheck.issue, tool))
-            return
-          }
-          setRouteDraft({ stationId, type: tool, anchors: [point], hover: point })
-          setNotice('Click to add anchors, click a machine port to connect, or click the last anchor again to finish.')
+          beginRoute(stationId, tool, point)
           return
         }
         const last = routeDraft.anchors[routeDraft.anchors.length - 1]
@@ -393,9 +483,7 @@ export function BaseDesigner() {
             setNotice(routeIssueMessage(routeCheck.issue, tool))
             return
           }
-          const mergeIds = [routeDraft.anchors[0], point]
-            .filter((anchor): anchor is Extract<RouteAnchor, { kind: 'port' }> => anchor.kind === 'port')
-            .flatMap((anchor) => (anchor.routeId ? [anchor.routeId] : []))
+          const mergeIds = routeMergeIds(routeDraft.anchors[0], point)
           if (
             placeRoute(
               routeDraft.stationId,
@@ -471,7 +559,7 @@ export function BaseDesigner() {
         )
       }
     },
-    [tool, stations, worldOccupied, worldPieces, routeDraft, place, placeRoute, removeAt],
+    [tool, stations, worldOccupied, worldPieces, routeDraft, place, placeRoute, removeAt, beginRoute],
   )
 
   const handleRouteHover = useCallback(
@@ -527,6 +615,10 @@ export function BaseDesigner() {
         id: station.id,
         type: 'station',
         position: station.position,
+        measured: {
+          width: STATION_TYPES[station.type].footprintCells * CELL_SIZE,
+          height: STATION_TYPES[station.type].footprintCells * CELL_SIZE,
+        },
         data: {
           station,
           layoutStations: stations,
@@ -543,7 +635,7 @@ export function BaseDesigner() {
           selectedRouteId: selectedPlacement?.routeId ?? null,
           selectedAreaIds: selectedAreaSet,
           selectionPreview,
-          pasteActive: pendingPaste !== null,
+          pasteActive: pendingPaste !== null || stationBuildActive,
           pastePreview,
           onPasteHover: handlePasteHover,
           onPasteLeave: handlePasteLeave,
@@ -551,11 +643,15 @@ export function BaseDesigner() {
           onActivate: setActiveStationId,
           onCell: handleCell,
           onPickTool: selectTool,
+          onStartBelt: handleStartBelt,
+          onOpenMachineItem: openMachineItem,
+          onClearMachineItem: clearMachineItem,
           onOpenDroneOutput: (stationId, slot) => {
             selectTool('select')
             setDroneModalStationId(stationId)
             setActiveDroneSlot(slot)
             setSelectedPart(null)
+            setMachineModalPart(null)
             setNotice(null)
           },
           onAreaSelect: (ids) => {
@@ -585,7 +681,7 @@ export function BaseDesigner() {
           routeDraft,
           routePreviewValid: routePreviewCheck?.ok ?? false,
         },
-        draggable: tool === 'select' && pendingPaste === null,
+        draggable: tool === 'select' && pendingPaste === null && !stationBuildActive,
         selectable: true,
         zIndex: station.placements.some((piece) => {
           const footprint = PLACEABLES[piece.type]
@@ -599,9 +695,10 @@ export function BaseDesigner() {
         id: note.id,
         type: 'note',
         position: note.position,
+        measured: nodeMeasurements.get(note.id),
         data: { text: note.text, selected: note.id === selectedNoteId, onCommit: (text) => updateNote(note.id, text) },
         dragHandle: '.base-note-handle',
-        draggable: tool === 'select' && pendingPaste === null,
+        draggable: tool === 'select' && pendingPaste === null && !stationBuildActive,
         selectable: true,
         zIndex: 8,
       })),
@@ -609,10 +706,12 @@ export function BaseDesigner() {
     [
       stations,
       notes,
+      nodeMeasurements,
       selectedNoteId,
       selectedAreaSet,
       selectionPreview,
       pendingPaste,
+      stationBuildActive,
       pastePreview,
       handlePasteHover,
       handlePasteLeave,
@@ -631,6 +730,7 @@ export function BaseDesigner() {
       selectedPart,
       selectedPlacement,
       handleCell,
+      handleStartBelt,
       handleRouteHover,
       handleMovePlacement,
       moveRoute,
@@ -641,12 +741,18 @@ export function BaseDesigner() {
       routeDraft,
       routePreviewCheck,
       selectTool,
+      openMachineItem,
+      clearMachineItem,
     ],
   )
 
   const add = (type: StationType) => {
-    addStation(type)
-    setNotice('Station added. Use Fit layout if it is outside the current view.')
+    selectTool('select')
+    setSelectedPart(null)
+    setSelectedAreaIds([])
+    setSelectedNoteId(null)
+    stationPlacement.start(type)
+    setNotice('Move the preview, click to place; arrows and Enter also work. Escape or right-click cancels.')
   }
 
   const addLayoutNote = () => {
@@ -741,58 +847,31 @@ export function BaseDesigner() {
       setSelectedNoteId(null)
       setNotice(null)
     } else if (selectedPlacement && selectedPart) {
-      const restoreInventoryFocus = inventoryRef.current?.containsFocus()
-      const restoreCanvasFocus = inspectorRef.current?.contains(document.activeElement)
-      const index = inventoryEntries.findIndex((entry) => entry.key === selectedInventoryKey)
-      const next = index >= 0 ? (inventoryEntries[index + 1] ?? inventoryEntries[index - 1]) : undefined
       removeAt(selectedPart.stationId, selectedPlacement.x, selectedPlacement.y)
       setSelectedPart(null)
-      if (restoreInventoryFocus) {
-        if (next) selectInventoryEntry(next)
-        requestAnimationFrame(() => inventoryRef.current?.focusEntry(next?.key))
-      } else if (restoreCanvasFocus) {
-        requestAnimationFrame(() => focusStationGrid(canvasRef.current, selectedPart.stationId))
-      }
+      setMachineModalPart(null)
       setNotice(`${PLACEABLES[selectedPlacement.type].label}${selectedPlacement.routeId ? ' route' : ''} removed.`)
     } else if (activeStationId) {
       setDeleteOpen(true)
     }
-  }, [
-    selectedAreaIds,
-    selectedNote,
-    selectedPlacement,
-    selectedPart,
-    activeStationId,
-    removePlacements,
-    removeNote,
-    removeAt,
-    inventoryEntries,
-    selectedInventoryKey,
-    selectInventoryEntry,
-    selectTool,
-  ])
+  }, [selectedAreaIds, selectedNote, selectedPlacement, selectedPart, activeStationId, removePlacements, removeNote, removeAt, selectTool])
 
   const rotateSelection = useCallback(() => {
     selectTool('select')
+    if (!selectedPlacement && activeStation?.type === 'drone_station') {
+      if (!rotateStation(activeStation.id)) setNotice('Remove parts in the drone corridor and unlock its station link before rotating.')
+      return
+    }
     if (!selectedPlacement || !selectedPart) return
     if (selectedPlacement.routeId) {
       setNotice('Redraw a belt route to change its turns.')
       return
     }
-    const focusedControl = document.activeElement
-    const fromInspector = inspectorRef.current?.contains(focusedControl)
     rotateAt(selectedPart.stationId, selectedPlacement.x, selectedPlacement.y)
-    if (fromInspector)
-      requestAnimationFrame(() => {
-        if (!focusedControl?.isConnected) inspectorRef.current?.focus({ preventScroll: true })
-      })
-  }, [selectedPlacement, selectedPart, rotateAt, selectTool])
+  }, [selectedPlacement, selectedPart, activeStation, rotateStation, rotateAt, selectTool])
 
   const changeHistory = useCallback(
     (action: 'undo' | 'redo') => {
-      const fromInventory = inventoryRef.current?.containsFocus()
-      const fromInspector = inspectorRef.current?.contains(document.activeElement)
-      const stationId = selectedPart?.stationId
       selectTool('select')
       if (action === 'undo') undo()
       else redo()
@@ -800,14 +879,10 @@ export function BaseDesigner() {
       setSelectedAreaIds([])
       setSelectedNoteId(null)
       setDroneModalStationId(null)
+      setMachineModalPart(null)
       setActiveStationId(null)
-      requestAnimationFrame(() => {
-        if (fromInventory) inventoryRef.current?.focusEntry()
-        else if (fromInspector && (!stationId || !focusStationGrid(canvasRef.current, stationId)))
-          inventoryToggleRef.current?.focus({ preventScroll: true })
-      })
     },
-    [selectedPart, selectTool, undo, redo],
+    [selectTool, undo, redo],
   )
 
   useEffect(() => {
@@ -815,10 +890,16 @@ export function BaseDesigner() {
       if (
         paletteOpen ||
         deleteOpen ||
+        machineModalPart ||
+        droneModalStationId ||
         (event.target instanceof HTMLElement && event.target.closest('input, textarea, [contenteditable="true"], [role="dialog"]'))
       )
         return
       if (event.defaultPrevented || event.repeat) return
+      if (stationPlacement.handleKeyDown(event)) {
+        if (event.key === 'Escape') setNotice(null)
+        return
+      }
       const command = event.ctrlKey || event.metaKey
       const key = event.key.toLowerCase()
       if (command && key === 'z') {
@@ -840,7 +921,7 @@ export function BaseDesigner() {
       } else if (!command && (key === 'delete' || key === 'backspace')) {
         event.preventDefault()
         deleteSelection()
-      } else if (!command && key === 'r' && selectedPart) {
+      } else if (!command && key === 'r' && (selectedPart || activeStation?.type === 'drone_station')) {
         event.preventDefault()
         rotateSelection()
       } else if (key === 'escape') {
@@ -854,7 +935,21 @@ export function BaseDesigner() {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('blur', onBlur)
     }
-  }, [paletteOpen, deleteOpen, selectedPart, copySelection, pasteSelection, deleteSelection, rotateSelection, changeHistory, selectTool])
+  }, [
+    paletteOpen,
+    deleteOpen,
+    machineModalPart,
+    droneModalStationId,
+    selectedPart,
+    activeStation,
+    stationPlacement,
+    copySelection,
+    pasteSelection,
+    deleteSelection,
+    rotateSelection,
+    changeHistory,
+    selectTool,
+  ])
 
   return (
     <div className="flex h-full min-h-0 w-full flex-col overflow-hidden bg-background">
@@ -874,11 +969,11 @@ export function BaseDesigner() {
           </Button>
           <Button
             size="sm"
-            variant={tool === 'select' && !pendingPaste ? 'solid' : 'flat'}
-            color={tool === 'select' && !pendingPaste ? 'primary' : 'default'}
+            variant={tool === 'select' && !pendingPaste && !stationBuildActive ? 'solid' : 'flat'}
+            color={tool === 'select' && !pendingPaste && !stationBuildActive ? 'primary' : 'default'}
             onPress={() => selectTool('select')}
             startContent={<Hand size={14} />}
-            aria-pressed={tool === 'select' && !pendingPaste}
+            aria-pressed={tool === 'select' && !pendingPaste && !stationBuildActive}
           >
             Select
           </Button>
@@ -896,48 +991,30 @@ export function BaseDesigner() {
             Note
           </Button>
           <Button
-            ref={inventoryToggleRef}
+            ref={productToggleRef}
             size="sm"
             variant="flat"
-            aria-expanded={inventoryOpen}
-            aria-controls="base-layout-inventory"
+            isDisabled={!canChooseProduct}
             onPress={() => {
-              if (inventoryOpen) closeInventory()
-              else {
-                setInventoryOpen(true)
-                requestAnimationFrame(() => inventoryRef.current?.focusEntry(selectedInventoryKey))
-              }
+              if (selectedPart) openMachineItem(selectedPart.stationId, selectedPart.placementId)
             }}
-            startContent={<List size={14} aria-hidden />}
+            startContent={<Package size={14} aria-hidden />}
           >
-            Inventory
+            Product
           </Button>
-          <Button
-            ref={inspectorToggleRef}
-            size="sm"
-            variant="flat"
-            isDisabled={!hasSelectedMachine}
-            aria-expanded={inspectorVisible}
-            aria-controls="base-machine-inspector"
-            onPress={inspectorVisible ? closeInspector : openInspector}
-            startContent={<Settings2 size={14} aria-hidden />}
-          >
-            Inspector
-          </Button>
-          <BasePlanComparison stations={stations} />
         </div>
         <div className="flex min-w-0 items-center justify-between gap-3 border-b border-divider bg-content1 px-3 py-1.5 text-xs text-foreground/75 sm:px-4">
           <span className="min-w-0 flex-1 truncate" title={activeToolLabel}>
             {activeToolLabel}
           </span>
-          <span className="shrink-0">{activeStation?.name ?? `${stations.length} stations`}</span>
+          <span className="shrink-0">{activeStation?.name ?? `${stations.length} station${stations.length === 1 ? '' : 's'}`}</span>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-divider bg-content1 px-3 py-1.5 sm:px-4">
           <div className="flex flex-wrap gap-1.5 text-xs">
             <span className="py-1 text-foreground/80 tabular-nums" title="Placed production and support machines">
               <Factory size={13} aria-hidden className="mr-1.5 inline text-primary" />
-              {machines.length} buildings
+              {machines.length} building{machines.length === 1 ? '' : 's'}
             </span>
             <span
               className="py-1 text-foreground/80 tabular-nums"
@@ -1000,8 +1077,14 @@ export function BaseDesigner() {
                 size="sm"
                 variant="light"
                 aria-label="Rotate selected element"
-                isDisabled={!selectedPlacement || Boolean(selectedPlacement.routeId)}
-                onPress={rotateSelection}
+                isDisabled={
+                  stationBuildActive
+                    ? stationPlacement.draft?.type !== 'drone_station'
+                    : (!selectedPlacement && activeStation?.type !== 'drone_station') || Boolean(selectedPlacement?.routeId)
+                }
+                onPress={() =>
+                  stationBuildActive ? stationPlacement.handleKeyDown(new KeyboardEvent('keydown', { key: 'r' })) : rotateSelection()
+                }
               >
                 <RotateCw size={16} />
               </Button>
@@ -1059,9 +1142,33 @@ export function BaseDesigner() {
           </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-          <div ref={canvasRef} className="relative min-h-0 min-w-0 flex-1" onPointerCancelCapture={() => selectTool('select')}>
+          <BaseBuildingsPanel stations={stations} plan={referencePlan} />
+          <div
+            ref={canvasRef}
+            data-base-canvas
+            tabIndex={0}
+            aria-label="Base canvas"
+            className="relative min-h-0 min-w-0 flex-1 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-focus"
+            onPointerMoveCapture={stationPlacement.handlePointerMove}
+            onPointerDownCapture={stationPlacement.handlePointerDown}
+            onKeyDownCapture={(event) => {
+              if (stationPlacement.handleKeyDown(event.nativeEvent)) {
+                if (event.key === 'Escape') setNotice(null)
+                event.stopPropagation()
+              }
+            }}
+            onContextMenuCapture={(event) => {
+              if (stationBuildActive) {
+                event.preventDefault()
+                event.stopPropagation()
+                selectTool('select')
+              }
+            }}
+            onPointerCancelCapture={() => selectTool('select')}
+          >
             <ReactFlow<StationFlowNode | NoteFlowNode>
               nodes={nodes}
+              onNodesChange={handleNodesChange}
               edges={[]}
               onInit={setFlow}
               nodeTypes={nodeTypes}
@@ -1124,9 +1231,14 @@ export function BaseDesigner() {
               deleteKeyCode={null}
               className="bg-background"
             >
+              {stationPlacement.draft ? (
+                <ViewportPortal>
+                  <StationPreview station={stationPlacement.draft} valid={stationPlacement.valid} corridors={stationCorridorPreview} />
+                </ViewportPortal>
+              ) : null}
               <Background variant={BackgroundVariant.Lines} gap={CELL_SIZE} color="hsl(var(--heroui-default-300) / 0.25)" />
             </ReactFlow>
-            {stations.length === 0 ? (
+            {stations.length === 0 && !stationBuildActive ? (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
                 <div className="max-w-sm border border-divider bg-content1/95 p-6 text-center shadow-lg shadow-black/20">
                   <Box size={28} aria-hidden className="mx-auto mb-3 text-primary" />
@@ -1138,38 +1250,6 @@ export function BaseDesigner() {
               </div>
             ) : null}
           </div>
-          {inventoryOpen || inspectorVisible ? (
-            <div className="flex max-h-[45%] min-h-0 w-full shrink-0 flex-col overflow-y-auto border-t border-divider bg-content1 md:max-h-none md:w-80 md:border-t-0 md:border-l">
-              {inventoryOpen ? (
-                <LayoutInventoryPanel
-                  ref={inventoryRef}
-                  entries={inventoryEntries}
-                  stations={stations}
-                  selectedKey={selectedInventoryKey}
-                  onSelect={selectInventoryEntry}
-                  onLocate={locateInventoryEntry}
-                  onInspect={openInspector}
-                  onCopy={copySelection}
-                  onRotate={rotateSelection}
-                  onDelete={deleteSelection}
-                  onClose={closeInventory}
-                />
-              ) : selectedPlacement && selectedPart ? (
-                <MachineRecipePanel
-                  key={selectedPlacement.id}
-                  ref={inspectorRef}
-                  onClose={closeInspector}
-                  placement={selectedPlacement}
-                  ports={selectedPorts}
-                  onToggleOutput={(port) =>
-                    handleToggleMachineOutput(selectedPart.stationId, selectedPart.placementId, port.face, port.offset)
-                  }
-                  onAssign={(recipeId) => assignRecipe(selectedPart.stationId, selectedPart.placementId, recipeId)}
-                  onAssignInputItem={(itemId) => setMachineInputItem(selectedPart.stationId, selectedPart.placementId, itemId)}
-                />
-              ) : null}
-            </div>
-          ) : null}
         </div>
         <p
           role="status"
@@ -1181,6 +1261,17 @@ export function BaseDesigner() {
       </div>
 
       <BuildPaletteModal open={paletteOpen} onOpenChange={setPaletteOpen} tool={tool} onSelect={selectTool} onAddStation={add} />
+      {machineModalPlacement && machineModalPart ? (
+        <MachineItemModal
+          key={machineModalPlacement.id}
+          placement={machineModalPlacement}
+          onClose={closeMachineItem}
+          onAssign={(itemId) => {
+            if (!setMachineProduct(machineModalPart.stationId, machineModalPart.placementId, itemId))
+              setNotice('This product is not available for this building.')
+          }}
+        />
+      ) : null}
       <DroneOutputModal
         station={droneModalStation}
         activeSlot={activeDroneSlot}

@@ -7,6 +7,7 @@ import {
   connectedStationIds,
   isCorridorFloorCell,
   isStationFloorCell,
+  stationOpenFaces,
   stationsConnect,
   type StationCorridor,
 } from './stations'
@@ -32,6 +33,37 @@ export function worldPlacements(stations: readonly BaseStation[]): WorldPlacemen
     const offsetY = station.position.y / CELL_SIZE
     return station.placements.map((piece) => ({ ...piece, stationId: station.id, x: piece.x + offsetX, y: piece.y + offsetY }))
   })
+}
+
+/** Lateral branches have independent route identities. Detaching one must release its receiving face. */
+export function pruneDisconnectedBeltJunctions(stations: BaseStation[]): BaseStation[] {
+  if (!stations.some((station) => station.placements.some((piece) => piece.extraIncoming?.length))) return stations
+  const pieces = worldPlacements(stations)
+  const occupied = indexPlacements(pieces)
+  const corridors = connectedCorridors(stations)
+  const survivingFaces = new Map<string, BasePlacement['extraIncoming']>()
+  for (const piece of pieces) {
+    if (!piece.extraIncoming?.length) continue
+    const remaining = piece.extraIncoming.filter((face) => {
+      const neighbor = beltConnection(occupied, piece, face, (x, y, direction) => {
+        const step = direction === 'north' ? [0, -1] : direction === 'east' ? [1, 0] : direction === 'south' ? [0, 1] : [-1, 0]
+        return canCrossStationBoundary(stations, { x, y }, { x: x + step[0], y: y + step[1] }, corridors)
+      })
+      return neighbor?.type === piece.type && neighbor.direction === oppositeDirection(face)
+    })
+    if (remaining.length !== piece.extraIncoming.length) survivingFaces.set(piece.id, remaining.length ? remaining : undefined)
+  }
+  if (!survivingFaces.size) return stations
+  return stations.map((station) =>
+    station.placements.some((piece) => survivingFaces.has(piece.id))
+      ? {
+          ...station,
+          placements: station.placements.map((piece) =>
+            survivingFaces.has(piece.id) ? { ...piece, extraIncoming: survivingFaces.get(piece.id) } : piece,
+          ),
+        }
+      : station,
+  )
 }
 
 /** Include the one-cell halo around the station and its passages so belts can see the next cell across a doorway. */
@@ -293,10 +325,9 @@ function crossesClosedStationWall(stations: readonly BaseStation[], from: RouteC
   const localY = from.y - station.position.y / CELL_SIZE
   const face = to.x > from.x ? 'east' : to.x < from.x ? 'west' : to.y > from.y ? 'south' : 'north'
   const edgeIndex = face === 'east' || face === 'west' ? localY : localX
-  const { gateStarts, openFaces } = STATION_TYPES[station.type]
+  const { gateStarts } = STATION_TYPES[station.type]
   return (
-    !openFaces.some((openFace: string) => openFace === face) ||
-    !gateStarts.some((start) => edgeIndex >= start && edgeIndex < start + STATION_GATE_CELLS)
+    !stationOpenFaces(station).includes(face) || !gateStarts.some((start) => edgeIndex >= start && edgeIndex < start + STATION_GATE_CELLS)
   )
 }
 

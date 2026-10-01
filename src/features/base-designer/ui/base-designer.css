@@ -1,5 +1,6 @@
 .base-station,
 .base-station-corridor {
+  --base-wall: #798792;
   background-color: #211f1e;
   /* The tile art and machine body share a small optical inset; the 20px cell pitch stays fixed. */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='3' y='3' width='14' height='14' rx='3' fill='%23282523' stroke='%23bc752f' stroke-opacity='.46' stroke-width='.9'/%3E%3C/svg%3E");
@@ -12,16 +13,36 @@
 }
 
 .base-station--drone {
-  background-color: #20292e;
+  background-color: transparent;
   background-image: none;
 }
 
-.base-station--drone .base-station-frame path:not(.base-station-frame-hit) {
-  stroke: #8298a2;
+.base-station-preview {
+  z-index: 20;
+  opacity: 0.7;
+  outline: 1px dashed #e6aa60;
+  outline-offset: 5px;
 }
 
-.base-station--drone.base-station--active .base-station-frame path:not(.base-station-frame-hit) {
+.base-station-preview[data-valid='false'] {
+  outline-color: #ef7373;
+  background-color: #4b2424;
+}
+
+.base-station-preview[data-valid='false'] .base-station-wall {
+  stroke: #ef7373;
+}
+
+.base-station--drone.base-station--active .base-drone-hull {
   stroke: #d79b54;
+}
+
+.base-station-preview[data-valid='false'] .base-drone-hull {
+  stroke: #ef7373;
+}
+
+.base-station--drone.base-station-preview[data-valid='false'] {
+  background-color: transparent;
 }
 
 /* A dragged selection may span modules; keep its ghost above adjacent station floors. */
@@ -49,11 +70,11 @@
   filter: none;
 }
 
-.base-station-frame path:not(.base-station-frame-hit) {
-  stroke: #798792;
+.base-station-frame .base-station-wall {
+  stroke: var(--base-wall);
   stroke-width: 3;
-  stroke-linecap: square;
-  stroke-linejoin: bevel;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   filter: drop-shadow(0 1px #303a40);
 }
 
@@ -63,12 +84,22 @@
   stroke-width: 1;
 }
 
-.base-station--active .base-station-frame path:not(.base-station-frame-hit) {
+.base-station--active .base-station-wall {
   stroke: #d79b54;
 }
 
 .base-station--active .base-station-frame circle {
   fill: #e6aa60;
+}
+
+.base-station-window line {
+  stroke: #8197a2;
+  stroke-width: 1.5;
+  stroke-opacity: 0.7;
+}
+
+.base-station-frame--interactive .base-station-window line {
+  pointer-events: stroke;
 }
 
 .base-palette-track::before {
@@ -94,23 +125,63 @@
   z-index: 1;
 }
 
-.base-station-corridor--horizontal {
-  box-shadow:
-    inset 0 2px rgb(215 155 84 / 0.7),
-    inset 0 -2px rgb(215 155 84 / 0.7);
+.base-station-corridor--preview {
+  --base-wall: #d79b54;
+  z-index: 19;
+  opacity: 0.7;
+  outline: 1px dashed #e6aa60;
+  outline-offset: -1px;
 }
 
-.base-station-corridor--vertical {
-  box-shadow:
-    inset 2px 0 rgb(215 155 84 / 0.7),
-    inset -2px 0 rgb(215 155 84 / 0.7);
+.base-station--active .base-station-corridor {
+  --base-wall: #d79b54;
+}
+
+.base-station-corridor::before,
+.base-station-corridor::after {
+  position: absolute;
+  border-radius: 1.5px;
+  background: var(--base-wall);
+  pointer-events: none;
+  content: '';
+}
+
+/* The rails meet the station's outward decorative wall, not the inset floor tile. */
+.base-station-corridor--horizontal::before,
+.base-station-corridor--horizontal::after {
+  right: 2.5px;
+  left: 2.5px;
+  height: 3px;
+}
+
+.base-station-corridor--horizontal::before {
+  top: -1.5px;
+}
+
+.base-station-corridor--horizontal::after {
+  bottom: -1.5px;
+}
+
+.base-station-corridor--vertical::before,
+.base-station-corridor--vertical::after {
+  top: 2.5px;
+  bottom: 2.5px;
+  width: 3px;
+}
+
+.base-station-corridor--vertical::before {
+  left: -1.5px;
+}
+
+.base-station-corridor--vertical::after {
+  right: -1.5px;
 }
 
 .base-corridor-lock {
   z-index: 11;
   display: grid;
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   place-items: center;
   transform: translate(-50%, -50%);
   border: 1px solid #7e6550;
@@ -118,6 +189,12 @@
   background: #252422;
   color: #e6aa60;
   cursor: pointer;
+}
+
+.base-corridor-lock::after {
+  position: absolute;
+  inset: -4px;
+  content: '';
 }
 
 .base-corridor-lock:hover,
@@ -132,21 +209,32 @@
   background: #4a3622;
 }
 
+.base-belt-join-preview {
+  z-index: 12;
+}
+
+.base-belt-join-preview[data-flow='disabled-output'] {
+  border-color: #ef7373;
+  background: #4b2424;
+  color: #ffc1c1;
+}
+
 .base-station-grid:focus-visible .base-grid-cursor {
   display: block;
 }
 
-.base-drone-port {
-  z-index: 8;
-  display: grid;
-  width: 15px;
-  height: 9px;
-  place-items: center;
-  transform: translate(-50%, -50%);
-  border: 1px solid #ba692a;
-  border-radius: 2px;
-  background: #e89a44;
-  color: #37200c;
+/* The drone has no square floor. Keep keyboard focus on its visible hull instead. */
+.base-station--drone .base-station-grid:focus-visible {
+  box-shadow: none;
+}
+
+.base-station--drone .base-station-grid:focus-visible .base-grid-cursor {
+  display: none;
+}
+
+.base-station--drone:has(.base-station-grid:focus-visible) .base-drone-hull {
+  stroke: #e6aa60;
+  stroke-width: 6;
 }
 
 .base-drone-item {
@@ -185,41 +273,51 @@
     inset 0 -3px 0 rgb(20 31 40 / 0.27);
 }
 
-.base-machine-item {
-  z-index: 2;
-  top: 75%;
-  left: 50%;
-  display: grid;
-  width: var(--base-marker-size);
-  height: var(--base-marker-size);
-  place-items: center;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgb(45 174 169 / 0.8);
-  border-radius: 4px;
-  background: rgb(40 53 62 / 0.82);
+.base-machine-item-button {
+  z-index: 5;
+  right: 7px;
+  bottom: 7px;
+  border: 1px solid #aab4bb;
+  background: #303b44;
+  color: #f2d0a0;
+}
+
+.base-machine-item-button:hover,
+.base-machine-item-button:focus-visible {
+  border-color: #e6aa60;
+  background: #414c54;
 }
 
 .base-machine-products {
   z-index: 2;
-  top: 25%;
-  left: 50%;
+  inset: 0;
   display: flex;
-  max-width: calc(100% - 8px);
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   gap: 3px;
-  transform: translate(-50%, -50%);
+  padding: 5px;
 }
 
 .base-machine-product {
   display: grid;
-  width: var(--base-marker-size);
-  height: var(--base-marker-size);
-  flex: 0 0 var(--base-marker-size);
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
   place-items: center;
   border: 1px solid rgb(216 145 42 / 0.85);
   border-radius: 4px;
   background: rgb(40 53 62 / 0.88);
+}
+
+.base-machine-product--primary {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--base-marker-size);
+  height: var(--base-marker-size);
+  transform: translate(-50%, -50%);
+  border: 0;
+  background: none;
 }
 
 .base-placement--compact .base-machine-product {
@@ -233,16 +331,22 @@
   font-variant-numeric: tabular-nums;
 }
 
-.base-placement--compact .base-machine-products {
-  top: 4px;
-  transform: translateX(-50%);
+.base-placement--compact .base-machine-product:not(.base-machine-product--primary) {
+  width: 14px;
+  height: 14px;
+  flex-basis: 14px;
 }
 
-.base-placement--compact .base-machine-item {
-  top: auto;
-  bottom: 4px;
-  transform: translateX(-50%);
-  border-radius: 2px;
+/* Keep the two ports on each Box face clear of the perpendicular corner ports. */
+.base-placement--storage .base-machine-port {
+  width: 12px;
+  height: 7px;
+}
+
+.base-placement--storage .base-machine-port[data-face='east'],
+.base-placement--storage .base-machine-port[data-face='west'] {
+  width: 7px;
+  height: 12px;
 }
 
 .base-machine-panel {
@@ -366,11 +470,14 @@
   display: none;
 }
 
-.base-machine-port {
+.base-io-port {
+  --base-input: #43d1c1;
+  --base-output: #f3a24a;
+  --base-blocked: #ba7370;
   z-index: 5;
   display: flex;
-  width: 13px;
-  height: 7px;
+  width: 15px;
+  height: 9px;
   align-items: center;
   justify-content: center;
   transform: translate(-50%, -50%);
@@ -415,23 +522,23 @@
   transform: translate(-100%, -50%);
 }
 
-.base-machine-port[data-face='east'],
-.base-machine-port[data-face='west'] {
-  width: 7px;
-  height: 13px;
+.base-io-port[data-face='east'],
+.base-io-port[data-face='west'] {
+  width: 9px;
+  height: 15px;
 }
 
-.base-machine-port[data-flow='input'] {
+.base-io-port[data-flow='input'] {
   border-color: #168d86;
   background: var(--base-input);
 }
 
-.base-machine-port[data-flow='output'] {
+.base-io-port[data-flow='output'] {
   border-color: #ac641e;
   background: var(--base-output);
 }
 
-.base-machine-port[data-flow='disabled-output'] {
+.base-io-port[data-flow='disabled-output'] {
   border-color: #9b4a45;
   background: var(--base-blocked);
   color: #321b1b;
@@ -460,8 +567,9 @@
   box-shadow: 0 0 0 2px rgb(244 176 85 / 0.3);
 }
 
-.base-machine-port--hovered {
-  box-shadow: 0 0 0 3px #f4b055;
+.base-io-port[data-hovered='true'] {
+  outline: 2px solid #f4b055;
+  outline-offset: 1px;
 }
 
 .base-placement--logistics {
@@ -498,10 +606,6 @@
 
 .base-placement--selected-route .base-belt-shell {
   stroke: var(--base-selection);
-}
-
-.base-placement--interactive:not(.base-placement--selected-route):hover .base-belt-shell {
-  stroke: #a0b3bd;
 }
 
 .base-placement--underground .base-belt-core {
@@ -693,8 +797,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .base-placement *,
-  .base-drone-item *,
-  .base-recipe-panel [data-load-state] * {
+  .base-drone-item * {
     animation: none !important;
     transition: none !important;
   }

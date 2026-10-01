@@ -1,8 +1,16 @@
 import { BaseDesigner } from '@/features/base-designer'
-import { ProductionPlanProvider } from '@/features/planner'
+import { ProductionPlanProvider, useProductionPlan } from '@/features/planner'
+import { useSearchParams } from 'react-router-dom'
 import { PageContainer, PageContent, PageHeader, Typography } from '@/shared/ui'
 
+function ComparedBaseDesigner() {
+  const plan = useProductionPlan()
+  return <BaseDesigner referencePlan={plan} />
+}
+
 export function PageBases() {
+  const [params] = useSearchParams()
+  const compare = params.get('compare') === 'planner'
   return (
     <PageContainer className="gap-0 p-0 sm:p-0 lg:p-0">
       <PageHeader
@@ -18,9 +26,13 @@ export function PageBases() {
         </Typography>
       </PageHeader>
       <PageContent overflow="hidden" surface="muted">
-        <ProductionPlanProvider>
+        {compare ? (
+          <ProductionPlanProvider>
+            <ComparedBaseDesigner />
+          </ProductionPlanProvider>
+        ) : (
           <BaseDesigner />
-        </ProductionPlanProvider>
+        )}
       </PageContent>
     </PageContainer>
   )

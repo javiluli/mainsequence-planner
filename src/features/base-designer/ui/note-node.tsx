@@ -1,4 +1,5 @@
 import { type Node, type NodeProps } from '@xyflow/react'
+import { Textarea } from '@heroui/react'
 import { Grip, StickyNote } from 'lucide-react'
 import { useState } from 'react'
 
@@ -13,15 +14,22 @@ export type NoteFlowNode = Node<NoteNodeData, 'note'>
 function NoteEditor({ text, onCommit }: Pick<NoteNodeData, 'text' | 'onCommit'>) {
   const [draft, setDraft] = useState(text)
   return (
-    <textarea
+    <Textarea
       aria-label="Layout note"
-      className="nodrag nopan nowheel block min-h-24 w-full resize-y bg-transparent px-2 py-2 text-xs leading-5 text-foreground outline-none placeholder:text-foreground/40 focus-visible:ring-1 focus-visible:ring-inset focus-visible:ring-primary"
+      disableAutosize
+      minRows={4}
+      variant="flat"
+      className="nodrag nopan nowheel"
+      classNames={{
+        inputWrapper:
+          'rounded-none bg-transparent px-2 py-2 shadow-none data-[hover=true]:bg-transparent group-data-[focus=true]:bg-transparent',
+        input: 'min-h-24 resize-y text-xs leading-5 placeholder:text-foreground/60',
+      }}
       placeholder="Add a note for this area…"
       value={draft}
-      onChange={(event) => setDraft(event.target.value)}
+      onValueChange={setDraft}
       onBlur={() => onCommit(draft)}
       onPointerDown={(event) => event.stopPropagation()}
-      onKeyDown={(event) => event.stopPropagation()}
     />
   )
 }

@@ -1,9 +1,18 @@
 import { beltConnection, beltIncoming, canAccessMachinePort, type CanTraverseEdge, type OccupiedCells } from './connections'
 import { type BasePlacement, type BaseStation } from './placement'
 import { machinePorts, oppositeDirection, portOutsideCell, type MachinePort } from './ports'
-import { type RouteAnchor, type RouteDraft } from './route'
-import { droneOutputPorts } from './stations'
-import { CELL_SIZE, PLACEABLES, STATION_TYPES, isSplitterType, type Direction, type EditorTool } from '../model/catalog'
+import { routeCells, type RouteAnchor, type RouteDraft } from './route'
+import { droneOutputPorts, type StationCorridor } from './stations'
+import {
+  CELL_SIZE,
+  PLACEABLES,
+  STATION_TYPES,
+  isRouteTool,
+  isSplitterType,
+  type Direction,
+  type EditorTool,
+  type StationType,
+} from '../model/catalog'
 
 interface ClientPoint {
   clientX: number
@@ -20,6 +29,30 @@ interface GridBounds {
 /** Shared by artwork and port hit-testing; never changes the logical footprint. */
 export const MACHINE_BODY_INSET = 3
 
+export function stationPlacementOrigin(point: { x: number; y: number }, type: StationType) {
+  const halfSize = STATION_TYPES[type].footprintCells / 2
+  return { x: Math.round(point.x / CELL_SIZE - halfSize) * CELL_SIZE, y: Math.round(point.y / CELL_SIZE - halfSize) * CELL_SIZE }
+}
+
+/** Park the compact control beside the passage, never on a buildable cell. Origin is in world cells. */
+export function corridorLockPosition(
+  corridor: StationCorridor,
+  origin: { x: number; y: number },
+  droneSide?: 'start' | 'end',
+  side: 'near' | 'far' = 'near',
+) {
+  const horizontal = corridor.width < corridor.height
+  const clearance = 24
+  const length = (horizontal ? corridor.width : corridor.height) * CELL_SIZE
+  // A one-cell gap cannot contain the full target. Park it on the drone's non-buildable side instead.
+  const along = droneSide === 'start' ? -10 : droneSide === 'end' ? length + 10 : length / 2
+  const across = side === 'near' ? -clearance : (horizontal ? corridor.height : corridor.width) * CELL_SIZE + clearance
+  return {
+    left: (corridor.x - origin.x) * CELL_SIZE + (horizontal ? along : across),
+    top: (corridor.y - origin.y) * CELL_SIZE + (horizontal ? across : along),
+  }
+}
+
 /** Project a cell between station-local spaces through their snapped world origins. */
 export function cellInStation(cell: { x: number; y: number }, source: BaseStation, target: BaseStation) {
   return {
@@ -34,10 +67,12 @@ export function dronePortAnchor(point: ClientPoint, bounds: GridBounds, station:
   const scale = bounds.width / size
   for (const port of droneOutputPorts(station)) {
     const localX = port.x - station.position.x / CELL_SIZE
-    const dx = point.clientX - (bounds.left + (localX + 0.5) * CELL_SIZE * scale)
-    const dy = point.clientY - (bounds.top + size * scale)
+    const localY = port.y - station.position.y / CELL_SIZE
+    const [stepX, stepY] = faceSteps[port.face]
+    const dx = point.clientX - (bounds.left + (localX + 0.5 - stepX / 2) * CELL_SIZE * scale)
+    const dy = point.clientY - (bounds.top + (localY + 0.5 - stepY / 2) * CELL_SIZE * scale)
     if (dx * dx + dy * dy <= 15 * 15) {
-      return { kind: 'port', x: localX, y: STATION_TYPES.drone_station.footprintCells, face: 'south', role: 'output' }
+      return { kind: 'port', x: localX, y: localY, face: port.face, role: 'output' }
     }
   }
   return null
@@ -142,6 +177,42 @@ export function beltEndAnchor(
   return { kind: 'port', x: belt.x + dx, y: belt.y + dy, face, role, routeId: belt.routeId }
 }
 
+/** Use the rendered terminal's edge, not whichever cell the pointer happens to fall into. */
+export function getBeltEndAnchor(
+  point: ClientPoint,
+  bounds: GridBounds,
+  occupied: OccupiedCells,
+  size: number,
+  type: EditorTool,
+  role: 'input' | 'output',
+  canTraverse: CanTraverseEdge,
+): RouteAnchor | null {
+  const scaleX = bounds.width / (size * CELL_SIZE)
+  const scaleY = bounds.height / (size * CELL_SIZE)
+  if (scaleX <= 0 || scaleY <= 0) return null
+  const localX = (point.clientX - bounds.left) / scaleX
+  const localY = (point.clientY - bounds.top) / scaleY
+  const radiusX = 14 / scaleX
+  const radiusY = 14 / scaleY
+  let nearest: { anchor: RouteAnchor; distance: number } | null = null
+  // Include the cell on both sides of an edge; screen-space tolerance stays the same at every zoom.
+  for (let y = Math.floor((localY - radiusY) / CELL_SIZE) - 1; y <= Math.floor((localY + radiusY) / CELL_SIZE); y++) {
+    for (let x = Math.floor((localX - radiusX) / CELL_SIZE) - 1; x <= Math.floor((localX + radiusX) / CELL_SIZE); x++) {
+      const belt = occupied.get(`${x},${y}`)
+      if (!belt || belt.buried || !isRouteTool(belt.type) || (type !== 'select' && belt.type !== type)) continue
+      const face = role === 'output' ? belt.direction : beltIncoming(belt)
+      const [edgeX, edgeY] = edgePoints[face]
+      const dx = point.clientX - (bounds.left + (belt.x * CELL_SIZE + edgeX) * scaleX)
+      const dy = point.clientY - (bounds.top + (belt.y * CELL_SIZE + edgeY) * scaleY)
+      const distance = dx * dx + dy * dy
+      if (distance > 14 * 14 || (nearest && distance >= nearest.distance)) continue
+      const anchor = beltEndAnchor(occupied, belt.x, belt.y, belt.type, role, canTraverse)
+      if (anchor) nearest = { anchor, distance }
+    }
+  }
+  return nearest?.anchor ?? null
+}
+
 /** A side click on a straight belt targets its adjacent free cell, so the new route joins without overwriting the old one. */
 export function beltJunctionAnchor(
   occupied: OccupiedCells,
@@ -154,11 +225,35 @@ export function beltJunctionAnchor(
   worldY: number,
 ): RouteAnchor | null {
   if (!draft || (type !== 'conveyor' && type !== 'conveyor_mk2')) return null
+  // Ending on the free cell next to a belt also joins, but only when the last segment points into it.
+  if (!occupied.has(`${x},${y}`)) {
+    const cells = routeCells([...draft.anchors, { kind: 'floor', x: x + worldX, y: y + worldY }])
+    const last = cells.at(-1)
+    if (!last || cells.length < 2) return null
+    const [dx, dy] = faceSteps[last.direction]
+    const target = occupied.get(`${x + dx},${y + dy}`)
+    const side = oppositeDirection(last.direction)
+    if (
+      !target ||
+      target.type !== type ||
+      !target.routeId ||
+      beltIncoming(target) !== oppositeDirection(target.direction) ||
+      side === target.direction ||
+      side === beltIncoming(target) ||
+      target.extraIncoming?.includes(side) ||
+      !canTraverse(x, y, last.direction)
+    )
+      return null
+    return { kind: 'port', x, y, face: side, role: 'input', routeId: target.routeId, mergeTargetId: target.id }
+  }
   const target = occupied.get(`${x},${y}`)
   if (!target || target.type !== type || !target.routeId) return null
   if (beltIncoming(target) !== oppositeDirection(target.direction)) return null
   const last = draft.anchors.at(-1)
   if (!last) return null
+  if (target.direction === 'east' || target.direction === 'west') {
+    if (last.y - worldY === target.y) return null
+  } else if (last.x - worldX === target.x) return null
   const side: Direction =
     target.direction === 'east' || target.direction === 'west'
       ? last.y - worldY < target.y

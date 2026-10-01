@@ -6,10 +6,16 @@ import {
   rotateDirection,
   rotateDisabledOutputPorts,
 } from '@/features/base-designer/lib/ports'
-import { recipeForPlaceable } from '@/features/base-designer/lib/machine-recipes'
+import { recipeForPlaceable, recipeForProduct } from '@/features/base-designer/lib/machine-recipes'
 import { beltIncoming } from '@/features/base-designer/lib/connections'
 import type { BeltJunction, RouteCell } from '@/features/base-designer/lib/route'
-import { canCrossStationBoundary, connectedCorridors, stationOverlap, stationsConnect } from '@/features/base-designer/lib/stations'
+import {
+  canCrossStationBoundary,
+  canPlaceStation,
+  connectedCorridors,
+  stationOverlap,
+  stationsConnect,
+} from '@/features/base-designer/lib/stations'
 import {
   canMoveInLayout,
   canMovePlacementsInLayout,
@@ -20,6 +26,7 @@ import {
   hasSpanningPlacement,
   linkedStationIds,
   pastePlacementOwners,
+  pruneDisconnectedBeltJunctions,
   routeCellOwner,
   withoutStationOwner,
   worldPlacements,
@@ -55,7 +62,8 @@ interface BaseDesignerState {
   beginMoveNote: () => void
   endMoveNote: () => void
   removeNote: (id: string) => void
-  addStation: (type: StationType) => void
+  addStation: (type: StationType, position: BaseStation['position'], direction?: Direction) => string | null
+  rotateStation: (id: string) => boolean
   beginMoveStation: () => void
   moveStation: (id: string, position: { x: number; y: number }) => void
   endMoveStation: () => void
@@ -63,7 +71,7 @@ interface BaseDesignerState {
   undo: () => void
   redo: () => void
   assignRecipe: (stationId: string, placementId: string, recipeId: string | null) => boolean
-  setMachineInputItem: (stationId: string, placementId: string, itemId: string | null) => boolean
+  setMachineProduct: (stationId: string, placementId: string, itemId: string | null) => boolean
   toggleMachineOutput: (stationId: string, placementId: string, face: Direction, offset: number) => boolean
   setDroneOutput: (stationId: string, slot: 0 | 1, itemId: string | null) => boolean
   toggleStationLock: (firstId: string, secondId: string) => void
@@ -103,7 +111,7 @@ interface BaseDesignerSnapshot {
 
 function changed(state: BaseDesignerState, stations: BaseStation[], notes = state.notes): Partial<BaseDesignerState> {
   return {
-    stations,
+    stations: stations === state.stations ? stations : pruneDisconnectedBeltJunctions(stations),
     notes,
     past: [...state.past, { stations: state.dragStartStations ?? state.stations, notes: state.dragStartNotes ?? state.notes }].slice(
       -historyLimit,
@@ -188,25 +196,44 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
           )
         : state,
     ),
-  addStation: (type) =>
-    set((state) => {
-      const nextX = state.stations.reduce(
-        (furthest, station) => Math.max(furthest, station.position.x + STATION_TYPES[station.type].footprintCells * CELL_SIZE + 120),
-        0,
-      )
-      return changed(state, [
-        ...state.stations,
-        {
-          id: makeId(),
-          type,
-          name: `${STATION_TYPES[type].label} ${state.stations.length + 1}`,
-          position: { x: nextX, y: 0 },
-          lockedTo: [],
-          droneOutputs: type === 'drone_station' ? [null, null] : undefined,
-          placements: [],
-        },
-      ])
-    }),
+  addStation: (type, position, direction = 'south') => {
+    const state = get()
+    const candidate: BaseStation = {
+      id: '',
+      type,
+      name: `${STATION_TYPES[type].label} ${state.stations.length + 1}`,
+      position,
+      direction,
+      lockedTo: [],
+      droneOutputs: type === 'drone_station' ? [null, null] : undefined,
+      placements: [],
+    }
+    if (!canPlaceStation(state.stations, candidate)) return null
+    const id = makeId()
+    set(changed(state, [...state.stations, { ...candidate, id }]))
+    return id
+  },
+  rotateStation: (id) => {
+    const state = get()
+    const station = state.stations.find((candidate) => candidate.id === id)
+    if (
+      !station ||
+      station.type !== 'drone_station' ||
+      hasLinkedNeighbor(state.stations, id) ||
+      station.lockedTo.length ||
+      state.stations.some((candidate) => candidate.lockedTo.includes(id))
+    )
+      return false
+    set(
+      changed(
+        state,
+        state.stations.map((candidate) =>
+          candidate.id === id ? { ...candidate, direction: rotateDirection(candidate.direction ?? 'south') } : candidate,
+        ),
+      ),
+    )
+    return true
+  },
   beginMoveStation: () => set((state) => ({ dragStartStations: state.stations })),
   moveStation: (id, position) =>
     set((state) => {
@@ -231,6 +258,7 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
     set((state) =>
       state.dragStartStations && !samePositions(state.dragStartStations, state.stations)
         ? {
+            stations: pruneDisconnectedBeltJunctions(state.stations),
             past: [...state.past, { stations: state.dragStartStations, notes: state.notes }].slice(-historyLimit),
             future: [],
             dragStartStations: null,
@@ -292,11 +320,6 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
                     ? {
                         ...placement,
                         recipeId: recipeId ?? undefined,
-                        inputItemId:
-                          recipeId &&
-                          recipeForPlaceable(placement.type, recipeId)?.inputs.some((input) => input.id === placement.inputItemId)
-                            ? placement.inputItemId
-                            : undefined,
                       }
                     : placement,
                 ),
@@ -307,30 +330,14 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
     )
     return true
   },
-  setMachineInputItem: (stationId, placementId, itemId) => {
+  setMachineProduct: (stationId, placementId, itemId) => {
     const piece = get()
       .stations.find((station) => station.id === stationId)
       ?.placements.find((placement) => placement.id === placementId)
     if (!piece || PLACEABLES[piece.type].category !== 'machine') return false
-    const recipe = recipeForPlaceable(piece.type, piece.recipeId)
-    if (itemId !== null && !recipe?.inputs.some((input) => input.id === itemId)) return false
-    if (piece.inputItemId === (itemId ?? undefined)) return true
-    set((state) =>
-      changed(
-        state,
-        state.stations.map((station) =>
-          station.id === stationId
-            ? {
-                ...station,
-                placements: station.placements.map((placement) =>
-                  placement.id === placementId ? { ...placement, inputItemId: itemId ?? undefined } : placement,
-                ),
-              }
-            : station,
-        ),
-      ),
-    )
-    return true
+    const recipe = itemId === null ? undefined : recipeForProduct(piece.type, itemId, piece.recipeId)
+    if (itemId !== null && !recipe) return false
+    return get().assignRecipe(stationId, placementId, recipe?.id ?? null)
   },
   toggleMachineOutput: (stationId, placementId, face, offset) => {
     const piece = get()
@@ -547,7 +554,6 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
         !canCrossStationBoundary(stations, last, target, connectedCorridors(stations))
       )
         return false
-      merging.add(target.routeId)
     }
     const existing = stations.flatMap((station) => station.placements).filter((piece) => piece.routeId && merging.has(piece.routeId))
     if (existing.some((piece) => piece.type !== type)) return false
@@ -563,19 +569,20 @@ export const useBaseDesignerStore = create<BaseDesignerState>((set, get) => ({
               buried: isUndergroundType(type) && index > 0 && index < cells.length - 1,
             }))
             .filter((cell) => routeCellOwner(state.stations, stationId, cell.x, cell.y)?.id === candidate.id)
-          if (!owned.length && !candidate.placements.some((piece) => piece.routeId && merging.has(piece.routeId))) return candidate
+          if (
+            !owned.length &&
+            !candidate.placements.some((piece) => (piece.routeId && merging.has(piece.routeId)) || piece.id === junction?.targetId)
+          )
+            return candidate
           return {
             ...candidate,
             placements: [
               ...candidate.placements.map((piece) =>
-                piece.routeId && merging.has(piece.routeId)
-                  ? {
-                      ...piece,
-                      routeId,
-                      extraIncoming:
-                        junction && piece.id === junction.targetId ? [...(piece.extraIncoming ?? []), junction.face] : piece.extraIncoming,
-                    }
-                  : piece,
+                junction && piece.id === junction.targetId
+                  ? { ...piece, extraIncoming: [...(piece.extraIncoming ?? []), junction.face] }
+                  : piece.routeId && merging.has(piece.routeId)
+                    ? { ...piece, routeId }
+                    : piece,
               ),
               ...owned.map((cell) => ({
                 id: makeId(),

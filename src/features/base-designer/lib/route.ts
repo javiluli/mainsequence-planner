@@ -28,6 +28,11 @@ export interface RouteCell extends GridPoint {
   incoming: Direction
 }
 
+/** A lateral target is joined separately; including it here would look like a loop from that route. */
+export function routeMergeIds(start: RouteAnchor, end: RouteAnchor): string[] {
+  return [start, end].flatMap((anchor) => (anchor.kind === 'port' && anchor.routeId && !anchor.mergeTargetId ? [anchor.routeId] : []))
+}
+
 /** Hover identity includes routing intent, not just the highlighted cell/face. */
 export function sameRouteAnchor(first: RouteAnchor | null, second: RouteAnchor | null): boolean {
   if (first === second) return true

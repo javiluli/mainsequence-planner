@@ -9,8 +9,6 @@ export interface BasePlacement {
   direction: Direction
   /** Stable catalog recipe ID chosen for this machine; absent means unassigned. */
   recipeId?: string
-  /** Optional visual label, restricted to an input item of the assigned recipe. */
-  inputItemId?: string
   /** Disabling an output never blocks an input arriving through the same I/O. */
   disabledOutputPorts?: string[]
   /** Belt face that receives material; omitted for machines. */
@@ -31,6 +29,8 @@ export interface BaseStation {
   position: { x: number; y: number }
   /** Explicit, reversible group links to aligned neighboring stations. */
   lockedTo: string[]
+  /** The drone module's only open face; regular stations have fixed, symmetric doors. */
+  direction?: Direction
   /** Drone outlets are optional catalog item IDs, from left to right on its open face. */
   droneOutputs?: [string | null, string | null]
   placements: BasePlacement[]

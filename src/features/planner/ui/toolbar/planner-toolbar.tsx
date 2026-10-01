@@ -19,7 +19,7 @@ export const PlannerToolbar = () => (
     <SupplyPopover />
     <RecipeOptionsPopover />
     <Link
-      to="/bases"
+      to="/bases?compare=planner"
       className="ml-auto inline-flex h-8 items-center gap-1.5 border border-divider px-2.5 text-xs font-medium text-foreground/75 transition-colors hover:border-primary/60 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       title="Compare the current production plan with your base layout"
     >

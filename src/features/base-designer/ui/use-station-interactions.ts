@@ -1,11 +1,21 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react'
 import { type CanTraverseEdge } from '../lib/connections'
-import { indexPlacements } from '../lib/placement'
-import { machinePorts, portOutsideCell } from '../lib/ports'
+import { indexPlacements, type BaseStation } from '../lib/placement'
+import { machinePorts, portOutsideCell, rotateDirection } from '../lib/ports'
 import { sameRouteAnchor, type RouteAnchor } from '../lib/route'
-import { beltEndAnchor, beltJunctionAnchor, cellInStation, dronePortAnchor, getPortAnchor, gridCell } from '../lib/station-spatial'
+import {
+  beltEndAnchor,
+  beltJunctionAnchor,
+  cellInStation,
+  dronePortAnchor,
+  getPortAnchor,
+  getBeltEndAnchor,
+  gridCell,
+  stationPlacementOrigin,
+} from '../lib/station-spatial'
+import { canPlaceStation } from '../lib/stations'
 import { canMoveInLayout, canMoveRouteInLayout } from '../lib/world-layout'
-import { CELL_SIZE, PLACEABLES, STATION_TYPES, isPlaceableTool, isRouteTool } from '../model/catalog'
+import { CELL_SIZE, PLACEABLES, STATION_TYPES, isPlaceableTool, isRouteTool, isSplitterType, type StationType } from '../model/catalog'
 import { type StationNodeData } from '../model/station-node'
 
 interface MachineDrag {
@@ -65,6 +75,7 @@ type InteractionData = Pick<
   | 'onActivate'
   | 'onCell'
   | 'onPickTool'
+  | 'onStartBelt'
   | 'onAreaSelect'
   | 'onMoveArea'
   | 'onSelectionPreview'
@@ -73,8 +84,84 @@ type InteractionData = Pick<
   | 'onMovePlacement'
   | 'onMoveRoute'
   | 'onToggleMachineOutput'
+  | 'onClearMachineItem'
   | 'onReleaseTool'
 >
+
+/** A station build tool is transient and repeatable; only confirmed placements enter the store. */
+export function useStationPlacement({
+  stations,
+  project,
+  getBounds,
+  onConfirm,
+}: {
+  stations: readonly BaseStation[]
+  project: (point: { x: number; y: number }) => { x: number; y: number }
+  getBounds: () => DOMRect | undefined
+  onConfirm: (station: BaseStation) => boolean
+}) {
+  const [draft, setDraft] = useState<BaseStation | null>(null)
+  const cancel = useCallback(() => setDraft(null), [])
+  const start = (type: StationType) => {
+    const bounds = getBounds()
+    const center = project({ x: bounds ? bounds.left + bounds.width / 2 : 0, y: bounds ? bounds.top + bounds.height / 2 : 0 })
+    setDraft({
+      id: 'station-preview',
+      type,
+      name: STATION_TYPES[type].label,
+      position: stationPlacementOrigin(center, type),
+      direction: 'south',
+      lockedTo: [],
+      placements: [],
+    })
+  }
+  const atPointer = (event: PointerEvent<HTMLDivElement>) =>
+    draft
+      ? {
+          ...draft,
+          position: stationPlacementOrigin(project({ x: event.clientX, y: event.clientY }), draft.type),
+        }
+      : null
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || !draft) return
+    const next = atPointer(event)
+    if (next && (next.position.x !== draft.position.x || next.position.y !== draft.position.y)) setDraft(next)
+  }
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (!event.isPrimary || event.button !== 0 || !draft) return
+    event.preventDefault()
+    event.stopPropagation()
+    event.currentTarget.focus({ preventScroll: true })
+    const next = atPointer(event)
+    if (next) {
+      setDraft(next)
+      onConfirm(next)
+    }
+  }
+  const handleKeyDown = (event: globalThis.KeyboardEvent): boolean => {
+    if (!draft || event.ctrlKey || event.metaKey) return false
+    const steps: Record<string, readonly [number, number]> = { ArrowUp: [0, -1], ArrowRight: [1, 0], ArrowDown: [0, 1], ArrowLeft: [-1, 0] }
+    const step = steps[event.key]
+    if (step) setDraft({ ...draft, position: { x: draft.position.x + step[0] * CELL_SIZE, y: draft.position.y + step[1] * CELL_SIZE } })
+    else if (event.key === 'Enter' || event.key === ' ') onConfirm(draft)
+    else if (event.key.toLowerCase() === 'r' && draft.type === 'drone_station')
+      setDraft({ ...draft, direction: rotateDirection(draft.direction ?? 'south') })
+    else if (event.key === 'Escape') cancel()
+    else return false
+    event.preventDefault()
+    return true
+  }
+  return {
+    draft,
+    active: draft !== null,
+    valid: draft ? canPlaceStation(stations, draft) : false,
+    start,
+    cancel,
+    handlePointerMove,
+    handlePointerDown,
+    handleKeyDown,
+  }
+}
 
 /** Transient gestures stay outside the persisted layout and the station artwork. */
 export function useStationInteractions(data: InteractionData, canTraverse: CanTraverseEdge) {
@@ -95,6 +182,7 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
     onActivate,
     onCell,
     onPickTool,
+    onStartBelt,
     onAreaSelect,
     onMoveArea,
     onSelectionPreview,
@@ -103,6 +191,7 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
     onMovePlacement,
     onMoveRoute,
     onToggleMachineOutput,
+    onClearMachineItem,
     onReleaseTool,
   } = data
   const size = STATION_TYPES[station.type].footprintCells
@@ -131,7 +220,14 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
   }, [onClearSelectionPreview])
 
   // Dispose the old gesture before painting a new tool, layout, paste or history state.
-  useLayoutEffect(() => cancelGesture, [tool, pasteActive, layoutStations, interactionRevision, cancelGesture])
+  useLayoutEffect(() => cancelGesture, [tool, pasteActive, interactionRevision, cancelGesture])
+  // An idle port stays under the pointer when F changes its permission. Actual captures still cancel on layout changes.
+  useLayoutEffect(
+    () => () => {
+      if (dragRef.current || areaDragRef.current || capturedPointer.current) cancelGesture()
+    },
+    [layoutStations, cancelGesture],
+  )
 
   const capturePointer = (event: PointerEvent<HTMLDivElement>) => {
     capturedPointer.current = { id: event.pointerId, target: event.currentTarget }
@@ -155,12 +251,24 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
     [station.placements, externalPlacements, draggedId, draggedRouteId, selectionPreview, selectedAreaIds],
   )
 
+  const portPieces = useMemo(
+    () =>
+      [...station.placements, ...externalPlacements].filter(
+        (piece) => PLACEABLES[piece.type].category === 'machine' || isSplitterType(piece.type),
+      ),
+    [station.placements, externalPlacements],
+  )
+
   // Click and hover use the same priority: drone, machine/splitter, junction, route end.
   const portAt = (event: PointerEvent<HTMLDivElement>, cell: { x: number; y: number }) => {
     const bounds = event.currentTarget.getBoundingClientRect()
     return (
       dronePortAnchor(event, bounds, station) ??
-      getPortAnchor(event, bounds, [...station.placements, ...externalPlacements], size, canTraverse) ??
+      getPortAnchor(event, bounds, portPieces, size, canTraverse) ??
+      (isRouteTool(tool) || tool === 'select'
+        ? getBeltEndAnchor(event, bounds, occupied, size, tool, routeDraft ? 'input' : 'output', canTraverse)
+        : null) ??
+      (tool === 'select' ? getBeltEndAnchor(event, bounds, occupied, size, tool, 'input', canTraverse) : null) ??
       (isRouteTool(tool) ? beltJunctionAnchor(occupied, cell.x, cell.y, tool, routeDraft, canTraverse, worldX, worldY) : null) ??
       (isRouteTool(tool) ? beltEndAnchor(occupied, cell.x, cell.y, tool, routeDraft ? 'input' : 'output', canTraverse) : null)
     )
@@ -203,6 +311,13 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
       setHoveredPort(null)
     }
     if (tool === 'select') {
+      const port = portAt(event, cell)
+      if (port?.kind === 'port' && onStartBelt) {
+        event.preventDefault()
+        event.stopPropagation()
+        onStartBelt(station.id, port)
+        return
+      }
       const placed = occupied.get(`${cell.x},${cell.y}`)
       if (placed && selectedAreaIds.has(placed.id)) {
         event.preventDefault()
@@ -263,6 +378,9 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
     setCursor((current) => (current.x === cell.x && current.y === cell.y ? current : cell))
     const port = isRouteTool(tool) || tool === 'select' ? portAt(event, cell) : null
     setHoveredPort((current) => (sameRouteAnchor(current, port) ? current : port))
+    if (tool === 'select' && port && !event.buttons && document.activeElement?.hasAttribute('data-base-canvas')) {
+      event.currentTarget.focus({ preventScroll: true })
+    }
     if (routeDraft && isRouteTool(tool)) onRouteHover(station.id, port ?? { kind: 'floor', ...cell })
     const currentDrag = dragRef.current
     if (currentDrag && event.buttons & 1) {
@@ -377,6 +495,10 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
     } else if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
       event.stopPropagation()
+      if (tool === 'select' && hoveredPort?.kind === 'port' && onStartBelt) {
+        onStartBelt(station.id, hoveredPort)
+        return
+      }
       setHoveredPort(null)
       onActivate(station.id)
       const footprint = isPlaceableTool(tool) ? PLACEABLES[tool] : null
@@ -424,6 +546,15 @@ export function useStationInteractions(data: InteractionData, canTraverse: CanTr
   const handleContextMenu = (event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
     event.stopPropagation()
+    if (tool === 'select' && !pasteActive && !dragRef.current && !areaDragRef.current) {
+      const cell = cellAt(event)
+      const piece = occupied.get(`${cell.x},${cell.y}`)
+      if (piece?.recipeId && PLACEABLES[piece.type].category === 'machine') {
+        const ownerId = 'stationId' in piece && typeof piece.stationId === 'string' ? piece.stationId : station.id
+        onClearMachineItem(ownerId, piece.id)
+        return
+      }
+    }
     cancelGesture()
     onReleaseTool()
   }

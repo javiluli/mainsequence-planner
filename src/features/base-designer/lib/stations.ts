@@ -1,4 +1,12 @@
-import { CELL_SIZE, STATION_CORRIDOR_CELLS, STATION_GATE_CELLS, STATION_TYPES, type Direction, type StationType } from '../model/catalog'
+import {
+  CELL_SIZE,
+  DRONE_CORRIDOR_CELLS,
+  STATION_CORRIDOR_CELLS,
+  STATION_GATE_CELLS,
+  STATION_TYPES,
+  type Direction,
+  type StationType,
+} from '../model/catalog'
 import type { BaseStation } from './placement'
 
 export interface StationCorridor {
@@ -35,8 +43,8 @@ function matchingGateStarts(
   aPosition: BaseStation['position'],
   bPosition: BaseStation['position'],
 ) {
-  const aFaces: readonly string[] = STATION_TYPES[a.type].openFaces
-  const bFaces: readonly string[] = STATION_TYPES[b.type].openFaces
+  const aFaces = stationOpenFaces(a)
+  const bFaces = stationOpenFaces(b)
   if (!aFaces.includes(aFace) || !bFaces.includes(bFace)) return []
   const aOrigin = aPosition[axis] / CELL_SIZE
   const bOrigin = bPosition[axis] / CELL_SIZE
@@ -45,11 +53,20 @@ function matchingGateStarts(
     .filter((start) => STATION_TYPES[b.type].gateStarts.some((other) => start === bOrigin + other))
 }
 
-/** The passage occupies the two empty grid cells between exactly aligned six-cell doorways. */
+export function stationOpenFaces(station: BaseStation): readonly Direction[] {
+  return station.type === 'drone_station' ? [station.direction ?? 'south'] : STATION_TYPES[station.type].openFaces
+}
+
+export function droneRotation(direction: Direction = 'south'): number {
+  return { south: 0, west: 90, north: 180, east: 270 }[direction]
+}
+
+/** Drone links span one empty cell; other links span two, with the same aligned six-cell doorways. */
 function corridorsBetween(a: BaseStation, b: BaseStation, aPosition = a.position, bPosition = b.position): StationCorridor[] {
   const first = bounds(a, aPosition)
   const second = bounds(b, bPosition)
-  const gap = STATION_CORRIDOR_CELLS * CELL_SIZE
+  const corridorCells = a.type === 'drone_station' || b.type === 'drone_station' ? DRONE_CORRIDOR_CELLS : STATION_CORRIDOR_CELLS
+  const gap = corridorCells * CELL_SIZE
   if (first.right + gap === second.left || second.right + gap === first.left) {
     const left = first.right + gap === second.left ? a : b
     const right = left.id === a.id ? b : a
@@ -61,7 +78,7 @@ function corridorsBetween(a: BaseStation, b: BaseStation, aPosition = a.position
       otherId: right.id,
       x: bounds(left, leftPosition).right / CELL_SIZE,
       y,
-      width: STATION_CORRIDOR_CELLS,
+      width: corridorCells,
       height: STATION_GATE_CELLS,
     }))
   }
@@ -77,7 +94,7 @@ function corridorsBetween(a: BaseStation, b: BaseStation, aPosition = a.position
       x,
       y: bounds(top, topPosition).bottom / CELL_SIZE,
       width: STATION_GATE_CELLS,
-      height: STATION_CORRIDOR_CELLS,
+      height: corridorCells,
     }))
   }
   return []
@@ -91,11 +108,35 @@ export function droneOutputPorts(station: BaseStation): { slot: 0 | 1; x: number
   const originY = station.position.y / CELL_SIZE
   return ([0, 1] as const).map((slot) => ({
     slot,
-    x: originX + gateStart + 2 + slot,
-    y: originY + STATION_TYPES.drone_station.footprintCells,
-    face: 'south',
+    ...droneOutletCell(station.direction ?? 'south', gateStart + 2 + slot, originX, originY),
+    face: station.direction ?? 'south',
     itemId: station.droneOutputs?.[slot] ?? null,
   }))
+}
+
+function droneOutletCell(face: Direction, offset: number, originX: number, originY: number) {
+  const size = STATION_TYPES.drone_station.footprintCells
+  switch (face) {
+    case 'south':
+      return { x: originX + offset, y: originY + size }
+    case 'west':
+      return { x: originX - 1, y: originY + offset }
+    case 'north':
+      return { x: originX + size - 1 - offset, y: originY - 1 }
+    case 'east':
+      return { x: originX + size, y: originY + size - 1 - offset }
+  }
+}
+
+/** Preview and commit share one snapped footprint check; decorative frames do not reserve cells. */
+export function canPlaceStation(stations: readonly BaseStation[], candidate: BaseStation): boolean {
+  return (
+    Number.isFinite(candidate.position.x) &&
+    Number.isFinite(candidate.position.y) &&
+    candidate.position.x % CELL_SIZE === 0 &&
+    candidate.position.y % CELL_SIZE === 0 &&
+    !stations.some((station) => stationOverlap(station, candidate))
+  )
 }
 
 export function connectedCorridors(stations: readonly BaseStation[]): StationCorridor[] {
@@ -106,6 +147,12 @@ export function connectedCorridors(stations: readonly BaseStation[]): StationCor
     }
   }
   return corridors
+}
+
+/** Only proposed connections are drawn; an invalid module must not suggest buildable floor. */
+export function stationPreviewCorridors(stations: readonly BaseStation[], candidate: BaseStation): StationCorridor[] {
+  if (!canPlaceStation(stations, candidate)) return []
+  return stations.flatMap((station) => corridorsBetween(station, candidate))
 }
 
 /** A step is traversable inside a station, along its passage, or through either matching doorway. */
@@ -133,7 +180,7 @@ export function canCrossStationBoundary(
   return false
 }
 
-/** Modules connect only across a two-cell gap with complete doorways aligned. */
+/** Modules connect only across their type-specific gap with complete doorways aligned. */
 export function stationsConnect(a: BaseStation, b: BaseStation, aPosition = a.position, bPosition = b.position): boolean {
   return corridorsBetween(a, b, aPosition, bPosition).length > 0
 }
