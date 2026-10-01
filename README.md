@@ -4,7 +4,7 @@ Main Sequence Planner turns structured game recipes, machine data and research m
 
 ## Current scope
 
-- **Planner** — choose a target and production rate, inspect the calculated chain, and adjust supported planning inputs.
+- **Planner** — choose a target and production rate, inspect the calculated chain, and adjust supported planning inputs. Its empty state uses the lazy-loaded item network background instead of the random-item marquee.
 - **Items** — browse and filter the current catalog and open an item directly in the Planner.
 - **Buildings & Recipes** — inspect machines and the recipes they expose.
 - **Research** — explore the game-backed technology graph by science branch, search its nodes and inspect costs, prerequisites and unlocks.

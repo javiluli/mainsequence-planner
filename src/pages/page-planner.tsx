@@ -1,6 +1,7 @@
-import { PlannerToolbar, ProductionDiagramTabs, ProductionPlanProvider, RandomItemMarquee, useProductionPlan } from '@/features/planner'
+import { ItemNetworkBackground, PlannerToolbar, ProductionDiagramTabs, ProductionPlanProvider, useProductionPlan } from '@/features/planner'
 import { Flex, PageContainer, PageContent, PageHeader, Typography } from '@/shared/ui'
 import { Suspense } from 'react'
+
 import './page-planner.css'
 
 const PlannerToolbarFallback = () => (
@@ -17,6 +18,49 @@ const PlannerDiagram = () => (
   </div>
 )
 
+const PlannerEmptyState = () => (
+  <Flex
+    direction="col"
+    align="center"
+    justify="center"
+    className="
+      planner-empty-surface
+      relative
+      h-full
+      min-h-0
+      min-w-0
+      overflow-hidden
+      text-center
+    "
+  >
+    <Suspense fallback={null}>
+      <ItemNetworkBackground />
+    </Suspense>
+
+    <div
+      className="
+        planner-empty-content
+        pointer-events-none
+        relative
+        z-10
+        mx-auto
+        flex
+        max-w-2xl
+        flex-col
+        items-center
+        gap-2
+        px-6
+      "
+    >
+      <Typography variant="h2">Select an object to begin production</Typography>
+
+      <Typography tone="soft">
+        Choose any Main Sequence item to see its production chain, or select a raw material to use it as a terminal target.
+      </Typography>
+    </div>
+  </Flex>
+)
+
 const PlannerPageContent = () => {
   const plan = useProductionPlan()
 
@@ -26,31 +70,13 @@ const PlannerPageContent = () => {
         <Typography as="h1" variant="h2" className="sr-only">
           Main Sequence Production Planner
         </Typography>
+
         <Suspense fallback={<PlannerToolbarFallback />}>
           <PlannerToolbar />
         </Suspense>
       </PageHeader>
 
-      <PageContent overflow="hidden">
-        {plan ? (
-          <PlannerDiagram />
-        ) : (
-          <Flex
-            direction="col"
-            align="center"
-            justify="center"
-            className="planner-empty-surface h-full min-h-0 overflow-hidden text-center"
-          >
-            <Typography variant="h2">Select an object to begin production</Typography>
-            <Typography tone="soft">
-              Choose any Main Sequence item to see its production chain, or select a raw material to use it as a terminal target.
-            </Typography>
-            <div className="order-first w-full">
-              <RandomItemMarquee />
-            </div>
-          </Flex>
-        )}
-      </PageContent>
+      <PageContent overflow="hidden">{plan ? <PlannerDiagram /> : <PlannerEmptyState />}</PageContent>
     </PageContainer>
   )
 }

@@ -1,5 +1,35 @@
 .planner-empty-surface {
-  background-image: radial-gradient(ellipse 46% 43% at 50% 48%, hsl(var(--heroui-primary) / 0.065), transparent 100%);
+  isolation: isolate;
+
+  background:
+    radial-gradient(ellipse 34% 27% at 50% 50%, hsl(var(--heroui-primary) / 0.025), transparent 72%),
+    radial-gradient(ellipse 72% 68% at 50% 50%, hsl(var(--heroui-secondary) / 0.014), transparent 76%), hsl(var(--heroui-background));
+}
+
+.planner-network {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.planner-empty-content::before {
+  position: absolute;
+  z-index: -1;
+
+  width: 150%;
+  height: 230%;
+
+  content: '';
+  pointer-events: none;
+
+  background: radial-gradient(
+    ellipse at center,
+    hsl(var(--heroui-background) / 0.91) 0%,
+    hsl(var(--heroui-background) / 0.68) 36%,
+    hsl(var(--heroui-background) / 0.18) 62%,
+    transparent 78%
+  );
+
+  filter: blur(12px);
 }
 
 .planner-diagram-content {
@@ -61,5 +91,9 @@
   .planner-diagram-loading[data-phase='loading-enter'],
   .planner-diagram-loading[data-phase='loading-exit'] {
     animation: none;
+  }
+
+  .planner-diagram-content[data-phase='content-enter'] {
+    opacity: 1;
   }
 }

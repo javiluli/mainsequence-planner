@@ -20,6 +20,7 @@ El catálogo JSON generado desde FModel es la fuente de verdad de objetos, recet
 
 ## Capabilities and Constraints
 
+- El estado vacío de Planner usa el fondo de red de ítems cargado de forma diferida, en sustitución del marquee aleatorio. La integración conserva los accesos y la comparación con Bases; la animación no modifica el plan de producción.
 - El diseñador de bases permite colocar estaciones y máquinas repetidamente con preview centrado en el cursor y ajustado a la cuadrícula, sin inserción inmediata. Clic o Enter confirma una estación, flechas la reposicionan y Escape/clic derecho cancela. El solapamiento se marca en rojo y se rechaza sin historial. Las cintas ortogonales se trazan mediante anclas antes de confirmar la ruta completa.
 - El dron admite giros de 90° con R o Rotate, tanto en preview como colocado. Su cara abierta, salidas e hit-testing giran juntos; los ítems conservan lectura vertical. No se permite girar un enlace bloqueado ni eliminar suelo de un pasillo ocupado. Las cintas existentes conservan su posición.
 - Las conexiones con drones son la excepción al hueco estándar de dos celdas: requieren una única celda vacía y generan un pasillo 1×6 (o 6×1), sin estrechar la abertura de seis celdas ni alterar la huella del dron. Preview, construcción, cintas y candados comparten esta variante en las cuatro orientaciones.
