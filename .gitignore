@@ -25,3 +25,7 @@ dist-ssr
 playwright-report/
 test-results/
 blob-report/
+
+# Rebuildable Graphify output and installation backups.
+graphify-out/
+*.graphify-bak

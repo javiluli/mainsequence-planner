@@ -11,6 +11,10 @@ public/assets/
 skills-lock.json
 pnpm-lock.yaml
 
+# Generated graphs and vendored skill instructions retain their own formatting.
+graphify-out/
+.codex/skills/graphify/
+
 # Game-data snapshots are updated only when the user explicitly approves new source data.
 src/shared/data/*.json
 # Keep transferred research source shards unformatted for source provenance hashes.
