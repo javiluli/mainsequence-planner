@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mainsequence-planner.vercel.app/</loc>
+  </url>
+  <url>
+    <loc>https://mainsequence-planner.vercel.app/items</loc>
+  </url>
+  <url>
+    <loc>https://mainsequence-planner.vercel.app/recipes</loc>
+  </url>
+  <url>
+    <loc>https://mainsequence-planner.vercel.app/research</loc>
+  </url>
+  <url>
+    <loc>https://mainsequence-planner.vercel.app/bases</loc>
+  </url>
+</urlset>

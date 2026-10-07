@@ -1,0 +1,219 @@
+/* Stations / Frames / Station Preview */
+
+.base-station,
+.base-station-corridor {
+  --base-wall: #798792;
+  background-color: #211f1e;
+  /* The tile art and machine body share a small optical inset; the 20px cell pitch stays fixed. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Crect x='3' y='3' width='14' height='14' rx='3' fill='%23282523' stroke='%23bc752f' stroke-opacity='.46' stroke-width='.9'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 20px 20px;
+}
+
+.base-station {
+  overflow: visible;
+}
+
+.base-station--drone {
+  background-color: transparent;
+  background-image: none;
+}
+
+.base-station-preview {
+  z-index: 20;
+  opacity: 0.7;
+  outline: 1px dashed var(--base-accent);
+  outline-offset: 5px;
+}
+
+.base-station-preview[data-valid='false'] {
+  outline-color: var(--base-invalid);
+  background-color: var(--base-invalid-surface);
+}
+
+.base-station-preview[data-valid='false'] .base-station-wall {
+  stroke: var(--base-invalid);
+}
+
+.base-station--drone.base-station--active .base-drone-hull {
+  stroke: var(--base-active);
+}
+
+.base-station-preview[data-valid='false'] .base-drone-hull {
+  stroke: var(--base-invalid);
+}
+
+.base-station--drone.base-station-preview[data-valid='false'] {
+  background-color: transparent;
+}
+
+.base-station-frame {
+  z-index: 9;
+  overflow: visible;
+  fill: none;
+  pointer-events: none;
+}
+
+.base-station-frame--interactive path {
+  pointer-events: stroke;
+}
+
+.base-station-frame .base-station-frame-hit {
+  stroke: transparent;
+  stroke-width: 12;
+  stroke-linecap: butt;
+  filter: none;
+}
+
+.base-station-frame .base-station-wall {
+  stroke: var(--base-wall);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px #303a40);
+}
+
+.base-station-frame circle {
+  fill: #9da9af;
+  stroke: #303a40;
+  stroke-width: 1;
+}
+
+.base-station--active .base-station-wall {
+  stroke: var(--base-active);
+}
+
+.base-station--active .base-station-frame circle {
+  fill: var(--base-accent);
+}
+
+.base-station--moving {
+  outline: 1px dashed var(--base-accent);
+  outline-offset: 5px;
+  opacity: 0.8;
+}
+
+.base-station--moving[data-movement-valid='false'] {
+  outline-color: var(--base-invalid);
+  background-color: var(--base-invalid-surface);
+}
+
+.base-station--moving[data-movement-valid='false'] .base-station-wall,
+.base-station--moving[data-movement-valid='false'] .base-drone-hull {
+  stroke: var(--base-invalid);
+}
+
+.base-station-window line {
+  stroke: #8197a2;
+  stroke-width: 1.5;
+  stroke-opacity: 0.7;
+}
+
+.base-station-frame--interactive .base-station-window line {
+  pointer-events: stroke;
+}
+
+/* Corridors / Locks */
+
+.base-station-corridor {
+  z-index: 1;
+}
+
+.base-station-corridor--preview {
+  --base-wall: var(--base-active);
+  z-index: 19;
+  opacity: 0.7;
+  outline: 1px dashed var(--base-accent);
+  outline-offset: -1px;
+}
+
+.base-station--active .base-station-corridor {
+  --base-wall: var(--base-active);
+}
+
+.base-station-corridor::before,
+.base-station-corridor::after {
+  position: absolute;
+  border-radius: 1.5px;
+  background: var(--base-wall);
+  pointer-events: none;
+  content: '';
+}
+
+/* The rails meet the station's outward decorative wall, not the inset floor tile. */
+.base-station-corridor--horizontal::before,
+.base-station-corridor--horizontal::after {
+  right: 2.5px;
+  left: 2.5px;
+  height: 3px;
+}
+
+.base-station-corridor--horizontal::before {
+  top: -1.5px;
+}
+
+.base-station-corridor--horizontal::after {
+  bottom: -1.5px;
+}
+
+.base-station-corridor--vertical::before,
+.base-station-corridor--vertical::after {
+  top: 2.5px;
+  bottom: 2.5px;
+  width: 3px;
+}
+
+.base-station-corridor--vertical::before {
+  left: -1.5px;
+}
+
+.base-station-corridor--vertical::after {
+  right: -1.5px;
+}
+
+.base-corridor-lock {
+  z-index: 11;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 1px solid #7e6550;
+  border-radius: 4px;
+  background: #252422;
+  color: var(--base-accent);
+  cursor: pointer;
+}
+
+.base-corridor-lock::after {
+  position: absolute;
+  inset: -4px;
+  content: '';
+}
+
+.base-corridor-lock:hover,
+.base-corridor-lock:focus-visible {
+  border-color: var(--base-accent);
+  background: #3a3028;
+  outline: none;
+}
+
+.base-corridor-lock[aria-pressed='true'] {
+  border-color: var(--base-accent);
+  background: #4a3622;
+}
+
+/* Drone Items */
+
+.base-drone-item {
+  z-index: 3;
+  display: grid;
+  width: 47px;
+  height: 46px;
+  place-items: center;
+  color: #334650;
+}
+
+.base-drone-item:has(button):hover {
+  filter: brightness(1.12);
+}

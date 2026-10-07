@@ -1,0 +1,94 @@
+@import './stations.css';
+@import './placements.css';
+@import './ports.css';
+
+/* Single feature entry: imported artwork rules precede canvas overrides and reduced motion.
+   Tokens below apply on artwork roots even in portals; they do not depend on canvas ancestry. */
+
+/* Variables */
+
+/* Artwork can render outside the canvas (HeroUI portals and paste previews).
+   Scope defaults to its roots rather than :root or a canvas ancestor.
+   These are paint metrics only: CELL_SIZE, footprints and hit-testing stay in the domain. */
+.base-station,
+.base-station-corridor,
+.base-corridor-lock,
+.base-placement,
+.base-io-port {
+  --base-accent: #e6aa60;
+  --base-active: #d79b54;
+  --base-selection-rgb: 244 176 85;
+  --base-selection: rgb(var(--base-selection-rgb));
+  --base-selected-belt: #aa8453;
+  --base-invalid: #ef7373;
+  --base-invalid-surface: #4b2424;
+  --base-belt-core: #435966;
+  --base-belt-shell: #273c48;
+  --base-belt-slats: #8c9eaa;
+  --base-machine-border: #536571;
+  --base-machine-surface: #71808d;
+  --base-metal-light: #b7c4ca;
+  --base-metal-ink: #1f303a;
+  --base-input: #43d1c1;
+  --base-input-border: #168d86;
+  --base-output: #f3a24a;
+  --base-output-border: #ac641e;
+  --base-blocked: #ba7370;
+  --base-blocked-border: #9b4a45;
+  --base-blocked-ink: #321b1b;
+  --base-io-length: 12px;
+  --base-io-depth: 6px;
+  --base-io-connection-size: 9px;
+  /* Unitless strokes retain SVG user units; buried artwork never becomes surface occupancy. */
+  --base-belt-shell-width: 12;
+  --base-belt-core-width: 9;
+  --base-buried-shell-width: 11;
+  --base-buried-core-width: 8;
+}
+
+/* Canvas / React Flow */
+
+[data-base-canvas] .react-flow {
+  --xy-selection-background-color: hsl(var(--heroui-primary) / 0.1);
+  --xy-selection-border: 2px dashed hsl(var(--heroui-primary) / 0.85);
+}
+
+/* One compositor surface per station bounds Chrome's expensive SVG overlap/layer analysis during pan/zoom.
+   Keep this at the node root: promoting individual tiles multiplies GPU surfaces; paint containment would clip cross-floor ghosts.
+   Memory grows with compositor surfaces; keep representative profiling in the local performance guide. */
+.react-flow__node-station {
+  will-change: transform;
+}
+
+/* A dragged selection may span modules; keep its ghost above adjacent station floors. */
+.react-flow__node-station:has(.base-placement--preview.base-placement--machine),
+.react-flow__node-station:has(.base-placement--selected-route.base-placement--moving) {
+  z-index: 10 !important;
+}
+
+/* Animations / Reduced Motion */
+
+/* The React Flow viewport owns overview/detail policy. Pausing preserves each confirmed flow's phase;
+   it changes neither connectivity nor domain state, and reduced motion still takes precedence below. */
+[data-base-canvas] .base-belt-slats {
+  animation-play-state: var(--base-belt-motion, running);
+}
+
+@keyframes base-belt-flow {
+  to {
+    stroke-dashoffset: -15;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .base-placement *,
+  .base-drone-item * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .base-placement--flowing .base-belt-slats {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

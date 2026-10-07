@@ -1,0 +1,99 @@
+.planner-empty-surface {
+  isolation: isolate;
+
+  background:
+    radial-gradient(ellipse 34% 27% at 50% 50%, hsl(var(--heroui-primary) / 0.025), transparent 72%),
+    radial-gradient(ellipse 72% 68% at 50% 50%, hsl(var(--heroui-secondary) / 0.014), transparent 76%), hsl(var(--heroui-background));
+}
+
+.planner-network {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.planner-empty-content::before {
+  position: absolute;
+  z-index: -1;
+
+  width: 150%;
+  height: 230%;
+
+  content: '';
+  pointer-events: none;
+
+  background: radial-gradient(
+    ellipse at center,
+    hsl(var(--heroui-background) / 0.91) 0%,
+    hsl(var(--heroui-background) / 0.68) 36%,
+    hsl(var(--heroui-background) / 0.18) 62%,
+    transparent 78%
+  );
+
+  filter: blur(12px);
+}
+
+.planner-diagram-content {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.planner-diagram-content[data-phase='content-enter'] {
+  visibility: visible;
+  animation: planner-content-enter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.planner-diagram-content[data-phase='ready'] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.planner-diagram-loading[data-phase='loading-enter'] {
+  animation: planner-loading-enter 160ms ease-out both;
+}
+
+.planner-diagram-loading[data-phase='loading-hold'] {
+  opacity: 1;
+}
+
+.planner-diagram-loading[data-phase='loading-exit'] {
+  animation: planner-loading-exit 150ms ease-in both;
+}
+
+@keyframes planner-loading-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes planner-loading-exit {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes planner-content-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planner-diagram-content[data-phase='content-enter'],
+  .planner-diagram-loading[data-phase='loading-enter'],
+  .planner-diagram-loading[data-phase='loading-exit'] {
+    animation: none;
+  }
+
+  .planner-diagram-content[data-phase='content-enter'] {
+    opacity: 1;
+  }
+}

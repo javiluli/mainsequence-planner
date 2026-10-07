@@ -1,0 +1,171 @@
+/* Route hints precede shared I/O rules as before; equal-specificity port states must keep their precedence. */
+
+/* Route Join Preview */
+
+.base-belt-join-preview {
+  z-index: 12;
+}
+
+.base-belt-join-preview[data-flow='disabled-output'] {
+  border-color: var(--base-invalid);
+  background: var(--base-invalid-surface);
+  color: #ffc1c1;
+}
+
+/* Ports / Connections */
+
+.base-io-port {
+  z-index: 5;
+  display: flex;
+  width: var(--base-io-length);
+  height: var(--base-io-depth);
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  border: 1px solid #253744;
+  border-radius: 2px;
+  background: #83949f;
+  color: #18313b;
+}
+
+.base-machine-port-bridge {
+  z-index: 4;
+  background: var(--base-belt-core);
+  pointer-events: none;
+}
+
+.base-machine-port-bridge[data-face='north'],
+.base-machine-port-bridge[data-face='south'] {
+  width: var(--base-io-connection-size);
+  height: var(--base-machine-inset);
+}
+
+.base-machine-port-bridge[data-face='east'],
+.base-machine-port-bridge[data-face='west'] {
+  width: var(--base-machine-inset);
+  height: var(--base-io-connection-size);
+}
+
+.base-machine-port-bridge[data-face='north'] {
+  transform: translate(-50%, -100%);
+}
+
+.base-machine-port-bridge[data-face='east'] {
+  transform: translateY(-50%);
+}
+
+.base-machine-port-bridge[data-face='south'] {
+  transform: translateX(-50%);
+}
+
+.base-machine-port-bridge[data-face='west'] {
+  transform: translate(-100%, -50%);
+}
+
+.base-io-port[data-face='east'],
+.base-io-port[data-face='west'] {
+  width: var(--base-io-depth);
+  height: var(--base-io-length);
+}
+
+.base-io-port[data-flow='input'] {
+  border-color: var(--base-input-border);
+  background: var(--base-input);
+}
+
+.base-io-port[data-flow='output'] {
+  border-color: var(--base-output-border);
+  background: var(--base-output);
+}
+
+.base-io-port[data-flow='disabled-output'] {
+  border-color: var(--base-blocked-border);
+  background: var(--base-blocked);
+  color: var(--base-blocked-ink);
+}
+
+/* The approaching belt covers only the outer half of the complete port frame. */
+.base-io-port[data-connected='true']::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--base-io-connection-size);
+  height: var(--base-io-connection-size);
+  transform: translate(-50%, -50%);
+  background: var(--base-belt-core);
+  pointer-events: none;
+  content: '';
+}
+
+.base-io-port[data-connected='true'][data-face='north']::before {
+  clip-path: inset(0 0 50% 0);
+}
+
+.base-io-port[data-connected='true'][data-face='east']::before {
+  clip-path: inset(0 0 0 50%);
+}
+
+.base-io-port[data-connected='true'][data-face='south']::before {
+  clip-path: inset(50% 0 0 0);
+}
+
+.base-io-port[data-connected='true'][data-face='west']::before {
+  clip-path: inset(0 50% 0 0);
+}
+
+/* Outgoing permission remains visible even when an incoming belt is connected. */
+.base-machine-port[data-flow='input'][data-output-enabled='false']::after {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 3px;
+  height: 3px;
+  border: 1px solid var(--base-blocked-ink);
+  border-radius: 1px;
+  background: var(--base-blocked);
+  content: '';
+}
+
+.base-io-port[data-hovered='true'] {
+  outline: 1px solid rgb(var(--base-selection-rgb) / 0.6);
+  outline-offset: 0;
+}
+
+.base-machine-port--routeable[data-flow='unconnected'] {
+  border-color: #ba945d;
+}
+
+/* Splitter Ports: keep their role colors after the shared I/O defaults. */
+
+.base-splitter-port {
+  z-index: 5;
+}
+
+.base-splitter-port[data-role='input'][data-connected='false'] {
+  border-color: var(--base-input-border);
+  background: #6aaba5;
+  color: #103b3b;
+}
+
+.base-splitter-port[data-role='output'][data-connected='false'] {
+  border-color: var(--base-output-border);
+  background: #be9863;
+  color: #31261a;
+}
+
+.base-splitter-port[data-face='north'] {
+  top: 0;
+  left: 50%;
+}
+.base-splitter-port[data-face='east'] {
+  top: 50%;
+  left: 100%;
+}
+.base-splitter-port[data-face='south'] {
+  top: 100%;
+  left: 50%;
+}
+.base-splitter-port[data-face='west'] {
+  top: 50%;
+  left: 0;
+}

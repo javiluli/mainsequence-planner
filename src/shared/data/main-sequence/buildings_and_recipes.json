@@ -1,0 +1,1159 @@
+[
+  {
+    "id": "refinery",
+    "name": "Refinery",
+    "type": "production",
+    "power": 4.5,
+    "construction_cost": [
+      {
+        "id": "T_LightweightFrame1",
+        "amount": 2
+      },
+      {
+        "id": "T_MagneticCoil1",
+        "amount": 5
+      }
+    ],
+    "recipes": [
+      {
+        "id": "cobalt_plates",
+        "output": {
+          "id": "T_CobaltPlates",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_CobaltOre",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "enriched_cobalt_plates",
+        "output": {
+          "id": "T_CobaltPlates",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_EnrichedCobalt",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "enriched_nickel_plates",
+        "output": {
+          "id": "T_NickelPlates1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_EnrichedNickel",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "enriched_titanium_plates",
+        "output": {
+          "id": "T_TitaniumPlates1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_EnrichedTitanium",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "graphene",
+        "output": {
+          "id": "T_Graphene",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_Graphite",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "hydrogen_fuel",
+        "output": {
+          "id": "T_HydrogenFuel",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_WaterIce1",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "iridium_plates",
+        "output": {
+          "id": "T_IridiumPlates2",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_IridiumOre",
+            "amount_per_minute": 40
+          },
+          {
+            "id": "T_TitaniumOre",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "nickel_plates",
+        "output": {
+          "id": "T_NickelPlates1",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_NickelOre",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "reinforced_glass",
+        "output": {
+          "id": "T_ReinforcedGlass1",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_Silica",
+            "amount_per_minute": 40
+          }
+        ]
+      },
+      {
+        "id": "silicon_wafers",
+        "output": {
+          "id": "T_SiliconWafer2",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_Silica",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "titanium_plates",
+        "output": {
+          "id": "T_TitaniumPlates1",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_TitaniumOre",
+            "amount_per_minute": 20
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fabricator",
+    "name": "Assembler",
+    "type": "production",
+    "power": 6,
+    "construction_cost": [
+      {
+        "id": "T_LightweightFrame1",
+        "amount": 5
+      },
+      {
+        "id": "T_Capacitor1",
+        "amount": 3
+      }
+    ],
+    "recipes": [
+      {
+        "id": "basic_circuit",
+        "output": {
+          "id": "T_BasicCircuit",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_SiliconWafer2",
+            "amount_per_minute": 20
+          },
+          {
+            "id": "T_MagneticCoil1",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "basic_motor",
+        "output": {
+          "id": "T_BasicMotor",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_TitaniumPlates1",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "capacitor",
+        "output": {
+          "id": "T_Capacitor1",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_NickelPlates1",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_TitaniumPlates1",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "containment_coil",
+        "output": {
+          "id": "T_ContainmentCoil",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_MagneticCoil1",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_Capacitor1",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_BasicCircuit",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "detector_array",
+        "output": {
+          "id": "T_DetectorArray",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_Graphene",
+            "amount_per_minute": 20
+          },
+          {
+            "id": "T_CobaltPlates",
+            "amount_per_minute": 20
+          },
+          {
+            "id": "T_BasicCircuit",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "hull_plates",
+        "output": {
+          "id": "T_HullPlate",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_TitaniumPlates1",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "lightweight_frame",
+        "output": {
+          "id": "T_LightweightFrame1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_TitaniumPlates1",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "magnetic_coils",
+        "output": {
+          "id": "T_MagneticCoil1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_NickelPlates1",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "maglev_coupling",
+        "output": {
+          "id": "T_MaglevCoupling",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_Servomotor",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "missile",
+        "output": {
+          "id": "T_MissileItem",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_HullPlate",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_ContainmentCoil",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_Coolant",
+            "amount_per_minute": 40
+          }
+        ]
+      },
+      {
+        "id": "reinforced_plates",
+        "output": {
+          "id": "T_ReinforcedPlate",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_HullPlate",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "relic_capacitor",
+        "output": {
+          "id": "T_RelicCapacitor",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_Capacitor1",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_RelicShard",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "repair_kit",
+        "output": {
+          "id": "T_RepairKit",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_LightweightFrame1",
+            "amount_per_minute": 40
+          },
+          {
+            "id": "T_NickelPlates1",
+            "amount_per_minute": 40
+          }
+        ]
+      },
+      {
+        "id": "repair_kit_electric",
+        "output": {
+          "id": "repair_kit_electric",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_MagneticCoil1",
+            "amount_per_minute": 400
+          },
+          {
+            "id": "T_Capacitor1",
+            "amount_per_minute": 400
+          }
+        ]
+      },
+      {
+        "id": "repair_kit_hull",
+        "output": {
+          "id": "repair_kit_hull",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_HullPlate",
+            "amount_per_minute": 200
+          },
+          {
+            "id": "T_LightweightFrame1",
+            "amount_per_minute": 200
+          }
+        ]
+      },
+      {
+        "id": "servomotor",
+        "output": {
+          "id": "T_Servomotor",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_LightweightFrame1",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_BasicMotor",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "T_Capacitor1",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "superconductor_coil",
+        "output": {
+          "id": "T_SuperconductorCoil1",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_MaglevCoupling",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_ContainmentCoil",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Coolant",
+            "amount_per_minute": 60
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "enrichment",
+    "name": "Enrichment Chamber",
+    "type": "production",
+    "power": 18,
+    "construction_cost": [
+      {
+        "id": "T_ContainmentCoil",
+        "amount": 20
+      },
+      {
+        "id": "T_Servomotor",
+        "amount": 10
+      }
+    ],
+    "recipes": [
+      {
+        "id": "chromatic_alloy",
+        "output": {
+          "id": "T_ChromaticAlloy",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_IridiumPlates2",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "coolant",
+        "output": {
+          "id": "T_Coolant",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_NitrogenGas",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "enriched_cobalt_ore",
+        "output": {
+          "id": "T_EnrichedCobalt",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_CobaltOre",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "enriched_fuel",
+        "output": {
+          "id": "T_DeuteriumFuel1",
+          "amount_per_minute": 20
+        },
+        "inputs": [
+          {
+            "id": "T_HydrogenFuel",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "enriched_nickel_ore",
+        "output": {
+          "id": "T_EnrichedNickel",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_NickelOre",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "enriched_titanium_ore",
+        "output": {
+          "id": "T_EnrichedTitanium",
+          "amount_per_minute": 40
+        },
+        "inputs": [
+          {
+            "id": "T_TitaniumOre",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "nickel_synthesis",
+        "output": {
+          "id": "T_NickelOre",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_Protomatter",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "superalloy",
+        "output": {
+          "id": "T_Superalloy",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_EnrichedTitanium",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_EnrichedNickel",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_EnrichedCobalt",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "titanium_synthesis",
+        "output": {
+          "id": "T_TitaniumOre",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_Protomatter",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "warp_fuel",
+        "output": {
+          "id": "T_WarpFuel1",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_DeuteriumFuel1",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_ContainmentCoil",
+            "amount_per_minute": 5
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "growth_chamber",
+    "name": "Growth Chamber",
+    "type": "production",
+    "power": 6,
+    "recipes": [
+      {
+        "id": "alpha_protein",
+        "output": {
+          "id": "T_AlphaProtein",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_Xenoeukarya",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Enzyme",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Nutrients",
+            "amount_per_minute": 30
+          }
+        ],
+        "extra_outputs": [
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "beta_protein",
+        "output": {
+          "id": "T_BetaProtein",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_Xenoarchaea",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Enzyme",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Nutrients",
+            "amount_per_minute": 30
+          }
+        ],
+        "extra_outputs": [
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 15
+          }
+        ]
+      },
+      {
+        "id": "biolattice",
+        "output": {
+          "id": "T_Biolattice",
+          "amount_per_minute": 15
+        },
+        "inputs": [
+          {
+            "id": "T_AlphaProtein",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_BetaProtein",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_Nutrients",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "enzyme",
+        "output": {
+          "id": "T_Enzyme",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_Xenobacteria",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_Nutrients",
+            "amount_per_minute": 60
+          }
+        ],
+        "extra_outputs": [
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "nutrients",
+        "output": {
+          "id": "T_Nutrients",
+          "amount_per_minute": 120
+        },
+        "inputs": [
+          {
+            "id": "T_Graphite",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "T_Silica",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "T_WaterIce1",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "xenoarchaea_recycling",
+        "output": {
+          "id": "T_Xenoarchaea",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_Xenoarchaea",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "xenobacteria_recycling",
+        "output": {
+          "id": "T_Xenobacteria",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_Xenobacteria",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "xeno_eukarya_recycling",
+        "output": {
+          "id": "T_Xenoeukarya",
+          "amount_per_minute": 60
+        },
+        "inputs": [
+          {
+            "id": "T_Xenoeukarya",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_LeavesIcon",
+            "amount_per_minute": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "advanced_assembler",
+    "name": "Advanced Assembler",
+    "type": "production",
+    "power": 18,
+    "recipes": [
+      {
+        "id": "advanced_circuits",
+        "output": {
+          "id": "T_AdvancedCircuit",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_DetectorArray",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_BasicCircuit",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 5
+          },
+          {
+            "id": "T_Coolant",
+            "amount_per_minute": 30
+          }
+        ]
+      },
+      {
+        "id": "advanced_plates",
+        "output": {
+          "id": "T_AdvancedPlate",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_ChromaticAlloy",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_ChitinComposite",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_ReinforcedPlate",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_Multisensor",
+            "amount_per_minute": 5
+          }
+        ]
+      },
+      {
+        "id": "chitin_composite",
+        "output": {
+          "id": "T_ChitinComposite",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_Biolattice",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_Graphene",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_ReinforcedGlass1",
+            "amount_per_minute": 15
+          },
+          {
+            "id": "T_Enzyme",
+            "amount_per_minute": 60
+          }
+        ]
+      },
+      {
+        "id": "empty_simulation_matrix",
+        "output": {
+          "id": "T_EmptySimulationMatrix",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_AdvancedCircuit",
+            "amount_per_minute": 20
+          },
+          {
+            "id": "T_Lonsdaleite",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "multisensor",
+        "output": {
+          "id": "T_Multisensor",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_ChromaticAlloy",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_Lonsdaleite",
+            "amount_per_minute": 30
+          },
+          {
+            "id": "T_EncodedSimulationMatrix",
+            "amount_per_minute": 10
+          },
+          {
+            "id": "T_SuperconductorCoil1",
+            "amount_per_minute": 10
+          }
+        ]
+      },
+      {
+        "id": "servo_plates",
+        "output": {
+          "id": "T_ServoPlate",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_ReinforcedPlate",
+            "amount_per_minute": 20
+          },
+          {
+            "id": "T_MaglevCoupling",
+            "amount_per_minute": 20
+          }
+        ]
+      },
+      {
+        "id": "superalloy_frame",
+        "output": {
+          "id": "T_SuperalloyFrame",
+          "amount_per_minute": 5
+        },
+        "inputs": [
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 15
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "armoury",
+    "name": "Armoury",
+    "type": "production",
+    "recipes": [
+      {
+        "id": "backpack_mk1",
+        "output": {
+          "id": "T_Backpack_1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_HullPlate",
+            "amount_per_minute": 300
+          },
+          {
+            "id": "T_LightweightFrame1",
+            "amount_per_minute": 300
+          }
+        ]
+      },
+      {
+        "id": "backpack_mk2",
+        "output": {
+          "id": "backpack_mk2",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_ReinforcedPlate",
+            "amount_per_minute": 300
+          },
+          {
+            "id": "T_Graphene",
+            "amount_per_minute": 600
+          }
+        ]
+      },
+      {
+        "id": "backpack_mk3",
+        "output": {
+          "id": "backpack_mk3",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_SuperalloyFrame",
+            "amount_per_minute": 300
+          },
+          {
+            "id": "T_Biolattice",
+            "amount_per_minute": 300
+          }
+        ]
+      },
+      {
+        "id": "exoskeleton_mk1",
+        "output": {
+          "id": "T_Exoskeleton_1",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_Servomotor",
+            "amount_per_minute": 900
+          },
+          {
+            "id": "T_Capacitor1",
+            "amount_per_minute": 600
+          }
+        ]
+      },
+      {
+        "id": "exoskeleton_mk2",
+        "output": {
+          "id": "exoskeleton_mk2",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_MaglevCoupling",
+            "amount_per_minute": 600
+          },
+          {
+            "id": "T_Coolant",
+            "amount_per_minute": 600
+          }
+        ]
+      },
+      {
+        "id": "exoskeleton_mk3",
+        "output": {
+          "id": "exoskeleton_mk3",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_ChitinComposite",
+            "amount_per_minute": 300
+          },
+          {
+            "id": "T_ChromaticAlloy",
+            "amount_per_minute": 300
+          }
+        ]
+      },
+      {
+        "id": "exosuit",
+        "output": {
+          "id": "T_Exosuit",
+          "amount_per_minute": 30
+        },
+        "inputs": [
+          {
+            "id": "T_AdvancedPlate",
+            "amount_per_minute": 900
+          },
+          {
+            "id": "backpack_mk3",
+            "amount_per_minute": 60
+          },
+          {
+            "id": "exoskeleton_mk3",
+            "amount_per_minute": 60
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "relic_synthesizer",
+    "name": "Relic Synthesizer",
+    "type": "production",
+    "power": 54,
+    "recipes": [
+      {
+        "id": "protomatter",
+        "output": {
+          "id": "T_Protomatter",
+          "amount_per_minute": 120
+        },
+        "inputs": []
+      },
+      {
+        "id": "relic_shard_synthesis",
+        "output": {
+          "id": "T_RelicShard",
+          "amount_per_minute": 10
+        },
+        "inputs": [
+          {
+            "id": "T_Superalloy",
+            "amount_per_minute": 10
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "supercomputer",
+    "name": "Supercomputer",
+    "type": "production",
+    "power": 18,
+    "recipes": [
+      {
+        "id": "encoded_simulation_matrix",
+        "output": {
+          "id": "T_EncodedSimulationMatrix",
+          "amount_per_minute": 2
+        },
+        "inputs": [
+          {
+            "id": "T_EmptySimulationMatrix",
+            "amount_per_minute": 2
+          },
+          {
+            "id": "T_StellarSurveyData",
+            "amount_per_minute": 2
+          }
+        ]
+      }
+    ]
+  }
+]

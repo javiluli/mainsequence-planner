@@ -1,0 +1,18 @@
+node_modules/
+dist/
+public/assets/
+.agents/
+.github/agents/impeccable-*.agent.md
+.github/hooks/impeccable.json
+.github/skills/impeccable/
+skills-lock.json
+pnpm-lock.yaml
+
+# Generated graphs and vendored skill instructions retain their own formatting.
+graphify-out/
+.codex/skills/graphify/
+
+# Game-data snapshots are updated only when the user explicitly approves new source data.
+src/shared/data/*.json
+# Keep transferred research source shards unformatted for source provenance hashes.
+src/shared/data/research/*.json

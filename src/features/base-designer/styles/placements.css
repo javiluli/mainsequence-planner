@@ -1,0 +1,280 @@
+/* Machines / Products */
+
+.base-placement--machine {
+  z-index: 3;
+  color: #18222a;
+}
+
+.base-machine-shell {
+  inset: var(--base-machine-inset);
+  overflow: hidden;
+  border: 1px solid var(--base-machine-border);
+  border-radius: 4px;
+  background: var(--base-machine-surface);
+}
+
+.base-machine-item-button {
+  z-index: 5;
+  right: 7px;
+  bottom: 7px;
+  border: 1px solid #aab4bb;
+  background: #303b44;
+  color: #f2d0a0;
+}
+
+.base-machine-item-button:hover,
+.base-machine-item-button:focus-visible {
+  border-color: var(--base-accent);
+  background: #414c54;
+}
+
+.base-machine-products {
+  z-index: 2;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px;
+}
+
+.base-machine-product {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border: 1px solid rgb(216 145 42 / 0.85);
+  border-radius: 4px;
+  background: rgb(40 53 62 / 0.88);
+}
+
+.base-machine-product--primary {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--base-marker-size);
+  height: var(--base-marker-size);
+  transform: translate(-50%, -50%);
+  border: 0;
+  background: none;
+}
+
+.base-placement--compact .base-machine-product {
+  border-radius: 2px;
+}
+
+.base-machine-product--count {
+  color: #f4ce93;
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.base-placement--compact .base-machine-product:not(.base-machine-product--primary) {
+  width: 14px;
+  height: 14px;
+  flex-basis: 14px;
+}
+
+.base-machine-band {
+  top: 50%;
+  z-index: 3;
+  display: flex;
+  min-height: 12px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transform: translateY(-50%);
+  padding: 2px 0;
+  background: #c99a59;
+  color: #30291e;
+  font-size: 7px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  white-space: normal;
+}
+
+.base-placement--storage .base-machine-band {
+  top: 60%;
+  min-height: 10px;
+  background: var(--base-metal-light);
+  color: var(--base-metal-ink);
+}
+
+.base-storage-mark {
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #253744;
+}
+
+/* Belts / Tunnels / Splitters */
+
+.base-placement--logistics {
+  z-index: 2;
+  color: #14252f;
+}
+
+.base-placement--logistics svg path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.base-belt-shell {
+  stroke: var(--base-belt-shell);
+  stroke-width: var(--base-belt-shell-width);
+}
+
+.base-belt-core {
+  stroke: var(--base-belt-core);
+  stroke-width: var(--base-belt-core-width);
+}
+
+.base-placement--logistics svg .base-belt-slats {
+  stroke: var(--base-belt-slats);
+  stroke-width: 4.5;
+  stroke-linecap: butt;
+  stroke-dasharray: 9 6;
+}
+
+.base-placement--flowing .base-belt-slats {
+  animation: base-belt-flow 1s linear infinite;
+}
+
+.base-placement--selected-route .base-belt-shell {
+  stroke: var(--base-selected-belt);
+}
+
+.base-placement--buried .base-belt-core {
+  stroke-width: var(--base-buried-core-width);
+}
+
+.base-placement--selected-route.base-placement--buried .base-belt-core {
+  stroke: var(--base-selected-belt);
+}
+
+.base-placement--logistics svg .base-tunnel-mouth path {
+  fill: #293e49;
+  stroke: #7c909b;
+  stroke-width: 1;
+  stroke-linecap: butt;
+}
+
+.base-placement--logistics svg .base-tunnel-mouth .base-tunnel-lip {
+  fill: none;
+  stroke: #acbcc5;
+  stroke-width: 1.5;
+}
+
+.base-placement--buried {
+  z-index: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.base-placement--buried .base-belt-shell {
+  stroke-width: var(--base-buried-shell-width);
+}
+
+.base-placement--buried svg .base-belt-slats {
+  stroke-width: 4;
+}
+
+.base-placement--splitter {
+  z-index: 3;
+}
+
+.base-placement--splitter::after {
+  position: absolute;
+  inset: 1px;
+  border: 1px solid var(--base-machine-border);
+  border-radius: 3px;
+  background: var(--base-machine-surface);
+  content: '';
+}
+
+.base-splitter-center {
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 11px;
+  height: 11px;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  border: 1px solid #43535e;
+  border-radius: 2px;
+  background: var(--base-metal-light);
+  color: var(--base-metal-ink);
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.base-placement--selected-route.base-placement--splitter::after {
+  border-color: var(--base-selection);
+}
+
+/* Placement Preview / Selection / Invalid States */
+
+.base-placement--preview {
+  z-index: 6;
+  opacity: 0.68;
+}
+
+.base-placement--preview.base-placement--invalid {
+  opacity: 0.45;
+}
+
+.base-placement--moving {
+  opacity: 0.96;
+}
+
+.base-placement--preview.base-placement--machine .base-machine-shell {
+  box-shadow: inset 0 0 0 2px var(--base-selection);
+}
+
+.base-placement--selected-machine .base-machine-shell {
+  border-color: #c89a59;
+  box-shadow: inset 0 0 0 1px rgb(var(--base-selection-rgb) / 0.4);
+}
+
+.base-placement--invalid {
+  filter: saturate(0.8) sepia(0.8) hue-rotate(300deg);
+}
+
+.base-placement--invalid.base-placement--machine .base-machine-shell {
+  box-shadow: inset 0 0 0 2px #ef6666;
+  border-color: #ae3636;
+  background: #b33f3f;
+}
+
+.base-placement--invalid.base-placement--machine .base-machine-band {
+  background: #ed7770;
+}
+
+.base-placement--invalid .base-belt-shell {
+  stroke: #ab4343;
+}
+
+.base-placement--invalid .base-belt-core {
+  stroke: #d87070;
+}
+
+/* Route Anchors */
+
+.base-route-anchor {
+  z-index: 7;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, -50%);
+  border: 1px solid #30291e;
+  border-radius: 50%;
+  background: var(--base-selection);
+}
+
+.base-route-anchor--last {
+  box-shadow: 0 0 0 3px rgb(var(--base-selection-rgb) / 0.3);
+}

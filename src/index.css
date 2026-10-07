@@ -1,0 +1,173 @@
+@import 'tailwindcss';
+@plugin './hero.ts';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist/Geist-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/fonts/geist/GeistMono-Variable.woff2') format('woff2');
+}
+
+@theme {
+  /* Colores de dominio compartidos por Items y las conexiones del Flow. */
+  --color-item-raw: #a0a6a9;
+  --color-item-processed: #d99154;
+  --color-item-component: #74a2b2;
+  --color-item-material: #aa9dbe;
+  --color-item-ammo: #d7786d;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background: hsl(var(--heroui-primary) / 0.28);
+    color: hsl(var(--heroui-foreground));
+  }
+
+  body {
+    caret-color: hsl(var(--heroui-primary));
+  }
+
+  body,
+  #root,
+  main {
+    font-family:
+      'Geist Sans',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      sans-serif;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  }
+}
+
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--heroui-default-600) / 0.65) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: hsl(var(--heroui-default-600) / 0.65);
+    border-radius: 2px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--heroui-primary) / 0.75);
+  }
+
+  *::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+.react-flow__edge-raw .react-flow__edge-path {
+  stroke: var(--color-item-raw);
+}
+.react-flow__edge-processed .react-flow__edge-path {
+  stroke: var(--color-item-processed);
+}
+.react-flow__edge-component .react-flow__edge-path {
+  stroke: var(--color-item-component);
+}
+.react-flow__edge-material .react-flow__edge-path {
+  stroke: var(--color-item-material);
+}
+.react-flow__edge-ammo .react-flow__edge-path {
+  stroke: var(--color-item-ammo);
+}
+[data-flow-selection-surface] .react-flow {
+  --xy-selection-background-color: hsl(var(--heroui-primary) / 0.1);
+  --xy-selection-border: 1px solid hsl(var(--heroui-primary) / 0.75);
+}
+
+@layer utilities {
+  .page-enter {
+    animation: page-enter 180ms ease-out both;
+  }
+
+  .soft-enter {
+    animation: soft-enter 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  .deferred-render {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 96px;
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .page-enter,
+  .soft-enter {
+    animation: none !important;
+  }
+
+  .react-flow__edge.animated path {
+    animation: none !important;
+  }
+}
