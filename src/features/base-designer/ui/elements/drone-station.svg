@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288">
+  <!-- Reserved 14x14 deck and original drone hull; only the south doorway opens. -->
+  <g transform="translate(4 4)">
+    <rect width="280" height="280" fill="#17191a"/>
+    <!-- Match station.svg's wall planes and six-cell aperture so every rotated one-cell corridor meets the frame. -->
+    <path d="M77.5 282.5H.5Q-2.5 282.5-2.5 279.5V.5Q-2.5-2.5 .5-2.5H279.5Q282.5-2.5 282.5 .5V279.5Q282.5 282.5 279.5 282.5H202.5" fill="none" stroke="#798792" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M80 280V197q0-4 4-4h112q4 0 4 4v83" fill="#526672" stroke="#8396a0" stroke-width="2"/>
+    <path d="M86 200h108v80H86z" fill="#71848e"/>
+    <path d="M130 211v52m20-52v52" stroke="#4a5e68" stroke-width="2"/>
+    <g transform="translate(140 140) scale(1.12) translate(-140 -140)">
+      <path d="M92 54h96q4 0 8 3l50 37q4 3 4 9v74q0 6-4 9l-50 37q-4 3-8 3H92q-4 0-8-3l-50-37q-4-3-4-9v-74q0-6 4-9l50-37q4-3 8-3z" fill="#94a4ae" stroke="#526672" stroke-width="2"/>
+      <path d="M95 62h90q4 0 8 3l45 33q4 3 4 9v66q0 6-4 9l-45 33q-4 3-8 3H95q-4 0-8-3l-45-33q-4-3-4-9v-66q0-6 4-9l45-33q4-3 8-3z" fill="#b5c0c7"/>
+      <g fill="#c99a59" stroke="#956b35" stroke-width="1.5">
+        <rect x="36" y="119" width="47" height="46" rx="7"/>
+        <rect x="197" y="119" width="47" height="46" rx="7"/>
+      </g>
+      <g fill="#8797a1">
+        <rect x="41" y="124" width="37" height="36" rx="4"/>
+        <rect x="202" y="124" width="37" height="36" rx="4"/>
+      </g>
+      <path d="M125 98h30q2 0 3 3l15 35q1 2 0 4l-7 42q-.5 3-3 3h-46q-2.5 0-3-3l-7-42q-1-2 0-4l15-35q1-3 3-3z" fill="#607681" stroke="#526672" stroke-width="2"/>
+      <path d="M115 124h50q2 0 3 2l9 10q2 2 0 4l-9 10q-1 2-3 2h-50q-2 0-3-2l-9-10q-2-2 0-4l9-10q1-2 3-2z" fill="#c99a59"/>
+      <rect x="116" y="132" width="12" height="12" rx="2" fill="#526672"/>
+      <circle cx="151" cy="138" r="8" fill="#526672" stroke="#d2b77e" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

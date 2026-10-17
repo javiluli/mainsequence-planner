@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="288" height="288" viewBox="0 0 288 288">
+  <!-- Graphite floor mirrors HeroUI content1/content2; original amber details and four-pixel clearance stay intact. -->
+  <defs>
+    <pattern id="floor" x="4" y="4" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#17191a"/>
+      <rect x="3" y="3" width="14" height="14" rx="3" fill="#202324" stroke="#bc752f" stroke-opacity=".46" stroke-width=".9"/>
+    </pattern>
+  </defs>
+  <rect x="4" y="4" width="280" height="280" fill="url(#floor)"/>
+  <path d="M4.5 1.5H81.5 M206.5 1.5H283.5 M4.5 286.5H81.5 M206.5 286.5H283.5 M1.5 4.5V81.5 M1.5 206.5V283.5 M286.5 4.5V81.5 M286.5 206.5V283.5 M1.5 4.5Q1.5 1.5 4.5 1.5 M283.5 1.5Q286.5 1.5 286.5 4.5 M286.5 283.5Q286.5 286.5 283.5 286.5 M4.5 286.5Q1.5 286.5 1.5 283.5" fill="none" stroke="#798792" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Gate separators stay within the floor width; the corridor covers them without leaving wall-end stubs. -->
+  <path d="M84 1.5H204 M84 286.5H204 M1.5 84V204 M286.5 84V204" fill="none" stroke="#8197a2" stroke-width="1.5" stroke-opacity=".7"/>
+  <g fill="#9da9af" stroke="#303a40" stroke-width="1">
+    <circle cx="7" cy="7" r="2"/><circle cx="281" cy="7" r="2"/>
+    <circle cx="7" cy="281" r="2"/><circle cx="281" cy="281" r="2"/>
+  </g>
+</svg>

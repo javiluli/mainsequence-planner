@@ -1,0 +1,352 @@
+[
+  {
+    "id": "T_AdvancedCircuit",
+    "name": "Advanced Circuits",
+    "type": "component"
+  },
+  {
+    "id": "T_AdvancedPlate",
+    "name": "Advanced Plate",
+    "type": "component"
+  },
+  {
+    "id": "T_AlphaProtein",
+    "name": "Alpha Protein",
+    "type": "component"
+  },
+  {
+    "id": "T_Backpack_1",
+    "name": "Backpack Mk. 1",
+    "type": "component"
+  },
+  {
+    "id": "backpack_mk2",
+    "name": "Backpack Mk. 2",
+    "type": "component"
+  },
+  {
+    "id": "backpack_mk3",
+    "name": "Backpack Mk. 3",
+    "type": "component"
+  },
+  {
+    "id": "T_BasicCircuit",
+    "name": "Basic Circuits",
+    "type": "component"
+  },
+  {
+    "id": "T_BasicMotor",
+    "name": "Basic Motor",
+    "type": "component"
+  },
+  {
+    "id": "T_BetaProtein",
+    "name": "Beta Protein",
+    "type": "component"
+  },
+  {
+    "id": "T_Biolattice",
+    "name": "Biolattice",
+    "type": "component"
+  },
+  {
+    "id": "T_LeavesIcon",
+    "name": "Biomass",
+    "type": "component"
+  },
+  {
+    "id": "T_Capacitor1",
+    "name": "Capacitor",
+    "type": "component"
+  },
+  {
+    "id": "T_ChitinComposite",
+    "name": "Chitin Composite",
+    "type": "component"
+  },
+  {
+    "id": "T_ChromaticAlloy",
+    "name": "Chromatic Alloy",
+    "type": "processed"
+  },
+  {
+    "id": "T_CobaltOre",
+    "name": "Cobalt Ore",
+    "type": "raw"
+  },
+  {
+    "id": "T_CobaltPlates",
+    "name": "Cobalt Plates",
+    "type": "processed"
+  },
+  {
+    "id": "T_ContainmentCoil",
+    "name": "Containment Coil",
+    "type": "component"
+  },
+  {
+    "id": "T_Coolant",
+    "name": "Coolant",
+    "type": "processed"
+  },
+  {
+    "id": "T_DetectorArray",
+    "name": "Detector Array",
+    "type": "component"
+  },
+  {
+    "id": "T_EmptySimulationMatrix",
+    "name": "Empty Simulation Matrix",
+    "type": "component"
+  },
+  {
+    "id": "T_EncodedSimulationMatrix",
+    "name": "Encoded Simulation Matrix",
+    "type": "component"
+  },
+  {
+    "id": "T_EnrichedCobalt",
+    "name": "Enriched Cobalt Ore",
+    "type": "processed"
+  },
+  {
+    "id": "T_DeuteriumFuel1",
+    "name": "Deuterium Fuel",
+    "type": "processed"
+  },
+  {
+    "id": "T_EnrichedNickel",
+    "name": "Enriched Nickel Ore",
+    "type": "processed"
+  },
+  {
+    "id": "T_EnrichedTitanium",
+    "name": "Enriched Titanium Ore",
+    "type": "processed"
+  },
+  {
+    "id": "T_Enzyme",
+    "name": "Enzyme",
+    "type": "component"
+  },
+  {
+    "id": "T_Exoskeleton_1",
+    "name": "Exoskeleton Mk. 1",
+    "type": "component"
+  },
+  {
+    "id": "exoskeleton_mk2",
+    "name": "Exoskeleton Mk. 2",
+    "type": "component"
+  },
+  {
+    "id": "exoskeleton_mk3",
+    "name": "Exoskeleton Mk. 3",
+    "type": "component"
+  },
+  {
+    "id": "T_Exosuit",
+    "name": "Exosuit",
+    "type": "component"
+  },
+  {
+    "id": "T_Graphene",
+    "name": "Graphene",
+    "type": "processed"
+  },
+  {
+    "id": "T_Graphite",
+    "name": "Graphite",
+    "type": "raw"
+  },
+  {
+    "id": "T_HullPlate",
+    "name": "Hull Plate",
+    "type": "component"
+  },
+  {
+    "id": "T_HydrogenFuel",
+    "name": "Hydrogen Fuel",
+    "type": "processed"
+  },
+  {
+    "id": "T_IridiumOre",
+    "name": "Iridium Ore",
+    "type": "raw"
+  },
+  {
+    "id": "T_IridiumPlates2",
+    "name": "Iridium Plates",
+    "type": "processed"
+  },
+  {
+    "id": "T_LightweightFrame1",
+    "name": "Lightweight Frames",
+    "type": "component"
+  },
+  {
+    "id": "T_Lonsdaleite",
+    "name": "Lonsdaleite",
+    "type": "raw"
+  },
+  {
+    "id": "T_MaglevCoupling",
+    "name": "Maglev Coupling",
+    "type": "component"
+  },
+  {
+    "id": "T_MagneticCoil1",
+    "name": "Magnetic Coils",
+    "type": "component"
+  },
+  {
+    "id": "T_MissileItem",
+    "name": "Missile",
+    "type": "component"
+  },
+  {
+    "id": "T_Multisensor",
+    "name": "Multisensor",
+    "type": "component"
+  },
+  {
+    "id": "T_NickelOre",
+    "name": "Nickel Ore",
+    "type": "raw"
+  },
+  {
+    "id": "T_NickelPlates1",
+    "name": "Nickel Plates",
+    "type": "processed"
+  },
+  {
+    "id": "T_NitrogenGas",
+    "name": "Nitrogen Gas",
+    "type": "raw"
+  },
+  {
+    "id": "T_Nutrients",
+    "name": "Nutrients",
+    "type": "component"
+  },
+  {
+    "id": "T_Protomatter",
+    "name": "Protomatter",
+    "type": "component"
+  },
+  {
+    "id": "T_ReinforcedGlass1",
+    "name": "Reinforced Glass",
+    "type": "processed"
+  },
+  {
+    "id": "T_ReinforcedPlate",
+    "name": "Reinforced Plate",
+    "type": "component"
+  },
+  {
+    "id": "T_RelicCapacitor",
+    "name": "Relic Capacitor",
+    "type": "component"
+  },
+  {
+    "id": "T_RelicCore",
+    "name": "Relic Core",
+    "type": "component"
+  },
+  {
+    "id": "T_RelicShard",
+    "name": "Relic Shard",
+    "type": "component"
+  },
+  {
+    "id": "T_RepairKit",
+    "name": "Repair Kit",
+    "type": "component"
+  },
+  {
+    "id": "repair_kit_electric",
+    "name": "Electrical Repair Kit",
+    "type": "component"
+  },
+  {
+    "id": "repair_kit_hull",
+    "name": "Hull Repair Kit",
+    "type": "component"
+  },
+  {
+    "id": "T_Servomotor",
+    "name": "Servomotor",
+    "type": "component"
+  },
+  {
+    "id": "T_ServoPlate",
+    "name": "Servo Plate",
+    "type": "component"
+  },
+  {
+    "id": "T_Silica",
+    "name": "Silica",
+    "type": "raw"
+  },
+  {
+    "id": "T_SiliconWafer2",
+    "name": "Silicon Wafers",
+    "type": "processed"
+  },
+  {
+    "id": "T_StellarSurveyData",
+    "name": "Stellar Survey Data",
+    "type": "component"
+  },
+  {
+    "id": "T_Superalloy",
+    "name": "Superalloy",
+    "type": "processed"
+  },
+  {
+    "id": "T_SuperalloyFrame",
+    "name": "Superalloy Frame",
+    "type": "component"
+  },
+  {
+    "id": "T_SuperconductorCoil1",
+    "name": "Superconductor Coil",
+    "type": "component"
+  },
+  {
+    "id": "T_TitaniumOre",
+    "name": "Titanium Ore",
+    "type": "raw"
+  },
+  {
+    "id": "T_TitaniumPlates1",
+    "name": "Titanium Plates",
+    "type": "processed"
+  },
+  {
+    "id": "T_WarpFuel1",
+    "name": "Warp Fuel",
+    "type": "processed"
+  },
+  {
+    "id": "T_WaterIce1",
+    "name": "Water Ice",
+    "type": "raw"
+  },
+  {
+    "id": "T_Xenoarchaea",
+    "name": "Xenoarchaea",
+    "type": "component"
+  },
+  {
+    "id": "T_Xenobacteria",
+    "name": "Xenobacteria",
+    "type": "component"
+  },
+  {
+    "id": "T_Xenoeukarya",
+    "name": "Xenoeukarya",
+    "type": "component"
+  }
+]

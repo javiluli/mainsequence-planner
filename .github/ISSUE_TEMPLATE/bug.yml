@@ -1,0 +1,24 @@
+name: Bug report
+description: Report a problem with the website.
+title: '[Bug]: '
+labels: [bug]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What went wrong?
+      description: Explain what happened and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we reproduce it?
+      description: Include the page and the actions or settings that cause the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else? (optional)
+      description: Add screenshots or useful details, such as your browser.

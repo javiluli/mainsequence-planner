@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="128" viewBox="0 0 48 128">
+  <!-- Two by six floor cells, with open station joins and the same four-pixel clearance as station.svg. -->
+  <defs>
+    <pattern id="floor" x="4" y="4" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect width="20" height="20" fill="#17191a" />
+      <rect x="3" y="3" width="14" height="14" rx="3" fill="#202324" stroke="#bc752f" stroke-opacity=".46" stroke-width=".9" />
+    </pattern>
+  </defs>
+  <rect x="4" y="4" width="40" height="120" fill="url(#floor)" />
+  <path d="M6.5 1.5H41.5 M6.5 126.5H41.5" fill="none" stroke="#798792" stroke-width="3" stroke-linecap="round" />
+</svg>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mainsequence-planner.vercel.app/sitemap.xml
